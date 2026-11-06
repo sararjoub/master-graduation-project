@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Skills | Skills Swap Admin</title>
+
+    <link rel="stylesheet" href="../../css/shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-mange-skills.css">
+<link rel="stylesheet" href="../admin-css/admin-skill-view.css"><script src="../../js/site-preferences-init.js"></script><link rel="stylesheet" href="../../css/site-preferences.css">
+<link rel="stylesheet" href="../../css/responsive-refinements.css">
+<link rel="stylesheet" href="../../css/brand.css">
+<link rel="icon" type="image/svg+xml" href="../../assests/brand-mark.svg">
+<link rel="stylesheet" href="../../css/interface-polish.css">
+<script src="../../js/skill-access.js"></script>
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- Mobile Overlay -->
+    <div class="admin-sidebar-overlay"
+         id="adminSidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar"><button class="admin-sidebar-dismiss" type="button" data-admin-close aria-label="Close sidebar">×</button><a href="dashboard.html" class="admin-sidebar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span><span class="brand-subtitle">Admin workspace</span></span></a><nav class="admin-sidebar-nav" aria-label="Administration"><span class="admin-sidebar-label">Overview</span><a class="admin-sidebar-link" href="dashboard.html"><span class="admin-sidebar-text">Dashboard</span></a><span class="admin-sidebar-label">People & skills</span><a class="admin-sidebar-link" href="manage-users.html"><span class="admin-sidebar-text">Members</span></a><a class="admin-sidebar-link" href="manage-categories.html"><span class="admin-sidebar-text">Categories</span></a><a class="admin-sidebar-link active" href="manage-skills.html"><span class="admin-sidebar-text">Skill directory</span></a><a class="admin-sidebar-link" href="expert-applications.html"><span class="admin-sidebar-text">Expert applications</span></a><a class="admin-sidebar-link" href="manage-reviews.html"><span class="admin-sidebar-text">Reviews</span></a><span class="admin-sidebar-label">Membership</span><a class="admin-sidebar-link" href="plans.html"><span class="admin-sidebar-text">Free &amp; Plus</span></a><a class="admin-sidebar-link" href="manage-subscriptions.html"><span class="admin-sidebar-text">Subscriptions</span></a><a class="admin-sidebar-link" href="transactions.html"><span class="admin-sidebar-text">Transactions</span></a><span class="admin-sidebar-label">Analytics</span><a class="admin-sidebar-link" href="reports.html"><span class="admin-sidebar-text">Analytics</span></a></nav><div class="admin-sidebar-footer"><a class="admin-sidebar-link" href="admin-profile.html">Admin account</a><button class="admin-sidebar-logout" id="adminLogout" type="button">Log out</button></div></aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main"><button type="button" class="admin-mobile-menu" id="adminSidebarToggle" aria-label="Open sidebar" aria-controls="adminSidebar" aria-expanded="false">☰</button>
+
+        <div class="admin-content manage-skills-page">
+
+            <!-- Mobile Navigation -->
+            
+
+            <!-- Page Header -->
+            <div class="admin-page-header admin-fade-rise">
+
+                <div class="admin-page-header-left">
+                    <h1>Manage Skills</h1>
+                    <p>
+                        Add, edit, and organize all skills
+                        on the platform.
+                    </p>
+                </div>
+
+                <div class="admin-page-header-actions">
+                    <button type="button"
+                            class="admin-btn admin-btn-outline"
+                            id="exportSkillsBtn">
+                        Export CSV
+                    </button>
+
+                    <a href="add-edit-skill.html"
+                       class="admin-btn admin-btn-primary">
+                        + Add New Skill
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- STATISTICS -->
+            <div class="admin-stats-grid admin-stagger">
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-header">
+                        <div class="admin-stat-icon admin-stat-icon-primary">
+                            🎯
+                        </div>
+                    </div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value">—</div>
+                        <div class="admin-stat-label">Total Skills</div>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-header">
+                        <div class="admin-stat-icon admin-stat-icon-success">
+                            ✅
+                        </div>
+                    </div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value">—</div>
+                        <div class="admin-stat-label">Active Skills</div>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-header">
+                        <div class="admin-stat-icon admin-stat-icon-warning">
+                            ⭐
+                        </div>
+                    </div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value">—</div>
+                        <div class="admin-stat-label">Archived Skills</div>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-header">
+                        <div class="admin-stat-icon admin-stat-icon-info">
+                            📁
+                        </div>
+                    </div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value">—</div>
+                        <div class="admin-stat-label">Categories</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SKILLS DIRECTORY -->
+            <div class="admin-card admin-fade-rise-2 skills-directory-card">
+
+                <div class="admin-card-header skills-directory-heading">
+                    <div>
+                        <h3 class="admin-card-title">Skills Directory</h3>
+                        <p class="admin-card-subtitle">
+                            Browse and manage platform skills.
+                        </p>
+                    </div>
+                    <span class="skills-demo-label">Demo Data</span>
+                </div>
+               
+<!-- Search and Filters - Match Manage Users -->
+<div class="admin-card-header admin-card-header-filters skills-toolbar">
+
+    <!-- Search Left -->
+    <div class="admin-search-bar skills-search-field">
+        <span class="skills-search-icon" aria-hidden="true">⌕</span>
+
+        <input type="search"
+               class="admin-search-input"
+               id="skillsSearchInput"
+               placeholder="Search skills..."
+               aria-label="Search skills"
+               autocomplete="off">
+    </div>
+
+    <!-- Filters Right -->
+    <div class="admin-filters skills-filter-group">
+
+        <button type="button"
+                class="admin-filter-btn active"
+                data-filter="all">
+            All Skills
+        </button>
+
+        <button type="button"
+                class="admin-filter-btn"
+                data-filter="active">
+            Active
+        </button>
+
+        <button type="button"
+                class="admin-filter-btn"
+                data-filter="archived">
+            Archived
+        </button>
+
+        <button type="button"
+                class="admin-filter-btn"
+                data-filter="beginner">
+            Beginner
+        </button>
+
+        <button type="button"
+                class="admin-filter-btn"
+                data-filter="advanced">
+            Advanced
+        </button>
+
+    </div>
+
+</div>
+
+                <!-- Skills Table -->
+                <div class="admin-card-body admin-card-body-flush">
+
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table" id="skillsTable">
+
+                            <thead>
+                                <tr>
+                                    <th class="admin-checkbox-col">
+                                        <input type="checkbox"
+                                               id="selectAllSkills"
+                                               aria-label="Select all visible skills">
+                                    </th>
+                                    <th>Skill</th>
+                                    <th>Category</th>
+                                    <th>Level</th>
+                                    <th>State</th>
+                                    <th>Users</th>
+                                    <th class="admin-actions-col">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="skillsTableBody">
+                                <!-- Rendered by admin-skills.js -->
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="admin-empty-state hidden"
+                         id="skillsEmptyState"
+                         hidden>
+                        <div class="admin-empty-icon">⌕</div>
+                        <h3>No skills found</h3>
+                        <p>
+                            Try adjusting your filters or search.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Table Footer -->
+                <div class="admin-card-footer skills-table-footer">
+
+                    <div class="admin-table-info"
+                         id="skillsShowingText"
+                         aria-live="polite">
+                        Showing 0 skills
+                    </div>
+
+                    <div class="admin-pagination">
+                        <button type="button"
+                                class="admin-page-btn"
+                                id="prevSkillsPage"
+                                aria-label="Previous page">←</button>
+
+                        <span id="skillsPageInfo">Page 1 of 1</span>
+
+                        <button type="button"
+                                class="admin-page-btn"
+                                id="nextSkillsPage"
+                                aria-label="Next page">→</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- BULK ACTIONS -->
+<div class="admin-bulk-bar hidden" id="bulkActionsBar">
+
+    <div class="admin-bulk-info">
+        <strong id="selectedCount">0</strong>
+        skills selected
+    </div>
+
+    <div class="admin-bulk-actions">
+
+        <button type="button"
+                class="admin-btn admin-btn-success admin-btn-sm"
+                id="bulkActivate">
+            Activate
+        </button>
+
+        <button type="button"
+                class="admin-btn admin-btn-outline admin-btn-sm"
+                id="bulkBan">
+            Archive
+        </button>
+
+        <button type="button"
+                class="admin-btn admin-btn-danger admin-btn-sm"
+                id="bulkDelete">
+            Delete
+        </button>
+
+        <button type="button"
+                class="admin-btn admin-btn-outline admin-btn-sm"
+                id="bulkCancel">
+            Cancel
+        </button>
+
+    </div>
+</div>
+
+<script src="../admin-js/admin-shared.js"></script>
+<script src="../admin-js/admin-skills.js"></script>
+
+<script src="../admin-js/admin-workflow-links.js"></script>
+<script src="../../js/site-ar.js"></script><script src="../../js/site-preferences.js"></script>
+<script src="../../js/icon-tones.js"></script>
+<script src="../../js/interface-polish.js"></script>
+</body>
+</html>

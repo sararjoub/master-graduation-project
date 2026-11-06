@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Users | Skills Swap Admin</title>
+
+    <!-- Existing shared CSS -->
+     <link rel="stylesheet" href="../../css/shared.css">
+
+    <link rel="stylesheet" href="../admin-css/admin-shared.css">
+
+    <!-- Manage Users page CSS -->
+    <link rel="stylesheet" href="../admin-css/admin-mange-users.css">
+<script src="../../js/site-preferences-init.js"></script><link rel="stylesheet" href="../../css/site-preferences.css">
+<link rel="stylesheet" href="../../css/responsive-refinements.css">
+<link rel="stylesheet" href="../../css/brand.css">
+<link rel="icon" type="image/svg+xml" href="../../assests/brand-mark.svg">
+<link rel="stylesheet" href="../../css/interface-polish.css">
+<script src="../../js/skill-access.js"></script>
+</head>
+
+<body>
+
+ <div class="admin-layout">
+
+        <!-- ===== Sidebar Overlay (Mobile) ===== -->
+        <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
+
+       
+<!-- SIDEBAR -->
+<aside class="admin-sidebar" id="adminSidebar"><button class="admin-sidebar-dismiss" type="button" data-admin-close aria-label="Close sidebar">×</button><a href="dashboard.html" class="admin-sidebar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span><span class="brand-subtitle">Admin workspace</span></span></a><nav class="admin-sidebar-nav" aria-label="Administration"><span class="admin-sidebar-label">Overview</span><a class="admin-sidebar-link" href="dashboard.html"><span class="admin-sidebar-text">Dashboard</span></a><span class="admin-sidebar-label">People & skills</span><a class="admin-sidebar-link active" href="manage-users.html"><span class="admin-sidebar-text">Members</span></a><a class="admin-sidebar-link" href="manage-categories.html"><span class="admin-sidebar-text">Categories</span></a><a class="admin-sidebar-link" href="manage-skills.html"><span class="admin-sidebar-text">Skill directory</span></a><a class="admin-sidebar-link" href="expert-applications.html"><span class="admin-sidebar-text">Expert applications</span></a><a class="admin-sidebar-link" href="manage-reviews.html"><span class="admin-sidebar-text">Reviews</span></a><span class="admin-sidebar-label">Membership</span><a class="admin-sidebar-link" href="plans.html"><span class="admin-sidebar-text">Free &amp; Plus</span></a><a class="admin-sidebar-link" href="manage-subscriptions.html"><span class="admin-sidebar-text">Subscriptions</span></a><a class="admin-sidebar-link" href="transactions.html"><span class="admin-sidebar-text">Transactions</span></a><span class="admin-sidebar-label">Analytics</span><a class="admin-sidebar-link" href="reports.html"><span class="admin-sidebar-text">Analytics</span></a></nav><div class="admin-sidebar-footer"><a class="admin-sidebar-link" href="admin-profile.html">Admin account</a><button class="admin-sidebar-logout" id="adminLogout" type="button">Log out</button></div></aside>
+
+    <!-- MAIN -->
+    <main class="admin-main"><button type="button" class="admin-mobile-menu" id="adminSidebarToggle" aria-label="Open sidebar" aria-controls="adminSidebar" aria-expanded="false">☰</button>
+
+        
+        <!-- PAGE CONTENT -->
+        <div class="admin-content manage-users-page">
+            
+<!-- Mobile Sidebar Toggle -->
+
+
+
+            <!-- HEADER -->
+            <section class="users-page-heading">
+
+                <div>
+                    
+
+                    <h2>Platform Members</h2>
+
+                    <p>
+                        Review registered users, monitor verification,
+                        and manage account access securely.
+                    </p>
+                </div>
+
+                <button type="button"
+                        class="admin-btn admin-btn-outline"
+                        id="exportUsersBtn">
+                    Export CSV
+                </button>
+
+            </section>
+
+            <!-- STATISTICS -->
+            <section class="users-stats-grid">
+
+                <div class="users-stat-card">
+                    <span class="users-stat-icon purple">👥</span>
+                    <div>
+                        <span class="users-stat-label">
+                            Total Users
+                        </span>
+                        <strong id="statTotal">—</strong>
+                    </div>
+                </div>
+
+                <div class="users-stat-card">
+                    <span class="users-stat-icon green">✓</span>
+                    <div>
+                        <span class="users-stat-label">
+                            Verified Emails
+                        </span>
+                        <strong id="statVerified">—</strong>
+                    </div>
+                </div>
+
+                <div class="users-stat-card">
+                    <span class="users-stat-icon red">⊘</span>
+                    <div>
+                        <span class="users-stat-label">
+                            Suspended Accounts
+                        </span>
+                        <strong id="statSuspended">—</strong>
+                    </div>
+                </div>
+
+                <div class="users-stat-card">
+                    <span class="users-stat-icon gold">★</span>
+                    <div>
+                        <span class="users-stat-label">
+                            Verified Experts
+                        </span>
+                        <strong id="statExperts">—</strong>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- USERS DIRECTORY -->
+            <section class="users-directory">
+
+                <div class="users-directory-heading">
+
+                    <div>
+                        <h3>Users Directory</h3>
+                        <p>
+                            View and manage registered platform members.
+                        </p>
+                    </div>
+
+                    <span class="users-demo-label">
+                        Demo Data
+                    </span>
+
+                </div>
+
+                <!-- SEARCH AND FILTER -->
+                <div class="users-toolbar">
+
+                    <div class="users-search-field">
+                        <span aria-hidden="true">⌕</span>
+
+                        <input type="search"
+                               id="usersSearchInput"
+                               placeholder="Search by name or email..."
+                               aria-label="Search users">
+                    </div>
+
+                    <div class="users-filter-group">
+
+                        <button type="button"
+                                class="users-filter active"
+                                data-filter="all">
+                            All Users
+                        </button>
+
+                        <button type="button"
+                                class="users-filter"
+                                data-filter="active">
+                            Active
+                        </button>
+
+                        <button type="button"
+                                class="users-filter"
+                                data-filter="suspended">
+                            Suspended
+                        </button>
+
+                        <button type="button"
+                                class="users-filter"
+                                data-filter="unverified">
+                            Unverified
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- TABLE -->
+                <div class="users-table-scroll">
+
+                    <table class="users-table" id="usersTable">
+
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Email Verification</th>
+                                <th>Account Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="usersTableBody">
+                            <!-- JavaScript will render users -->
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- EMPTY STATE -->
+                <div class="users-empty-state"
+                     id="usersEmptyState"
+                     hidden>
+
+                    <div>⌕</div>
+
+                    <h3>No users found</h3>
+
+                    <p>
+                        Try adjusting your search or filters.
+                    </p>
+
+                </div>
+
+                <!-- PAGINATION -->
+                <div class="users-table-footer">
+
+                    <span id="usersShowingText">
+                        Showing 0 users
+                    </span>
+
+                    <div class="users-pagination">
+
+                        <button type="button"
+                                id="prevUsersPage"
+                                aria-label="Previous page">
+                            ←
+                        </button>
+
+                        <span id="usersPageInfo">
+                            Page 1 of 1
+                        </span>
+
+                        <button type="button"
+                                id="nextUsersPage"
+                                aria-label="Next page">
+                            →
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- USER DETAILS MODAL -->
+<div class="users-modal-overlay"
+     id="userDetailsModal"
+     hidden>
+
+    <div class="users-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="userDetailsTitle">
+
+        <div class="users-modal-header">
+
+            <h2 id="userDetailsTitle">User Details</h2>
+
+            <button type="button"
+                    id="closeUserDetails"
+                    aria-label="Close user details">
+                ×
+            </button>
+
+        </div>
+
+        <div id="userDetailsContent"></div>
+
+        <div class="users-modal-actions">
+            <button type="button"
+                    class="admin-btn admin-btn-outline"
+                    id="doneUserDetails">
+                Close
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SUSPEND ACCOUNT MODAL -->
+<div class="users-modal-overlay"
+     id="suspendUserModal"
+     hidden>
+
+    <div class="users-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="suspendModalTitle">
+
+        <div class="users-modal-header">
+
+            <h2 id="suspendModalTitle">
+                Suspend Account
+            </h2>
+
+            <button type="button"
+                    id="closeSuspendModal"
+                    aria-label="Close suspension dialog">
+                ×
+            </button>
+
+        </div>
+
+        <p>
+            Suspending this account will prevent the user
+            from signing in while the suspension is active.
+        </p>
+
+        <label for="suspensionReason"
+               class="users-field-label">
+            Reason for suspension
+        </label>
+
+        <textarea id="suspensionReason"
+                  class="users-reason-input"
+                  rows="4"
+                  maxlength="500"
+                  placeholder="Explain why this account is being suspended..."
+                  required></textarea>
+
+        <p class="users-field-error"
+           id="suspensionReasonError"
+           hidden>
+            Please provide a reason for suspension.
+        </p>
+
+        <div class="users-modal-actions">
+
+            <button type="button"
+                    class="admin-btn admin-btn-outline"
+                    id="cancelSuspend">
+                Cancel
+            </button>
+
+            <button type="button"
+                    class="admin-btn admin-btn-danger"
+                    id="confirmSuspend">
+                Suspend Account
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- REACTIVATE ACCOUNT MODAL -->
+<div class="users-modal-overlay"
+     id="reactivateUserModal"
+     hidden>
+
+    <div class="users-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="reactivateModalTitle">
+
+        <div class="users-modal-header">
+
+            <h2 id="reactivateModalTitle">
+                Reactivate Account
+            </h2>
+
+            <button type="button"
+                    id="closeReactivateModal"
+                    aria-label="Close reactivation dialog">
+                ×
+            </button>
+
+        </div>
+
+        <p>
+            Are you sure you want to reactivate
+            <strong id="reactivateUserName"></strong>?
+        </p>
+
+        <div class="users-modal-actions">
+
+            <button type="button"
+                    class="admin-btn admin-btn-outline"
+                    id="cancelReactivate">
+                Cancel
+            </button>
+
+            <button type="button"
+                    class="admin-btn admin-btn-primary"
+                    id="confirmReactivate">
+                Reactivate Account
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SHARED JAVASCRIPT -->
+<script src="../admin-js/admin-shared.js"></script>
+
+<!-- PAGE JAVASCRIPT -->
+<script src="../admin-js/admin-users.js"></script>
+
+<script src="../admin-js/admin-workflow-links.js"></script>
+<script src="../../js/site-ar.js"></script><script src="../../js/site-preferences.js"></script>
+<script src="../../js/icon-tones.js"></script>
+<script src="../../js/interface-polish.js"></script>
+</body>
+</html>

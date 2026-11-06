@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Category - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/category-overview.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+</head><body class="wf-page"><nav class="navbar navbar-authed">
+    <div class="navbar-container">
+        
+        <!-- الشعار -->
+        <a href="home.html" class="navbar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+
+        <!-- روابط التنقل -->
+        <div class="navbar-links">
+            <a href="home.html" class="navbar-link">Home</a>
+            <a href="technology-category.html" class="navbar-link active">Categories</a>
+            <a href="career-path.html" class="navbar-link">Career Path</a>
+            <a href="skill-partners.html" class="navbar-link">Find Partners</a>
+        </div>
+
+        <!-- الإجراءات: إشعارات + رسائل + Avatar -->
+        <div class="navbar-actions">
+            
+            <!-- أيقونة الإشعارات -->
+            
+
+            <!-- أيقونة الرسائل -->
+            <button class="navbar-icon-btn" id="messagesBtn" title="Messages">
+                💬
+                <span class="notification-badge">2</span>
+            </button>
+
+            <!-- Avatar مع Dropdown -->
+            <div class="navbar-user" id="userMenu">
+                <button class="navbar-avatar" id="avatarBtn">
+                    <span>AH</span>
+                </button>
+                
+                <!-- القائمة المنسدلة -->
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="avatar avatar-md">
+                            <span>AH</span>
+                        </div>
+                        <div>
+                            <strong>Ahmad Hassan</strong>
+                            <span>ahmad@example.com</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown-divider"></div>
+                    
+                    <a href="profile.html" class="dropdown-item">
+                        <span class="dropdown-icon">👤</span>
+                        My Profile
+                    </a>
+                    <a href="dashboard.html" class="dropdown-item">
+                        <span class="dropdown-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="my-skills.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎯</span>
+                        My Skills
+                    </a>
+                    <a href="swap-requests.html" class="dropdown-item">
+                        <span class="dropdown-icon">🔄</span>
+                        Swap Requests
+                    </a>
+                    
+                    
+                    <div class="dropdown-divider"></div>
+                    
+                    <button class="dropdown-item dropdown-logout" id="logoutBtn">
+                        <span class="dropdown-icon">🚪</span>
+                        Logout
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</nav><main class="wf-section"><div class="wf-container"><div class="wf-header"><h1 id="category-title">Explore this category</h1><p>Select a subcategory to discover its skills.</p></div><div id="category-list" class="categories-grid"></div><p><a href="categories.html" class="btn btn-outline">← All categories</a></p></div></main><footer>
+    <div class="footer-container">
+
+        <!-- Brand + Logo -->
+        <div class="footer-brand">
+            <a href="home.html" class="footer-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <p>Learn · Share · Grow Together</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="skill-partners.html">Find Partners</a></li>
+                <li><a href="career-path.html">Career Path</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore -->
+        <div class="footer-links">
+            <h4>Explore</h4>
+            <ul>
+                <li><a href="home.html#work">How It Works</a></li>
+                <li><a href="home.html#about">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </div>
+
+        <!-- Support + Social -->
+        <div class="footer-links">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="help.html">Help Center</a></li>
+                <li><a href="help.html">Contact</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+            </ul>
+
+            <div class="footer-social" style="margin-top: 20px;">
+                <a href="#" title="Facebook">f</a>
+                <a href="#" title="X (Twitter)">X</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="Instagram">📷</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 Skills Swap. All rights reserved.</p>
+    </div>
+</footer><script src="js/animations.js"></script><script src="js/category-overview.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
+</body></html>

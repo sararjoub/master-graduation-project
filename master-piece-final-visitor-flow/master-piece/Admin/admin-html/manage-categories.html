@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Categories - Skills Swap Admin</title>
+
+    <link rel="stylesheet" href="../../css/shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-categories.css">
+<script src="../../js/site-preferences-init.js"></script><link rel="stylesheet" href="../../css/site-preferences.css">
+<link rel="stylesheet" href="../../css/responsive-refinements.css">
+<link rel="stylesheet" href="../../css/brand.css">
+<link rel="icon" type="image/svg+xml" href="../../assests/brand-mark.svg">
+<link rel="stylesheet" href="../../css/interface-polish.css">
+<script src="../../js/skill-access.js"></script>
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="admin-sidebar-overlay"
+         id="adminSidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar"><button class="admin-sidebar-dismiss" type="button" data-admin-close aria-label="Close sidebar">×</button><a href="dashboard.html" class="admin-sidebar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span><span class="brand-subtitle">Admin workspace</span></span></a><nav class="admin-sidebar-nav" aria-label="Administration"><span class="admin-sidebar-label">Overview</span><a class="admin-sidebar-link" href="dashboard.html"><span class="admin-sidebar-text">Dashboard</span></a><span class="admin-sidebar-label">People & skills</span><a class="admin-sidebar-link" href="manage-users.html"><span class="admin-sidebar-text">Members</span></a><a class="admin-sidebar-link active" href="manage-categories.html"><span class="admin-sidebar-text">Categories</span></a><a class="admin-sidebar-link" href="manage-skills.html"><span class="admin-sidebar-text">Skill directory</span></a><a class="admin-sidebar-link" href="expert-applications.html"><span class="admin-sidebar-text">Expert applications</span></a><a class="admin-sidebar-link" href="manage-reviews.html"><span class="admin-sidebar-text">Reviews</span></a><span class="admin-sidebar-label">Membership</span><a class="admin-sidebar-link" href="plans.html"><span class="admin-sidebar-text">Free &amp; Plus</span></a><a class="admin-sidebar-link" href="manage-subscriptions.html"><span class="admin-sidebar-text">Subscriptions</span></a><a class="admin-sidebar-link" href="transactions.html"><span class="admin-sidebar-text">Transactions</span></a><span class="admin-sidebar-label">Analytics</span><a class="admin-sidebar-link" href="reports.html"><span class="admin-sidebar-text">Analytics</span></a></nav><div class="admin-sidebar-footer"><a class="admin-sidebar-link" href="admin-profile.html">Admin account</a><button class="admin-sidebar-logout" id="adminLogout" type="button">Log out</button></div></aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main"><button type="button" class="admin-mobile-menu" id="adminSidebarToggle" aria-label="Open sidebar" aria-controls="adminSidebar" aria-expanded="false">☰</button>
+
+        <div class="admin-content manage-categories-page">
+
+            <!-- Mobile Toolbar -->
+            
+
+            <!-- Page Header -->
+            <div class="admin-page-header admin-fade-rise">
+
+                <div class="admin-page-header-left">
+                    <h1>Manage Categories</h1>
+                    <p>
+                        Organize skills into categories
+                        for easy discovery.
+                    </p>
+                </div>
+
+                <div class="admin-page-header-actions">
+                    <button type="button"
+                            class="admin-btn admin-btn-primary"
+                            id="addCategoryBtn">
+                        + Add New Category
+                    </button>
+                </div>
+
+            </div>
+
+            
+
+            <!-- Categories rendered by JavaScript -->
+            <div class="categories-grid admin-stagger"
+                 id="categoriesGrid"
+                 aria-live="polite">
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- ==========================================
+     CATEGORY CREATE / EDIT MODAL
+========================================== -->
+<div class="modal-overlay hidden"
+     id="categoryModal"
+     role="presentation">
+
+    <div class="modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="categoryModalTitle">
+
+        <div class="modal-header">
+            <h2 id="categoryModalTitle">Add Category</h2>
+
+            <button type="button"
+                    class="modal-close"
+                    data-close-modal
+                    aria-label="Close">
+                ✕
+            </button>
+        </div>
+
+        <form id="categoryForm">
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label class="form-label" for="categoryName">
+                        Category Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input type="text"
+                           class="form-input"
+                           id="categoryName"
+                           maxlength="60"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="categoryIcon">
+                        Icon (Emoji)
+                    </label>
+
+                    <input type="text"
+                           class="form-input"
+                           id="categoryIcon"
+                           maxlength="12"
+                           placeholder="📷">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"
+                           for="categoryDescription">
+                        Description
+                    </label>
+
+                    <textarea class="form-textarea"
+                              id="categoryDescription"
+                              maxlength="240"
+                              rows="3"></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="admin-btn admin-btn-outline"
+                        data-close-modal>
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="admin-btn admin-btn-primary"
+                        id="saveCategoryBtn">
+                    Save Category
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================
+     CATEGORY DETAILS MODAL
+========================================== -->
+<div class="modal-overlay hidden"
+     id="detailsModal"
+     role="presentation">
+
+    <div class="modal modal-wide"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="detailsTitle">
+
+        <div class="modal-header">
+            <h2 id="detailsTitle">Category Details</h2>
+
+            <button type="button"
+                    class="modal-close"
+                    data-close-modal
+                    aria-label="Close">
+                ✕
+            </button>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="category-details-intro">
+
+                <span id="detailsIcon"
+                      class="details-icon"></span>
+
+                <div>
+                    <h3 id="detailsName"></h3>
+                    <p id="detailsDescription"></p>
+
+                    <span class="admin-badge admin-badge-success">
+                        Active
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="subcategories-heading">
+
+                <div>
+                    <h3>Subcategories</h3>
+                    <p>
+                        Manage the groups inside this category.
+                    </p>
+                </div>
+
+                <button type="button"
+                        class="admin-btn admin-btn-primary"
+                        id="addSubcategoryBtn">
+                    + Add Subcategory
+                </button>
+
+            </div>
+
+            <div id="subcategoriesList"
+                 class="subcategories-list">
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="button"
+                    class="admin-btn admin-btn-outline"
+                    data-close-modal>
+                Close
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ==========================================
+     SUBCATEGORY CREATE / EDIT MODAL
+========================================== -->
+<div class="modal-overlay hidden"
+     id="subcategoryModal"
+     role="presentation">
+
+    <div class="modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="subcategoryModalTitle">
+
+        <div class="modal-header">
+            <h2 id="subcategoryModalTitle">
+                Add Subcategory
+            </h2>
+
+            <button type="button"
+                    class="modal-close"
+                    data-close-modal
+                    aria-label="Close">
+                ✕
+            </button>
+        </div>
+
+        <form id="subcategoryForm">
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label class="form-label"
+                           for="subcategoryParent">
+                        Main Category
+                    </label>
+
+                    <input type="text"
+                           class="form-input"
+                           id="subcategoryParent"
+                           readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"
+                           for="subcategoryName">
+                        Subcategory Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input type="text"
+                           class="form-input"
+                           id="subcategoryName"
+                           maxlength="60"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"
+                           for="subcategoryDescription">
+                        Description
+                    </label>
+
+                    <textarea class="form-textarea"
+                              id="subcategoryDescription"
+                              maxlength="240"
+                              rows="3"></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="admin-btn admin-btn-outline"
+                        data-close-modal>
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="admin-btn admin-btn-primary">
+                    Save Subcategory
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script src="../admin-js/admin-shared.js"></script>
+<script src="../admin-js/admin-categories.js"></script>
+
+<script src="../admin-js/admin-workflow-links.js"></script>
+<script src="../../js/site-ar.js"></script><script src="../../js/site-preferences.js"></script>
+<script src="../../js/icon-tones.js"></script>
+<script src="../../js/interface-polish.js"></script>
+</body>
+</html>

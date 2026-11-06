@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Profile - Skills Swap</title>
+
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/profile-setup.css">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+</head>
+<body>
+
+    <!--  Header (Logo)  -->
+    <header class="setup-header">
+        <a href="home.html" class="navbar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+        
+    </header>
+
+    <!--  Main Section  -->
+    <section class="setup-section">
+        <div class="setup-container">
+            
+            <!-- Progress Steps -->
+            <div class="setup-progress">
+                <div class="progress-step active" data-step="1">
+                    <div class="progress-circle">1</div>
+                    <span class="progress-label">Personal Info</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="2">
+                    <div class="progress-circle">2</div>
+                    <span class="progress-label">Teach Skills</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="3">
+                    <div class="progress-circle">3</div>
+                    <span class="progress-label">Learn Skills</span>
+                </div>
+            </div>
+
+            <!-- Setup Card -->
+            <div class="setup-card">
+                
+                <!--  STEP 1: Personal Info  -->
+                <div class="setup-step active" id="step-1">
+                    <div class="step-header">
+                        <span class="step-tag">STEP 1 OF 3</span>
+                        <h1>Complete Your Profile</h1>
+                        <p>Let others know who you are.</p>
+                    </div>
+
+                    <form class="setup-form" id="step1Form">
+                      <!-- Avatar Upload -->
+                 <div class="avatar-upload-wrapper">
+                  <div class="avatar-preview" id="avatarPreview">
+                            <span class="avatar-icon">👤</span>
+                       </div>
+    
+                <!-- حقل إخفاء لرفع الصورة -->
+                   <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+    
+           <!-- الزر الذي يفتح مستكشف الملفات -->
+                <button type="button" class="btn btn-outline btn-sm" id="uploadBtn">
+                    Upload Photo
+                </button>
+                </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-input" value="Ahmad Hassan" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-input" placeholder="e.g. Amman, Jordan">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-textarea" rows="4" placeholder="Tell others about yourself, your interests, and what you're passionate about..."></textarea>
+                        </div>
+
+                        <div class="step-actions">
+                            <button type="button" class="btn btn-primary btn-large" onclick="goToStep(2)">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+        
+             <!--  STEP 2: Teach Skills -->
+<div class="setup-step" id="step-2">
+    <div class="step-header">
+        <span class="step-tag">STEP 2 OF 3</span>
+        <h1>What Can You Teach?</h1>
+        <p>Optional: choose skills you can teach, or continue without selecting any.</p>
+    </div>
+
+    <div class="skills-selector">
+        <!-- Smart Search Dropdown -->
+        <div class="search-skill-wrapper">
+            <input 
+                type="text" 
+                class="form-input" 
+                id="teachSkillSearch" 
+                placeholder="🔍 Search for a skill (e.g. Web Development)..."
+                autocomplete="off"
+            >
+            <div class="search-results hidden" id="teachSearchResults"></div>
+        </div>
+
+        <!-- Selected Skills -->
+        <div class="selected-skills" id="selectedTeachSkills">
+            <!-- المهارات المختارة ستظهر هنا -->
+        </div>
+    </div>
+
+    <div class="step-actions">
+        <button type="button" class="btn btn-outline btn-large" onclick="goToStep(1)">← Back</button>
+        <button type="button" class="btn btn-outline btn-large" onclick="goToStep(3)">Skip teaching for now →</button>
+        <button type="button" class="btn btn-primary btn-large" onclick="goToStep(3)">Next Step →</button>
+    </div>
+</div>
+
+<!-- STEP 3: Learn Skills -->
+<div class="setup-step" id="step-3">
+    <div class="step-header">
+        <span class="step-tag">STEP 3 OF 3</span>
+        <h1>What Do You Want to Learn?</h1>
+        <p>Search and select the skills you are interested in learning.</p>
+    </div>
+
+    <div class="skills-selector">
+        <!-- Smart Search Dropdown -->
+        <div class="search-skill-wrapper">
+            <input 
+                type="text" 
+                class="form-input" 
+                id="learnSkillSearch" 
+                placeholder="🔍 Search for a skill (e.g. Python)..."
+                autocomplete="off"
+            >
+            <div class="search-results hidden" id="learnSearchResults"></div>
+        </div>
+
+        <!-- Selected Skills -->
+        <div class="selected-skills" id="selectedLearnSkills">
+            <!-- المهارات المختارة ستظهر هنا -->
+        </div>
+    </div>
+
+    <div class="step-actions">
+        <button type="button" class="btn btn-outline btn-large" onclick="goToStep(2)">← Back</button>
+        <button type="button" class="btn btn-primary btn-large" onclick="finishSetup(this)">Finish Setup ✓</button>
+    </div>
+</div>
+    </section>
+
+    <script src="js/profile-setup.js"></script>
+<footer>
+    <div class="footer-container">
+
+        <!-- Brand + Logo -->
+        <div class="footer-brand">
+            <a href="home.html" class="footer-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <p>Learn · Share · Grow Together</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="skill-partners.html">Find Partners</a></li>
+                <li><a href="career-path.html">Career Path</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore -->
+        <div class="footer-links">
+            <h4>Explore</h4>
+            <ul>
+                <li><a href="home.html#work">How It Works</a></li>
+                <li><a href="home.html#about">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </div>
+
+        <!-- Support + Social -->
+        <div class="footer-links">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="help.html">Help Center</a></li>
+                <li><a href="help.html">Contact</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+            </ul>
+
+            <div class="footer-social" style="margin-top: 20px;">
+                <a href="#" title="Facebook">f</a>
+                <a href="#" title="X (Twitter)">X</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="Instagram">📷</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 Skills Swap. All rights reserved.</p>
+    </div>
+</footer>
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+/*  scroll revel animations  */
+
+document.addEventListener('DOMContentLoaded', () => {
+    let observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    let observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    let revealElements = document.querySelectorAll('.reveal');
+    revealElements.forEach(el => observer.observe(el));
+});
+
+/* NAVBAR AUTHED - User Menu  */
+
+document.addEventListener('DOMContentLoaded', () => {
+    let avatarBtn = document.getElementById('avatarBtn');
+    let userDropdown = document.getElementById('userDropdown');
+    let userMenu = document.getElementById('userMenu');
+
+    // فتح/إغلاق القائمة المنسدلة
+    if (avatarBtn && userDropdown) {
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('open');
+        });
+
+        // إغلاق القائمة عند النقر خارجها
+        document.addEventListener('click', (e) => {
+            if (userMenu && !userMenu.contains(e.target)) {
+                userDropdown.classList.remove('open');
+            }
+        });
+
+        // إغلاق القائمة عند الضغط على Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                userDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    // زر تسجيل الخروج
+    let logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                // ✅ لاحقاً: سيتم مسح الجلسة
+                showNotification('Logging out...', 'info');
+                setTimeout(() => {
+                    window.SitePrefs.navigate('login.html');
+                }, 1000);
+            }
+        });
+    }
+
+    // أيقونة الرسائل
+    let messagesBtn = document.getElementById('messagesBtn');
+    if (messagesBtn) {
+        messagesBtn.addEventListener('click', () => {
+            showNotification('Opening messages...', 'info');
+            setTimeout(() => {
+                window.SitePrefs.navigate('chat.html');
+            }, 800);
+        });
+    }
+
+    // دالة التنبيهات (إذا لم تكن معرّفة في مكان آخر)
+    function showNotification(message, type = 'info') {
+        let oldNotification = document.querySelector('.notification');
+        if (oldNotification) oldNotification.remove();
+
+        let notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span class="notification-icon">
+                ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
+            </span>
+            <span class="notification-message">${message}</span>
+        `;
+
+        document.body.appendChild(notification);
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 2000);
+    }
+});
+
+

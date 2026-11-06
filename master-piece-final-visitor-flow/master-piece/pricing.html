@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Free &amp; Plus - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/pricing.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+</head><body><nav class="navbar navbar-authed">
+        <div class="navbar-container">
+            <a href="home.html" class="navbar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <div class="navbar-links">
+                <a href="dashboard.html" class="navbar-link">Dashboard</a>
+                <a href="categories.html" class="navbar-link">Categories</a>
+                <a href="career-path.html" class="navbar-link">Career Path</a>
+                <a href="skill-partners.html" class="navbar-link">Find Partners</a>
+            </div>
+            <div class="navbar-actions">
+                
+                <button class="navbar-icon-btn" id="messagesBtn" title="Messages">
+                    💬
+                    <span class="notification-badge">2</span>
+                </button>
+                <div class="navbar-user" id="userMenu">
+                    <button class="navbar-avatar" id="avatarBtn"><span>AH</span></button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <div class="avatar avatar-md"><span>AH</span></div>
+                            <div>
+                                <strong>Ahmad Hassan</strong>
+                                <span>ahmad@example.com</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="profile.html" class="dropdown-item"><span class="dropdown-icon">👤</span> My Profile</a>
+                        <a href="dashboard.html" class="dropdown-item"><span class="dropdown-icon">📊</span> Dashboard</a>
+                        <a href="my-skills.html" class="dropdown-item"><span class="dropdown-icon">🎯</span> My Skills</a>
+                        <a href="swap-requests.html" class="dropdown-item"><span class="dropdown-icon">🔄</span> Swap Requests</a>
+                        <a href="pricing.html" class="dropdown-item dropdown-premium-item">
+                            <span class="dropdown-icon">⭐</span> Upgrade to Plus
+                        </a>
+                        
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item dropdown-logout" id="logoutBtn"><span class="dropdown-icon">🚪</span> Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+<main class="pricing-page"><div class="container">
+<header class="pricing-heading"><span class="pricing-eyebrow">LEARN TOGETHER. CHOOSE YOUR SUPPORT.</span><h1>Good connections.<br><span>A little extra guidance.</span></h1><p>Start with Basic skills for free. Choose Plus for Advanced skill exchanges and approved expert booking.</p><div class="pricing-toggle" role="group" aria-label="Billing period"><button type="button" class="billing-btn active" data-billing="monthly" aria-pressed="true">Monthly</button><button type="button" class="billing-btn" data-billing="yearly" aria-pressed="false">Yearly <span>Save $24 / year</span></button></div></header>
+<div class="pricing-grid">
+<article class="pricing-plan"><div class="plan-label"><span class="plan-symbol">↔</span><span>YOUR COMMUNITY STARTS HERE</span></div><h2>Free</h2><p class="plan-description">Find your people. Learn something new.</p><div class="plan-amount">$0<span>/ forever</span></div><p class="billing-explanation">No subscription required.</p><a class="btn btn-outline plan-cta" href="categories.html">Explore skills →</a><div class="plan-divider"></div><h3>A good place to begin</h3><ul class="plan-benefits"><li>Discover Basic skills and community partners</li><li>Exchange Basic skills or learn from volunteers</li><li>Chat after your request is accepted</li><li>Arrange community learning sessions</li><li>Get a suggested order for your learning</li></ul><p class="plan-footnote">Teaching is optional. Reciprocal partners can ask for a skill in return.</p></article>
+<article class="pricing-plan plus-plan"><span class="plus-ribbon">FOR FOCUSED EXPERT SUPPORT</span><div class="plan-label"><span class="plan-symbol">✧</span><span>GO A LITTLE FURTHER</span></div><h2>Plus</h2><p class="plan-description">Advanced skill exchanges, with expert time when you need it.</p><div class="plan-amount">$<span id="plus-price" class="price-number">9</span><span>/ month</span></div><p class="billing-explanation" id="billing-explanation">$9 billed monthly.</p><button type="button" class="btn btn-primary plan-cta" id="choose-plus">Choose Plus →</button><div class="plan-divider"></div><h3>Everything in Free, plus</h3><ul class="plan-benefits"><li>View and exchange Advanced skills</li><li>Book skill-specific, approved experts</li><li><strong>1 expert-session credit each month</strong></li><li>30 minutes of focused support per credit</li><li>Chat linked to your confirmed expert booking</li><li>Clear booking and cancellation history</li></ul><p class="plan-footnote">A limited allowance, never unlimited sessions. Unused monthly credits do not roll over under the draft policy.</p></article></div>
+<p class="pricing-policy">Proposed pricing in USD. No payment is collected in this preview. Final pricing, taxes, and policies will be confirmed before launch.</p>
+<section class="comparison-section"><div class="pricing-section-head"><span class="pricing-eyebrow">THE DETAILS, SIDE BY SIDE</span><h2>Know what you are choosing.</h2><p>Basic skills are free. Advanced skill details and exchanges require Plus. Expert booking also requires Plus.</p></div><div class="comparison-wrap"><table><caption class="sr-only">Free and Plus feature comparison</caption><thead><tr><th scope="col">What is included</th><th scope="col">Free</th><th scope="col">Plus</th></tr></thead><tbody><tr><th scope="row">Browse Basic skills and partners</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Exchange Basic skills or learn from volunteers</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Chat after an accepted request</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Arrange community learning sessions</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Goal-based skill recommendations</th><td>Included</td><td>Included</td></tr><tr><th scope="row">View and exchange Advanced skills</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">Book approved experts</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">Monthly expert-session allowance</th><td>—</td><td>1 × 30 minutes</td></tr><tr><th scope="row">Community learning history</th><td>Included</td><td>Included</td></tr></tbody></table></div></section>
+<section class="pricing-faq" aria-labelledby="faq-title"><div class="pricing-section-head"><span class="pricing-eyebrow">A FEW THINGS YOU MIGHT BE WONDERING</span><h2 id="faq-title">Good questions. Clear answers.</h2><p>How the community, experts, and subscriptions fit together.</p></div><div class="faq-list"><details class="faq-item"><summary>Do I need to teach a skill to join?<span aria-hidden="true">+</span></summary><p>No. You can join just to learn. Choose a volunteer teacher, or use Plus to book an approved expert. A reciprocal exchange partner may ask for a skill in return.</p></details><details class="faq-item"><summary>What is the difference between a partner and an expert?<span aria-hidden="true">+</span></summary><p>Community partners offer reciprocal exchanges or voluntary teaching. Experts have skill-specific approval after a human reviews their teaching evidence.</p></details><details class="faq-item"><summary>What exactly does Plus include?<span aria-hidden="true">+</span></summary><p>Plus unlocks Advanced skill details and exchanges, and expert booking with a proposed allowance of one 30-minute expert-session credit per subscription month. Basic learning and recommendations remain available on Free.</p></details><details class="faq-item"><summary>Are there courses or recorded lessons?<span aria-hidden="true">+</span></summary><p>No. Skills Swap connects people. Learning happens through agreed conversations and sessions, not a library of courses.</p></details><details class="faq-item"><summary>How does the learning guide work?<span aria-hidden="true">+</span></summary><p>Choose your goal, current level, and skills you know. The guide suggests an order from approved skill sequences. You decide what to learn and whom to contact. It does not certify your level or book a session for you.</p></details><details class="faq-item"><summary>Does the annual plan include unlimited expert sessions?<span aria-hidden="true">+</span></summary><p>No. The proposed annual price covers 12 months, with one expert credit released per service month. Credits do not roll over under the draft policy.</p></details><details class="faq-item"><summary>Can I cancel or change a session?<span aria-hidden="true">+</span></summary><p>The proposed early-cancellation window is 24 hours. An eligible early cancellation returns its credit once. Rescheduling requires the other participant’s acceptance. Support reviews absence and technical issues.</p></details><details class="faq-item"><summary>What happens if I cancel my subscription?<span aria-hidden="true">+</span></summary><p>Cancellation stops the next renewal. Access continues until the paid-through date, and valid previously confirmed bookings remain. Your agreements and learning history are retained.</p></details><details class="faq-item"><summary>Will I be charged in this preview?<span aria-hidden="true">+</span></summary><p>No. The frontend shows a summary only. It does not collect card details, process a payment, activate a subscription, or save data.</p></details></div><div class="faq-contact"><span>Still have a question?</span><a href="help.html">Talk to support →</a></div></section>
+<section class="pricing-bottom"><div><span class="pricing-eyebrow">SMALL STEPS. SHARED PROGRESS.</span><h2>Your next skill starts with a person.</h2><p>Find someone who can help you take the next step.</p></div><a class="btn btn-primary" href="skill-partners.html">Find a learning partner →</a></section>
+</div></main><dialog class="pricing-checkout" id="plus-checkout" aria-labelledby="checkout-title"><div class="checkout-header"><h2 id="checkout-title">Your Plus summary</h2><button type="button" id="close-checkout" aria-label="Close subscription summary">×</button></div><dl><dt>Plan</dt><dd>Plus</dd><dt>Billing</dt><dd id="checkout-period"></dd><dt>Total</dt><dd id="checkout-total"></dd><dt>Allowance</dt><dd>1 × 30-minute expert credit per service month</dd></dl><p class="checkout-note">No payment service is connected. This summary does not activate a subscription.</p><a class="btn btn-primary" href="subscription-checkout.html" id="continue-checkout">Review subscription details →</a></dialog>
+<footer>
+    <div class="footer-container">
+
+        <!-- Brand + Logo -->
+        <div class="footer-brand">
+            <a href="home.html" class="footer-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <p>Learn · Share · Grow Together</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="skill-partners.html">Find Partners</a></li>
+                <li><a href="career-path.html">Career Path</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore -->
+        <div class="footer-links">
+            <h4>Explore</h4>
+            <ul>
+                <li><a href="home.html#work">How It Works</a></li>
+                <li><a href="home.html#about">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </div>
+
+        <!-- Support + Social -->
+        <div class="footer-links">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="help.html">Help Center</a></li>
+                <li><a href="help.html">Contact</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+            </ul>
+
+            <div class="footer-social" style="margin-top: 20px;">
+                <a href="#" title="Facebook">f</a>
+                <a href="#" title="X (Twitter)">X</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="Instagram">📷</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 Skills Swap. All rights reserved.</p>
+    </div>
+</footer><script src="js/animations.js"></script><script src="js/pricing.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
+</body></html>

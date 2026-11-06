@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills Swap - Exchange Skills, Learn Together</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/home.css">
+    <!-- استيراد خط Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/home-carousel.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="container nav-container">
+           <a href="home.html" class="navbar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+           
+           
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#categorie">Categories</a></li>
+                    <li><a href="#work">How It Works</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </nav>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </header>
+
+   <!-- Hero Section -->
+<section class="hero" id="home">
+
+    <video 
+        class="hero-bg-video"
+        autoplay 
+        loop 
+        muted 
+        playsinline
+        preload="auto"
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4"
+    ></video>
+
+    <!-- طبقة تعتيم فوق الفيديو -->
+    <div class="hero-overlay"></div>
+
+    <div class="container hero-container">
+        <div class="hero-content">
+            <span class="hero-tag">PEOPLE • SKILLS • REAL CONNECTIONS</span>
+            <h1>Exchange Skills.<br><span class="highlight">Learn Together.</span></h1>
+            <p>Share what you know. Learn something new. Connect with people who can teach and learn with you — for a brighter, more skilled tomorrow.</p>
+         <a href="#categorie" class="btn btn-primary btn-large">Explore Skills &rarr;</a>
+            
+            <div class="hero-features">
+                <div class="feature">
+                    <div class="icon-circle">🎓</div>
+                    <div>
+                        <strong>Learn</strong>
+                        <span>New Skills</span>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="icon-circle">🤝</div>
+                    <div>
+                        <strong>Meet</strong>
+                        <span>Amazing People</span>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="icon-circle">📈</div>
+                    <div>
+                        <strong>Grow</strong>
+                        <span>Together</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+    <!-- Categories Section -->
+    <section class="categories soft-motion-section"  id="categorie">
+        <div class="container">
+            <div class="section-header">
+                <h2>Explore Skills by Category</h2>
+                <p>Discover skills and connect with people who can teach and learn with you.</p>
+            </div>
+            <div class="category-carousel" role="region" aria-roledescription="carousel" aria-label="Explore skill categories">
+            <div class="category-grid" id="home-category-track" tabindex="0" aria-label="Skill categories">
+                <div class="category-card" role="button" tabindex="0" aria-haspopup="dialog" data-category="education">
+                    <div class="cat-icon">🎓</div>
+                    <h3>Education</h3>
+                  
+                </div>
+                <div class="category-card active-card" role="button" tabindex="0" aria-haspopup="dialog" data-category="technology">
+                    <div class="cat-icon">💻</div>
+                    <h3>Technology</h3>
+                  
+                </div>
+                <div class="category-card" role="button" tabindex="0" aria-haspopup="dialog" data-category="handmade">
+                    <div class="cat-icon">🎨</div>
+                    <h3>Handmade</h3>
+                   
+                </div>
+                <div class="category-card" role="button" tabindex="0" aria-haspopup="dialog" data-category="entertainment">
+                    <div class="cat-icon">🎬</div>
+                    <h3>Entertainment</h3>
+                 
+                </div>
+                <div class="category-card" role="button" tabindex="0" aria-haspopup="dialog" data-category="business">
+                    <div class="cat-icon">💼</div>
+                    <h3>Business</h3>
+                  
+                </div>
+                <div class="category-card" role="button" tabindex="0" aria-haspopup="dialog" data-category="health">
+                    <div class="cat-icon">❤️</div>
+                    <h3>Health & Fitness</h3>
+                  
+                </div>
+            </div>
+                <div class="category-carousel-controls">
+                    <button type="button" class="category-carousel-arrow" data-carousel-prev aria-label="Previous categories" aria-controls="home-category-track"><span aria-hidden="true">←</span></button>
+                    <div class="category-carousel-dots" role="group" aria-label="Category pages"></div>
+                    <span class="category-carousel-position" aria-live="polite" aria-atomic="true" data-no-translate></span>
+                    <button type="button" class="category-carousel-arrow" data-carousel-next aria-label="Next categories" aria-controls="home-category-track"><span aria-hidden="true">→</span></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+ <section class="how-it-works soft-motion-section" id="work">
+        <div class="container">
+            <div class="section-header">
+                <h2>How Skills Swap Works</h2>
+                <p>Learn, connect, and exchange skills in three simple steps.</p>
+            </div>
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">🔍</div>
+                    <h3>Choose a Skill</h3>
+                    <p>Find something you want to learn.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">👥</div>
+                    <h3>Find a Partner</h3>
+                    <p>Connect with the right person.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🔄</div>
+                    <h3>Exchange Skills</h3>
+                    <p>Share skills and learn together.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about " id="about">
+
+        <!-- الفيديو الخلفي -->
+    <video 
+        class="about-bg-video"
+        autoplay 
+        loop 
+        muted 
+        playsinline
+        preload="auto"
+        poster=""
+        src="assests/about.mp4"
+    ></video>
+
+    <!-- طبقة تعتيم -->
+    <div class="about-overlay"></div>
+
+        <div class="container about-container">
+            <div class="about-content">
+                <span class="about-tag">About Skills Swap</span>
+                <h2>A community where knowledge is shared, not sold.</h2>
+                <p>Skills Swap is a platform that connects people who want to teach and learn from each other. Instead of paying for every skill you want to learn, you can share what you know and learn something new in return.</p>
+                <a href="#" class="btn btn-outline">Learn More &rarr;</a>
+            </div>
+            <div class="about-image">
+         <img src="assests/Idea Sharing.svg" alt="People sharing skills" class="about-illustration">
+               
+            </div>
+            </div>
+       </section>
+
+    <!-- Career Path Section -->
+    <section class="career-path soft-motion-section">
+        <div class="container">
+            <div class="career-header">
+                <span class="career-tag">PERSONALIZED CAREER PATH</span>
+                <h2>Not Sure What to Learn?</h2>
+                <p>Tell us your goals and discover a personalized learning path tailored just for you.</p>
+                <a href="login.html" class="btn btn-primary">Explore My Career Path</a>
+            </div>
+            <div class="path-steps">
+                <div class="path-step active-path">Goal</div>
+                <div class="path-arrow">→</div>
+                <div class="path-step">Skills</div>
+                <div class="path-arrow">→</div>
+                <div class="path-step">Learning Path</div>
+                <div class="path-arrow">→</div>
+                <div class="path-step">Career</div>
+            </div>
+           
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="home-faq soft-motion-section" id="faq"><div class="container"><div class="section-header"><h2>Frequently Asked Questions</h2><p>Everything you need to start learning with Skills Swap.</p></div><div class="faq-list"><details class="faq-item"><summary>What is Skills Swap?<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>Skills Swap connects people who want to learn skills with people who can teach them through conversations and meetings.</p></div></details><details class="faq-item"><summary>Do I have to teach a skill to join?<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>No. You can join to learn. Adding skills you can teach is optional.</p></div></details><details class="faq-item"><summary>How do I start learning?<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>Create an account, verify your email, complete your profile, and choose a skill. Compare members, send a learning request, and agree on a time together.</p></div></details><details class="faq-item"><summary>Does the platform provide recorded courses?<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>No. Learning takes place between people. You coordinate a conversation or meeting with your learning partner.</p></div></details><details class="faq-item"><summary>What is the difference between Free and Plus?<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>Free includes Basic skills and their community exchanges. Plus unlocks Advanced skill details and exchanges, and approved expert booking within the allowance shown on the subscription page.</p></div></details><details class="faq-item"><summary>How does the career path help me?<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>Choose your goal, level, and preferences to receive a suggested order of skills. You decide what to follow and find people to learn each skill with.</p></div></details><details class="faq-item"><summary>Can administrators read my conversations?<span aria-hidden="true">+</span></summary><div class="faq-answer"><p>Private conversations and meetings are only available to their participants.</p></div></details></div></div></section>
+
+   
+<!--  FOOTER  section -->
+<footer>
+    <div class="footer-container">
+
+        <!-- Brand + Logo -->
+        <div class="footer-brand">
+            <a href="home.html" class="footer-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <p>Learn · Share · Grow Together</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="skill-partners.html">Find Partners</a></li>
+                <li><a href="career-path.html">Career Path</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore -->
+        <div class="footer-links">
+            <h4>Explore</h4>
+            <ul>
+                <li><a href="home.html#work">How It Works</a></li>
+                <li><a href="home.html#about">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </div>
+
+        <!-- Support + Social -->
+        <div class="footer-links">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+            </ul>
+
+            <div class="footer-social" style="margin-top: 20px;">
+                <a href="#" title="Facebook">f</a>
+                <a href="#" title="X (Twitter)">X</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="Instagram">📷</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 Skills Swap. All rights reserved.</p>
+    </div>
+</footer>
+<!--  MAIN CATEGORY MODAL (SUB CATEGORIES) -->
+<div class="category-modal-overlay hidden" id="categoryModal">
+    <div class="category-modal">
+        
+        <!-- Header -->
+        <div class="category-modal-header">
+            <div class="category-modal-title-wrapper">
+                <div class="category-modal-icon" id="modalCategoryIcon">💻</div>
+                <div>
+                    <h2 id="modalCategoryTitle">Technology Skills</h2>
+                    <p>Choose a sub-category to explore skills</p>
+                </div>
+            </div>
+            <button class="category-modal-close" id="closeCategoryModal">✕</button>
+        </div>
+
+        <!-- Body (Sub Categories) -->
+        <div class="category-modal-body">
+            
+            <!-- Education Sub Categories -->
+            <div class="sub-category-grid hidden" id="sub-education">
+                <a href="sub-category.html?cat=mathematics" class="sub-category-card">
+                    <span class="sub-category-icon">📐</span>
+                    <span class="sub-category-name">Mathematics</span>
+                </a>
+                <a href="sub-category.html?cat=physics" class="sub-category-card">
+                    <span class="sub-category-icon">⚛️</span>
+                    <span class="sub-category-name">Physics</span>
+                </a>
+                <a href="sub-category.html?cat=chemistry" class="sub-category-card">
+                    <span class="sub-category-icon">🧪</span>
+                    <span class="sub-category-name">Chemistry</span>
+                </a>
+                <a href="sub-category.html?cat=english" class="sub-category-card">
+                    <span class="sub-category-icon">🇬🇧</span>
+                    <span class="sub-category-name">English</span>
+                </a>
+                <a href="sub-category.html?cat=arabic" class="sub-category-card">
+                    <span class="sub-category-icon">📖</span>
+                    <span class="sub-category-name">Arabic Language</span>
+                </a>
+            </div>
+
+            <!-- Technology Sub Categories -->
+            <div class="sub-category-grid hidden" id="sub-technology">
+                <a href="sub-category.html?cat=web-development" class="sub-category-card">
+                    <span class="sub-category-icon">💻</span>
+                    <span class="sub-category-name">Web Development</span>
+                </a>
+                <a href="sub-category.html?cat=ui-ux" class="sub-category-card">
+                    <span class="sub-category-icon">🎨</span>
+                    <span class="sub-category-name">UI/UX Design</span>
+                </a>
+                <a href="sub-category.html?cat=mobile-development" class="sub-category-card">
+                    <span class="sub-category-icon">📱</span>
+                    <span class="sub-category-name">Mobile Development</span>
+                </a>
+                <a href="sub-category.html?cat=cybersecurity" class="sub-category-card">
+                    <span class="sub-category-icon">🛡️</span>
+                    <span class="sub-category-name">Cybersecurity</span>
+                </a>
+            </div>
+
+            <!-- Handmade Sub Categories -->
+            <div class="sub-category-grid hidden" id="sub-handmade">
+                <a href="sub-category.html?cat=painting" class="sub-category-card">
+                    <span class="sub-category-icon">🖌️</span>
+                    <span class="sub-category-name">Painting</span>
+                </a>
+                <a href="sub-category.html?cat=knitting" class="sub-category-card">
+                    <span class="sub-category-icon">🧶</span>
+                    <span class="sub-category-name">Knitting</span>
+                </a>
+                <a href="sub-category.html?cat=crafts" class="sub-category-card">
+                    <span class="sub-category-icon">✂️</span>
+                    <span class="sub-category-name">Crafts</span>
+                </a>
+                <a href="sub-category.html?cat=diy" class="sub-category-card">
+                    <span class="sub-category-icon">🔨</span>
+                    <span class="sub-category-name">DIY Projects</span>
+                </a>
+            </div>
+
+            <!-- Entertainment Sub Categories -->
+            <div class="sub-category-grid hidden" id="sub-entertainment">
+                <a href="sub-category.html?cat=music" class="sub-category-card">
+                    <span class="sub-category-icon">🎵</span>
+                    <span class="sub-category-name">Music</span>
+                </a>
+                <a href="sub-category.html?cat=video-editing" class="sub-category-card">
+                    <span class="sub-category-icon">🎬</span>
+                    <span class="sub-category-name">Video Editing</span>
+                </a>
+                <a href="sub-category.html?cat=photography" class="sub-category-card">
+                    <span class="sub-category-icon">📷</span>
+                    <span class="sub-category-name">Photography</span>
+                </a>
+            </div>
+
+            <!-- Business Sub Categories -->
+            <div class="sub-category-grid hidden" id="sub-business">
+                <a href="sub-category.html?cat=marketing" class="sub-category-card">
+                    <span class="sub-category-icon">📈</span>
+                    <span class="sub-category-name">Marketing</span>
+                </a>
+                <a href="sub-category.html?cat=management" class="sub-category-card">
+                    <span class="sub-category-icon">💼</span>
+                    <span class="sub-category-name">Management</span>
+                </a>
+                <a href="sub-category.html?cat=sales" class="sub-category-card">
+                    <span class="sub-category-icon">🤝</span>
+                    <span class="sub-category-name">Sales</span>
+                </a>
+                <a href="sub-category.html?cat=entrepreneurship" class="sub-category-card">
+                    <span class="sub-category-icon">🚀</span>
+                    <span class="sub-category-name">Entrepreneurship</span>
+                </a>
+            </div>
+
+            <!-- Health & Fitness Sub Categories -->
+            <div class="sub-category-grid hidden" id="sub-health">
+                <a href="sub-category.html?cat=yoga" class="sub-category-card">
+                    <span class="sub-category-icon">🧘</span>
+                    <span class="sub-category-name">Yoga</span>
+                </a>
+                <a href="sub-category.html?cat=nutrition" class="sub-category-card">
+                    <span class="sub-category-icon">🥗</span>
+                    <span class="sub-category-name">Nutrition</span>
+                </a>
+                <a href="sub-category.html?cat=personal-training" class="sub-category-card">
+                    <span class="sub-category-icon">💪</span>
+                    <span class="sub-category-name">Personal Training</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="js/script.js"></script>
+
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/home-carousel.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
+</body>
+</html>

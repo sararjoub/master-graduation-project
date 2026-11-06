@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Skills - Skills Swap</title>
+
+    <!-- الملفات المشتركة -->
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/sub-category.css">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+</head>
+<body>
+
+    <!--  Navbar (مبسط) -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="home.html" class="navbar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <div class="navbar-actions">
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!--  Main Section -->
+    <section class="sub-category-section">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb animate-fade-rise">
+                <a href="home.html">Home</a>
+                <span class="separator">/</span>
+                <a href="home.html#categorie">Categories</a>
+                <span class="separator">/</span>
+                <span class="current" id="breadcrumbCategory">Technology</span>
+            </div>
+
+            <!-- Header -->
+            <div class="sub-category-header animate-fade-rise-delay-1">
+                <div class="header-icon-wrapper">
+                    <span class="header-icon" id="subCategoryIcon">💻</span>
+                </div>
+                <h1 id="subCategoryTitle">Web Development</h1>
+                <p>Explore top skills to start your learning journey.</p>
+            </div>
+
+            <!-- Skills Grid -->
+            <div class="skills-grid stagger-children" id="skillsGrid">
+                <!-- سيتم إضافة البطاقات هنا بواسطة JavaScript -->
+            </div>
+
+        </div>
+    </section>
+
+    <!-- LOGIN REQUIRED MODAL  -->
+    <div class="login-required-modal hidden" id="loginRequiredModal">
+        <div class="login-modal-content">
+            <div class="login-modal-icon">🔒</div>
+            <h2>Login Required</h2>
+            <p>You need to login or create an account to start learning this skill.</p>
+            <div class="login-modal-actions">
+                <a href="login.html" class="btn btn-primary">Login</a>
+                <a href="signup.html" class="btn btn-outline">Sign Up</a>
+            </div>
+            <button class="login-modal-close" id="closeLoginModal">✕</button>
+        </div>
+    </div>
+
+    <script src="js/sub-category.js"></script>
+<footer>
+    <div class="footer-container">
+
+        <!-- Brand + Logo -->
+        <div class="footer-brand">
+            <a href="home.html" class="footer-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <p>Learn · Share · Grow Together</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="skill-partners.html">Find Partners</a></li>
+                <li><a href="career-path.html">Career Path</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore -->
+        <div class="footer-links">
+            <h4>Explore</h4>
+            <ul>
+                <li><a href="home.html#work">How It Works</a></li>
+                <li><a href="home.html#about">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </div>
+
+        <!-- Support + Social -->
+        <div class="footer-links">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="help.html">Help Center</a></li>
+                <li><a href="help.html">Contact</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+            </ul>
+
+            <div class="footer-social" style="margin-top: 20px;">
+                <a href="#" title="Facebook">f</a>
+                <a href="#" title="X (Twitter)">X</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="Instagram">📷</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 Skills Swap. All rights reserved.</p>
+    </div>
+</footer>
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
+</body>
+</html>

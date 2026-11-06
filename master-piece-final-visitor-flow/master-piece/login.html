@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Skills Swap</title>
+    
+    <!-- الملفات المشتركة -->
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/login.css">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+</head>
+<body>
+
+    <!--  Navbar (مشترك) -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="home.html" class="navbar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <div class="navbar-links">
+                <a href="home.html" class="navbar-link">Home</a>
+                <a href="categories.html" class="navbar-link">Categories</a>
+                <a href="home.html" class="navbar-link">How It Works</a>
+                <a href="home.html" class="navbar-link">About</a>
+            </div>
+            <div class="navbar-actions">
+                <button class="navbar-login" onclick="window.SitePrefs.navigate('login.html')">Login</button>
+                <button class="navbar-signup" onclick="window.SitePrefs.navigate('signup.html')">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <!--  Login Section  -->
+    <section class="auth-section">
+        <div class="auth-container">
+
+            <!--  الجهة اليسار الرسم التوضيحي  -->
+            <div class="auth-illustration animate-slide-in-left">
+                <div class="illustration-content">
+                    <h2>Welcome Back!</h2>
+                    <p>Login to continue your skill exchange journey and connect with your learning partners.</p>
+
+                    <!-- الصورة التوضيحية -->
+                    <img 
+                        src="assests/login.png" 
+                        alt="Welcome back"
+                        class="illustration-image"
+                    >
+                    <ul class="illustration-features">
+                        <li>
+                            <span class="feature-check">✓</span>
+                            <span>Continue your learning path</span>
+                        </li>
+                        <li>
+                            <span class="feature-check">✓</span>
+                            <span>Chat with your skill partners</span>
+                        </li>
+                        <li>
+                            <span class="feature-check">✓</span>
+                            <span>Track your progress</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- الجهة اليمين الفورم-->
+            <div class="auth-form-wrapper animate-scale-in">
+
+                <!-- الشعار يلي فوق-->
+                <div class="auth-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></div>
+
+                <form class="auth-form" id="loginForm">
+
+                    <!-- البريد الإلكتروني -->
+                    <div class="form-group animate-fade-rise-delay-1">
+                        <label class="form-label" for="email">Email Address</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">✉️</span>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                class="form-input" 
+                                placeholder="you@example.com"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- كلمة المرور -->
+                    <div class="form-group animate-fade-rise-delay-2">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🔒</span>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                class="form-input" 
+                                placeholder="Enter your password"
+                                required
+                            >
+                            <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me + Forgot Password -->
+                    <div class="form-options animate-fade-rise-delay-2">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <!-- زر تسجيل الدخول -->
+                    <button type="submit" class="btn btn-primary btn-large btn-full animate-fade-rise-delay-3">
+                        Login →
+                    </button>
+
+                    <!-- فاصل -->
+                    
+
+                    <!-- أزرار التواصل الاجتماعي -->
+                    
+
+                    <!-- رابط التسجيل -->
+                    <p class="auth-switch animate-fade-rise-delay-3">
+                        Don't have an account? <a href="signup.html">Sign Up</a>
+                    </p>
+
+                </form>
+
+                <!--  ADMIN ACCESS LINK -->
+<div class="admin-access-wrapper">
+    <span class="admin-access-text">Are you an administrator?</span>
+    <a href="Admin/admin-html/admin-login.html" class="admin-access-link">
+        <span class="admin-access-icon">🔒</span>
+        <span>Admin Access</span>
+    </a>
+</div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/animations.js"></script>
+    <script src="js/login.js"></script>
+
+<footer>
+    <div class="footer-container">
+
+        <!-- Brand + Logo -->
+        <div class="footer-brand">
+            <a href="home.html" class="footer-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+            <p>Learn · Share · Grow Together</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="skill-partners.html">Find Partners</a></li>
+                <li><a href="career-path.html">Career Path</a></li>
+            </ul>
+        </div>
+
+        <!-- Explore -->
+        <div class="footer-links">
+            <h4>Explore</h4>
+            <ul>
+                <li><a href="home.html#work">How It Works</a></li>
+                <li><a href="home.html#about">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </div>
+
+        <!-- Support + Social -->
+        <div class="footer-links">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="help.html">Help Center</a></li>
+                <li><a href="help.html">Contact</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+            </ul>
+
+            <div class="footer-social" style="margin-top: 20px;">
+                <a href="#" title="Facebook">f</a>
+                <a href="#" title="X (Twitter)">X</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="Instagram">📷</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 Skills Swap. All rights reserved.</p>
+    </div>
+</footer>
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
+</body>
+</html>

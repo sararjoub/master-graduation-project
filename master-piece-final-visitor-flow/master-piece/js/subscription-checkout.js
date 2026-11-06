@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',function(){const period=new URLSearchParams(location.search).get('billing');if(['monthly','yearly'].includes(period)){const field=document.querySelector('[name="billing"]');if(field)field.value=period;}});

@@ -1,0 +1,7 @@
+document.addEventListener('DOMContentLoaded',function(){
+ 'use strict';let billing='monthly';const dialog=document.getElementById('plus-checkout');
+ document.querySelectorAll('[data-billing]').forEach(button=>button.addEventListener('click',()=>{billing=button.dataset.billing;document.querySelectorAll('[data-billing]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});document.getElementById('plus-price').textContent=billing==='yearly'?'7':'9';document.getElementById('billing-explanation').textContent=billing==='yearly'?'$84 billed yearly ($7 per month equivalent).':'$9 billed monthly.';}));
+ document.getElementById('choose-plus').addEventListener('click',()=>{document.getElementById('checkout-period').textContent=billing==='yearly'?'Annual':'Monthly';document.getElementById('checkout-total').textContent=billing==='yearly'?'$84 / year (proposed)':'$9 / month (proposed)';document.getElementById('continue-checkout').href='subscription-checkout.html?billing='+billing;dialog.showModal();});
+ document.getElementById('close-checkout').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+ document.querySelectorAll('.faq-item').forEach(item=>item.addEventListener('toggle',()=>{if(item.open)document.querySelectorAll('.faq-item').forEach(other=>{if(other!==item)other.open=false;});}));
+});

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - Skills Swap Admin</title>
+
+    <!-- الملفات المشتركة -->
+    <link rel="stylesheet" href="../../css/shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-user-details.css">
+<script src="../../js/site-preferences-init.js"></script><link rel="stylesheet" href="../../css/site-preferences.css">
+<link rel="stylesheet" href="../../css/responsive-refinements.css">
+<link rel="stylesheet" href="../../css/brand.css">
+<link rel="icon" type="image/svg+xml" href="../../assests/brand-mark.svg">
+<link rel="stylesheet" href="../../css/interface-polish.css">
+<script src="../../js/skill-access.js"></script>
+</head>
+<body>
+
+    <!-- ============================================
+         ADMIN LAYOUT
+         ============================================ -->
+    <div class="admin-layout">
+
+        <!-- ===== Sidebar Overlay (Mobile) ===== -->
+        <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
+
+        <!-- ============================================
+             SIDEBAR
+             ============================================ -->
+        <aside class="admin-sidebar" id="adminSidebar"><button class="admin-sidebar-dismiss" type="button" data-admin-close aria-label="Close sidebar">×</button><a href="dashboard.html" class="admin-sidebar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span><span class="brand-subtitle">Admin workspace</span></span></a><nav class="admin-sidebar-nav" aria-label="Administration"><span class="admin-sidebar-label">Overview</span><a class="admin-sidebar-link" href="dashboard.html"><span class="admin-sidebar-text">Dashboard</span></a><span class="admin-sidebar-label">People & skills</span><a class="admin-sidebar-link" href="manage-users.html"><span class="admin-sidebar-text">Members</span></a><a class="admin-sidebar-link" href="manage-categories.html"><span class="admin-sidebar-text">Categories</span></a><a class="admin-sidebar-link" href="manage-skills.html"><span class="admin-sidebar-text">Skill directory</span></a><a class="admin-sidebar-link" href="expert-applications.html"><span class="admin-sidebar-text">Expert applications</span></a><a class="admin-sidebar-link" href="manage-reviews.html"><span class="admin-sidebar-text">Reviews</span></a><span class="admin-sidebar-label">Membership</span><a class="admin-sidebar-link" href="plans.html"><span class="admin-sidebar-text">Free &amp; Plus</span></a><a class="admin-sidebar-link" href="manage-subscriptions.html"><span class="admin-sidebar-text">Subscriptions</span></a><a class="admin-sidebar-link" href="transactions.html"><span class="admin-sidebar-text">Transactions</span></a><span class="admin-sidebar-label">Analytics</span><a class="admin-sidebar-link" href="reports.html"><span class="admin-sidebar-text">Analytics</span></a></nav><div class="admin-sidebar-footer"><a class="admin-sidebar-link" href="admin-profile.html">Admin account</a><button class="admin-sidebar-logout" id="adminLogout" type="button">Log out</button></div></aside>
+
+        <!-- ============================================
+             MAIN AREA
+             ============================================ -->
+        <main class="admin-main"><button type="button" class="admin-mobile-menu" id="adminSidebarToggle" aria-label="Open sidebar" aria-controls="adminSidebar" aria-expanded="false">☰</button>
+
+           
+
+            <!-- ===== Content ===== -->
+            <div class="admin-content">
+
+                <!-- ===== User Header Card ===== -->
+                <div class="user-details-header admin-fade-rise">
+
+                    <!-- Avatar -->
+                    <div class="user-details-avatar">
+                        <span>AA</span>
+                        <span class="user-details-status online"></span>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="user-details-info">
+                        <h1>Ahmad Ali</h1>
+                        <p class="user-details-email">ahmad@skills.com</p>
+
+                        <div class="user-details-meta">
+                            <span class="admin-badge admin-badge-primary">User</span>
+                            <span class="admin-badge admin-badge-success">● Active</span>
+                            <span class="user-details-joined">📅 Joined Oct 10, 2026</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="user-details-header-actions">
+                        <button class="admin-btn admin-btn-outline" id="editUserBtn">
+                            Edit User
+                        </button>
+                        
+                    </div>
+
+                </div>
+
+                <!-- ===== Stats Row ===== -->
+                <div class="user-stats-grid admin-stagger">
+
+                    <div class="user-stat-card">
+                        <div class="user-stat-icon user-stat-icon-primary">🔄</div>
+                        <div class="user-stat-value" data-count="12">0</div>
+                        <div class="user-stat-label">Total Swaps</div>
+                    </div>
+
+                    <div class="user-stat-card">
+                        <div class="user-stat-icon user-stat-icon-success">✅</div>
+                        <div class="user-stat-value" data-count="8">0</div>
+                        <div class="user-stat-label">Completed</div>
+                    </div>
+
+                    <div class="user-stat-card">
+                        <div class="user-stat-icon user-stat-icon-warning">⏳</div>
+                        <div class="user-stat-value" data-count="4">0</div>
+                        <div class="user-stat-label">Pending</div>
+                    </div>
+
+                    <div class="user-stat-card">
+                        <div class="user-stat-icon user-stat-icon-info">⭐</div>
+                        <div class="user-stat-value" data-count="24">0</div>
+                        <div class="user-stat-label">Reviews</div>
+                    </div>
+
+                </div>
+
+                <!-- ===== Main Grid ===== -->
+                <div class="user-details-grid">
+
+                    <!-- ===== Main Column ===== -->
+                    <div class="user-details-main">
+
+                        <!-- ===== Skills Section ===== -->
+                        <div class="admin-card admin-fade-rise-2">
+                            <div class="admin-card-header">
+                                <div>
+                                    <h3 class="admin-card-title">Skills</h3>
+                                    <p class="admin-card-subtitle">Skills Ahmad teaches and wants to learn</p>
+                                </div>
+                            </div>
+
+                            <div class="admin-card-body">
+
+                                <!-- Can Teach -->
+                                <div class="user-skills-block">
+                                    <h4 class="user-skills-title">
+                                        <span class="user-skills-icon">🎓</span>
+                                        Can Teach
+                                    </h4>
+                                    <div class="user-skills-tags">
+                                        <span class="user-skill-tag">Graphic Design</span>
+                                        <span class="user-skill-tag">Photoshop</span>
+                                        <span class="user-skill-tag">Illustrator</span>
+                                    </div>
+                                </div>
+
+                                <!-- Wants to Learn -->
+                                <div class="user-skills-block">
+                                    <h4 class="user-skills-title">
+                                        <span class="user-skills-icon">📚</span>
+                                        Wants to Learn
+                                    </h4>
+                                    <div class="user-skills-tags">
+                                        <span class="user-skill-tag user-skill-tag-want">Web Development</span>
+                                        <span class="user-skill-tag user-skill-tag-want">React</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- ===== Recent Activity ===== -->
+                        
+
+                    </div>
+
+                    <!-- ===== Side Column ===== -->
+                    <aside class="user-details-side admin-slide-in-right">
+
+                        <!-- ===== Rating Card ===== -->
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h3 class="admin-card-title">Rating</h3>
+                            </div>
+                            <div class="admin-card-body">
+                                <div class="user-rating-display">
+                                    <div class="user-rating-value">
+                                        <span class="user-rating-number">5.0</span>
+                                        <div class="user-rating-stars">
+                                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                                        </div>
+                                        <span class="user-rating-count">Based on 24 reviews</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== Availability ===== -->
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h3 class="admin-card-title">Availability</h3>
+                            </div>
+                            <div class="admin-card-body">
+                                <div class="user-availability">
+                                    <div class="user-availability-row">
+                                        <span class="user-availability-icon">🌙</span>
+                                        <div>
+                                            <strong>Evenings</strong>
+                                            <span>6 PM – 10 PM</span>
+                                        </div>
+                                    </div>
+                                    <div class="user-availability-row">
+                                        <span class="user-availability-icon">📅</span>
+                                        <div>
+                                            <strong>Weekends</strong>
+                                            <span>Full day</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== Contact Info ===== -->
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h3 class="admin-card-title">Contact Info</h3>
+                            </div>
+                            <div class="admin-card-body">
+                                <div class="user-contact">
+                                    <div class="user-contact-row">
+                                        <span class="user-contact-icon">✉️</span>
+                                        <span>ahmad@skills.com</span>
+                                    </div>
+                                    <div class="user-contact-row">
+                                        <span class="user-contact-icon">📍</span>
+                                        <span>Amman, Jordan</span>
+                                    </div>
+                                    <div class="user-contact-row">
+                                        <span class="user-contact-icon">🌐</span>
+                                        <span>ahmadhassan.dev</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== Danger Zone ===== -->
+                        <div class="admin-card danger-card">
+                            <div class="admin-card-header">
+                                <h3 class="admin-card-title danger-title">Danger Zone</h3>
+                            </div>
+                            <div class="admin-card-body">
+                                <button class="admin-btn admin-btn-warning admin-btn-full" id="suspendBtn">
+                                    Suspend Account
+                                </button>
+                                <button class="admin-btn admin-btn-danger admin-btn-full" id="deleteUserBtn" style="margin-top: 8px;">
+                                    Delete User
+                                </button>
+                            </div>
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ===== Confirm Modal ===== -->
+    <div class="modal-overlay hidden" id="confirmModal">
+        <div class="modal">
+            <div class="modal-header" id="confirmModalHeader">
+                <h2 id="confirmModalTitle">Confirm Action</h2>
+                <button class="modal-close" id="confirmModalClose">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage">Are you sure?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="admin-btn admin-btn-outline" id="confirmModalCancel">Cancel</button>
+                <button class="admin-btn admin-btn-danger" id="confirmModalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Scripts ===== -->
+    <script src="../admin-js/admin-shared.js"></script>
+    <script src="../admin-js/admin-user-details.js"></script>
+
+<script src="../admin-js/admin-workflow-links.js"></script>
+<script src="../../js/site-ar.js"></script><script src="../../js/site-preferences.js"></script>
+<script src="../../js/icon-tones.js"></script>
+<script src="../../js/interface-polish.js"></script>
+</body>
+</html>

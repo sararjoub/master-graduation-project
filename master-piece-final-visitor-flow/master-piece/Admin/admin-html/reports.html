@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Skills Swap Admin</title>
+
+    <link rel="stylesheet" href="../../css/shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-shared.css">
+    <link rel="stylesheet" href="../admin-css/admin-reports.css">
+<script src="../../js/site-preferences-init.js"></script><link rel="stylesheet" href="../../css/site-preferences.css">
+<link rel="stylesheet" href="../../css/responsive-refinements.css">
+<link rel="stylesheet" href="../../css/brand.css">
+<link rel="icon" type="image/svg+xml" href="../../assests/brand-mark.svg">
+<link rel="stylesheet" href="../../css/interface-polish.css">
+<script src="../../js/skill-access.js"></script>
+</head>
+<body>
+
+    <div class="admin-layout">
+
+        <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
+
+        <aside class="admin-sidebar" id="adminSidebar"><button class="admin-sidebar-dismiss" type="button" data-admin-close aria-label="Close sidebar">×</button><a href="dashboard.html" class="admin-sidebar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span><span class="brand-subtitle">Admin workspace</span></span></a><nav class="admin-sidebar-nav" aria-label="Administration"><span class="admin-sidebar-label">Overview</span><a class="admin-sidebar-link" href="dashboard.html"><span class="admin-sidebar-text">Dashboard</span></a><span class="admin-sidebar-label">People & skills</span><a class="admin-sidebar-link" href="manage-users.html"><span class="admin-sidebar-text">Members</span></a><a class="admin-sidebar-link" href="manage-categories.html"><span class="admin-sidebar-text">Categories</span></a><a class="admin-sidebar-link" href="manage-skills.html"><span class="admin-sidebar-text">Skill directory</span></a><a class="admin-sidebar-link" href="expert-applications.html"><span class="admin-sidebar-text">Expert applications</span></a><a class="admin-sidebar-link" href="manage-reviews.html"><span class="admin-sidebar-text">Reviews</span></a><span class="admin-sidebar-label">Membership</span><a class="admin-sidebar-link" href="plans.html"><span class="admin-sidebar-text">Free &amp; Plus</span></a><a class="admin-sidebar-link" href="manage-subscriptions.html"><span class="admin-sidebar-text">Subscriptions</span></a><a class="admin-sidebar-link" href="transactions.html"><span class="admin-sidebar-text">Transactions</span></a><span class="admin-sidebar-label">Analytics</span><a class="admin-sidebar-link active" href="reports.html"><span class="admin-sidebar-text">Analytics</span></a></nav><div class="admin-sidebar-footer"><a class="admin-sidebar-link" href="admin-profile.html">Admin account</a><button class="admin-sidebar-logout" id="adminLogout" type="button">Log out</button></div></aside>
+
+        <main class="admin-main"><button type="button" class="admin-mobile-menu" id="adminSidebarToggle" aria-label="Open sidebar" aria-controls="adminSidebar" aria-expanded="false">☰</button>
+
+           
+            <div class="admin-content">
+
+                <!-- ===== Page Header ===== -->
+                <div class="admin-page-header admin-fade-rise">
+                    <div class="admin-page-header-left">
+                        <h1>Reports & Analytics</h1>
+                        <p>Overview of platform performance and activity.</p>
+                    </div>
+                    <div class="admin-page-header-actions">
+                        
+                        <button class="admin-btn admin-btn-outline" id="exportReportBtn">
+                            ⬇️ Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ===== Summary Cards ===== -->
+                <div class="admin-stats-grid admin-stagger">
+
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <div class="admin-stat-icon admin-stat-icon-primary">👥</div>
+                            <span class="admin-stat-trend positive">↑ 18%</span>
+                        </div>
+                        <div class="admin-stat-info">
+                            <div class="admin-stat-value" data-count="2450">0</div>
+                            <div class="admin-stat-label">Total Users</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <div class="admin-stat-icon admin-stat-icon-success">🔄</div>
+                            <span class="admin-stat-trend positive">↑ 25%</span>
+                        </div>
+                        <div class="admin-stat-info">
+                            <div class="admin-stat-value" data-count="486">0</div>
+                            <div class="admin-stat-label">Total Swaps</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <div class="admin-stat-icon admin-stat-icon-warning">⭐</div>
+                            <span class="admin-stat-trend positive">↑ 12%</span>
+                        </div>
+                        <div class="admin-stat-info">
+                            <div class="admin-stat-value" data-count="342">0</div>
+                            <div class="admin-stat-label">Total Reviews</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <div class="admin-stat-icon admin-stat-icon-info">📊</div>
+                            <span class="admin-stat-trend positive">↑ 8%</span>
+                        </div>
+                        <div class="admin-stat-info">
+                            <div class="admin-stat-value" data-count="4.8" data-decimal="true">0</div>
+                            <div class="admin-stat-label">Avg Rating</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ===== Charts Grid ===== -->
+                <div class="reports-grid">
+
+                    <!-- ===== Users Growth Chart ===== -->
+                    <div class="admin-card admin-fade-rise-2 reports-chart-card">
+                        <div class="admin-card-header">
+                            <div>
+                                <h3 class="admin-card-title">Users Growth</h3>
+                                <p class="admin-card-subtitle">New registrations over time</p>
+                            </div>
+                            <span class="admin-badge admin-badge-success">↑ 18%</span>
+                        </div>
+                        <div class="admin-card-body">
+                            <div class="chart-bar-container" id="usersChart">
+                                <!-- Bars سيتم إنشاؤها بـ JavaScript -->
+                            </div>
+                            <div class="chart-labels">
+                                <span>Jan</span>
+                                <span>Feb</span>
+                                <span>Mar</span>
+                                <span>Apr</span>
+                                <span>May</span>
+                                <span>Jun</span>
+                                <span>Jul</span>
+                                <span>Aug</span>
+                                <span>Sep</span>
+                                <span>Oct</span>
+                                <span>Nov</span>
+                                <span>Dec</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== Swaps Over Time ===== -->
+                    <div class="admin-card admin-fade-rise-3 reports-chart-card">
+                        <div class="admin-card-header">
+                            <div>
+                                <h3 class="admin-card-title">Swaps Over Time</h3>
+                                <p class="admin-card-subtitle">Completed swaps per month</p>
+                            </div>
+                            <span class="admin-badge admin-badge-success">↑ 25%</span>
+                        </div>
+                        <div class="admin-card-body">
+                            <div class="chart-line-container" id="swapsChart">
+                                <!-- Line Chart بـ SVG -->
+                            </div>
+                            <div class="chart-labels">
+                                <span>Jan</span>
+                                <span>Mar</span>
+                                <span>May</span>
+                                <span>Jul</span>
+                                <span>Sep</span>
+                                <span>Nov</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== Top Categories (Donut) ===== -->
+                    <div class="admin-card admin-fade-rise-3 reports-chart-card">
+                        <div class="admin-card-header">
+                            <div>
+                                <h3 class="admin-card-title">Top Categories</h3>
+                                <p class="admin-card-subtitle">Distribution of skills</p>
+                            </div>
+                        </div>
+                        <div class="admin-card-body">
+                            <div class="donut-chart-wrapper">
+                                <div class="donut-chart" id="categoriesDonut">
+                                    <div class="donut-center">
+                                        <strong>48</strong>
+                                        <span>Skills</span>
+                                    </div>
+                                </div>
+                                <div class="donut-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-dot" style="background: #8b7cf6;"></span>
+                                        <span>Technology</span>
+                                        <strong>42%</strong>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot" style="background: #10b981;"></span>
+                                        <span>Education</span>
+                                        <strong>25%</strong>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot" style="background: #f59e0b;"></span>
+                                        <span>Handmade</span>
+                                        <strong>17%</strong>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot" style="background: #3b82f6;"></span>
+                                        <span>Business</span>
+                                        <strong>10%</strong>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot" style="background: #ec4899;"></span>
+                                        <span>Others</span>
+                                        <strong>6%</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== Top Skills ===== -->
+                    <div class="admin-card admin-fade-rise-4 reports-chart-card">
+                        <div class="admin-card-header">
+                            <div>
+                                <h3 class="admin-card-title">Top Skills</h3>
+                                <p class="admin-card-subtitle">Most popular skills</p>
+                            </div>
+                        </div>
+                        <div class="admin-card-body">
+                            <div class="top-skills-list">
+
+                                <div class="top-skill-item">
+                                    <div class="top-skill-header">
+                                        <span class="top-skill-name">💻 Web Development</span>
+                                        <span class="top-skill-count">68 users</span>
+                                    </div>
+                                    <div class="top-skill-bar">
+                                        <div class="top-skill-fill" style="width: 0%;" data-width="92%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="top-skill-item">
+                                    <div class="top-skill-header">
+                                        <span class="top-skill-name">⚡ JavaScript</span>
+                                        <span class="top-skill-count">52 users</span>
+                                    </div>
+                                    <div class="top-skill-bar">
+                                        <div class="top-skill-fill" style="width: 0%;" data-width="78%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="top-skill-item">
+                                    <div class="top-skill-header">
+                                        <span class="top-skill-name">🎨 Graphic Design</span>
+                                        <span class="top-skill-count">32 users</span>
+                                    </div>
+                                    <div class="top-skill-bar">
+                                        <div class="top-skill-fill" style="width: 0%;" data-width="65%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="top-skill-item">
+                                    <div class="top-skill-header">
+                                        <span class="top-skill-name">📷 Photography</span>
+                                        <span class="top-skill-count">29 users</span>
+                                    </div>
+                                    <div class="top-skill-bar">
+                                        <div class="top-skill-fill" style="width: 0%;" data-width="58%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="top-skill-item">
+                                    <div class="top-skill-header">
+                                        <span class="top-skill-name">🐍 Python</span>
+                                        <span class="top-skill-count">45 users</span>
+                                    </div>
+                                    <div class="top-skill-bar">
+                                        <div class="top-skill-fill" style="width: 0%;" data-width="70%"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== Recent Reports ===== -->
+                    
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="../admin-js/admin-shared.js"></script>
+    <script src="../admin-js/admin-reports.js"></script>
+
+<script src="../admin-js/admin-workflow-links.js"></script>
+<script src="../../js/site-ar.js"></script><script src="../../js/site-preferences.js"></script>
+<script src="../../js/icon-tones.js"></script>
+<script src="../../js/interface-polish.js"></script>
+</body>
+</html>
