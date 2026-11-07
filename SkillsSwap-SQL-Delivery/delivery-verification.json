@@ -1,0 +1,12 @@
+{
+  "database": "SkillsSwap_Final",
+  "tables": 36,
+  "foreignKeys": 69,
+  "referenceAndDemoRecords": 188,
+  "trialCountsConfirmedByUserSQLScreenshot": true,
+  "finalDDLAndSeedPreservedFromTrial": true,
+  "automaticPreCommitAssertions": true,
+  "userInterfaceFeaturesRemovedRemainExcluded": true,
+  "finalDatabaseExecutionByAgent": "Not executed; complete script will self-check during user execution",
+  "sha256": "4fd773c87043047977876f1d84649ddc74917cb1edaa58b4ca106638377b6e49"
+}
