@@ -1,0 +1,13 @@
+Skills Swap | master-piece-final-visitor-flow
+
+Import the individual PNGs into Figma and place each in a 1440 x 1000 frame. Add transparent hotspot layers and link them in Prototype. The full homepage is a taller reference for a scrolling frame. PNG screens are flat images.
+
+Suggested entry points
+Visitor: Home > Sign up > Verify email > Welcome > Profile setup > Dashboard
+Exchange: Categories > Skill details > Skill partners > Partner profile > Exchange request > Request sent > Swap requests > Chat > Sessions > Session details > Meeting > Session review
+Career: AI > Career path setup > Career path preview > Career path > Skill details
+Expert: Pricing > Checkout > Subscription > Expert booking (demo Plus active)
+Expert approval: Apply expert > Expert applications (Admin) > Expert workspace
+Admin: Admin login > Dashboard > choose a section from the sidebar. Admin section numbers organize files, not required sequential navigation.
+
+Screens were captured from the desktop English light UI. The extra expert booking state simulates active Plus for the mockup. The remote home hero video did not appear in the capture.
