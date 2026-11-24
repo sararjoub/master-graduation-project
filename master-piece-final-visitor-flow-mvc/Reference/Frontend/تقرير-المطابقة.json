@@ -1,0 +1,21 @@
+{
+  "htmlPages": 59,
+  "currentChangeChecks": {
+    "ok": true,
+    "errors": [],
+    "checks": [
+      "setup directly to career-path",
+      "original 8-milestone design and sidebar",
+      "dashboard View My Career Path to same timeline",
+      "progress preserved on return",
+      "timeline 20 viewport/language/theme combinations",
+      "user settings removed; edit inside profile"
+    ]
+  },
+  "responsiveTimelineChecks": 20,
+  "originalTimelineStylesheetPreserved": true,
+  "allLocalReferencesValid": true,
+  "allJavascriptSyntaxValid": true,
+  "memberSettingsRemoved": true,
+  "noBrowserStorage": true
+}

@@ -1,0 +1,13 @@
+@model CategoryOverviewViewModel
+@{ ViewData["BodyClass"] = "wf-page"; }
+@section Head {
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>@Model.Name - Skills Swap</title>
+<link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/category-overview.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css"><link rel="stylesheet" href="css/responsive-refinements.css"><link rel="stylesheet" href="css/brand.css"><link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg"><link rel="stylesheet" href="css/interface-polish.css">
+}
+@await Html.PartialAsync("_Navigation")
+<main class="wf-section"><div class="wf-container"><div class="wf-header"><h1>@Model.Name</h1><p>@(string.IsNullOrWhiteSpace(Model.Description) ? "Select a subcategory to discover its published skills." : Model.Description)</p></div>
+@if (Model.SubCategories.Count == 0) { <div class="wf-note" role="status">No active subcategories are available in this category yet.</div> }
+else { <div class="categories-grid">@foreach (var subCategory in Model.SubCategories) { <a class="category-card" href="/sub-category.html?slug=@Uri.EscapeDataString(subCategory.Slug)"><div class="category-icon">📚</div><h3 class="category-name">@subCategory.Name</h3><p class="category-description">@subCategory.SkillCount published skill@(subCategory.SkillCount == 1 ? "" : "s")</p></a> }</div> }
+<p><a href="/categories.html" class="btn btn-outline">← All categories</a></p></div></main>
+@await Html.PartialAsync("_Footer2")
+<script src="js/animations.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script><script src="js/icon-tones.js"></script><script src="js/interface-polish.js"></script>

@@ -1,0 +1,19 @@
+@{
+    ViewData["BodyClass"] = "wf-page";
+}
+
+@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Expert workspace - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/expert-workspace.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+}
+
+@await Html.PartialAsync("_Navigation")
+<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>Expert workspace</h1><p>Approved members manage teaching commitments independently of their learner subscription.</p></div><div class="wf-grid"><section class="wf-card"><h2>Approval status</h2><span class="wf-badge">Sample: application under review</span><p>An approved expert receives a badge for the reviewed skill and can offer sessions in that skill.</p><a href="apply-expert.html" class="btn btn-outline">View application requirements</a></section><section class="wf-card"><h2>Availability preferences</h2><form data-wf-form="availability"><div class="wf-errors" role="alert"></div><div class="form-group"><label class="form-label" for="days">Preferred teaching days</label><select class="form-input" id="days" name="days"><option value="weekend">Weekends</option><option value="weekday">Weekdays</option></select></div><div class="form-group"><label class="form-label" for="timezone">Timezone</label><select class="form-input" id="timezone" name="timezone"><option value="Asia/Amman">Asia/Amman</option><option value="Europe/London">Europe/London</option></select></div><div class="form-group"><label class="form-label" for="start">Start time</label><input class="form-input" id="start" name="start" type="time" value="17:00" required></div><div class="form-group"><label class="form-label" for="end">End time</label><input class="form-input" id="end" name="end" type="time" value="19:00" required></div><button class="btn btn-primary" type="submit">Preview availability</button><p class="wf-feedback" role="status" aria-live="polite"></p></form><div class="wf-note " role="note">Availability is not saved. A database calendar must prevent conflicting appointments.</div></section></div><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+@await Html.PartialAsync("_Footer2")
+<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/expert-workspace.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>

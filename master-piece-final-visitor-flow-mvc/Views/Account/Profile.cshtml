@@ -1,0 +1,32 @@
+@model ProfileViewModel
+@section Head {
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>My Profile - Skills Swap</title>
+<link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/profile.css"><link rel="stylesheet" href="css/name-outline.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css"><link rel="stylesheet" href="css/responsive-refinements.css"><link rel="stylesheet" href="css/brand.css"><link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg"><link rel="stylesheet" href="css/interface-polish.css"><script src="js/visitor-flow.js"></script><script src="js/skill-access.js"></script>}
+<nav class="navbar navbar-authed"><div class="navbar-container">
+<a href="home.html" class="navbar-logo"><span class="brand-symbol">↔</span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
+<div class="navbar-links"><a href="dashboard.html" class="navbar-link">Dashboard</a><a href="categories.html" class="navbar-link">Categories</a><a href="career-path.html" class="navbar-link">Career Path</a><a href="skill-partners.html" class="navbar-link">Find Partners</a></div>
+<div class="navbar-actions"><div class="navbar-user" id="userMenu"><button class="navbar-avatar" id="avatarBtn"><span>@Model.Initials</span></button><div class="user-dropdown" id="userDropdown"><div class="dropdown-header"><div class="avatar avatar-md"><span>@Model.Initials</span></div><div><strong>@Model.FullName</strong><span>@Model.Email</span></div></div><div class="dropdown-divider"></div><a href="profile.html" class="dropdown-item">👤 My Profile</a><a href="dashboard.html" class="dropdown-item">📊 Dashboard</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="dropdown-item dropdown-logout" type="submit">🚪 Logout</button></form></div></div></div>
+</div></nav>
+<section class="profile-section"><div class="container">
+<div class="profile-header-card animate-fade-rise"><div class="profile-avatar"><span>@Model.Initials</span></div><div class="profile-info"><h1 class="profile-name">@Model.FullName</h1><p class="profile-role">Skills Swap member</p><div class="profile-meta">@if (Model.AverageRating.HasValue) { <div class="profile-rating"><span class="rating-star">★</span><span class="rating-value">@Model.AverageRating.Value.ToString("0.0")</span><span class="rating-reviews">· @Model.ReviewsCount reviews</span></div> }<div class="profile-location"><span class="location-icon">📍</span><span>@(string.IsNullOrWhiteSpace(Model.Location) ? "Location not added" : Model.Location)</span></div></div></div><div class="profile-header-actions"><a class="btn btn-primary" href="profile-setup.html">✏️ Edit Profile</a></div></div>
+<div class="profile-stats stagger-children">
+<div class="profile-stat"><span class="stat-number">@Model.ActiveSessionsCount</span><span class="stat-name">Active Sessions</span></div>
+<div class="profile-stat"><span class="stat-number">@Model.LearnedSkillsCount</span><span class="stat-name">Learning Interests</span></div>
+<div class="profile-stat"><span class="stat-number">@Model.ReviewsCount</span><span class="stat-name">Reviews</span></div>
+<div class="profile-stat"><span class="stat-number">@Model.ConnectionsCount</span><span class="stat-name">Connections</span></div>
+</div>
+<div class="profile-grid"><div class="profile-main animate-fade-rise-delay-1">
+<div class="profile-block"><div class="block-header"><h2>About</h2></div><p data-user-content>@(string.IsNullOrWhiteSpace(Model.Bio) ? "No bio added yet." : Model.Bio)</p></div>
+<div class="profile-block"><div class="block-header"><h2>Can Teach</h2></div><div class="skill-tags">@if (Model.TeachSkills.Count == 0) { <span class="wf-muted">No teaching skills selected.</span> }@foreach (var skill in Model.TeachSkills) { <span class="skill-tag">@skill.Name</span> }</div></div>
+<div class="profile-block"><div class="block-header"><h2>Wants to Learn</h2></div><div class="skill-tags">@if (Model.LearnSkills.Count == 0) { <span class="wf-muted">No learning skills selected.</span> }@foreach (var skill in Model.LearnSkills) { <span class="skill-tag skill-tag-want">@skill.Name</span> }</div></div>
+<div class="profile-block"><div class="block-header"><h2>Reviews (@Model.ReviewsCount)</h2></div><div class="reviews-list">
+@if (Model.Reviews.Count == 0) { <p class="wf-muted">No verified reviews yet.</p> }
+@foreach (var review in Model.Reviews) { <div class="review-item"><div class="review-avatar"><span>@review.ReviewerInitials</span></div><div class="review-content"><div class="review-header"><strong>@review.ReviewerName</strong><div class="review-stars">@for (var i=0;i<review.Rating;i++) { <span>★</span> }</div></div>@if (!string.IsNullOrWhiteSpace(review.Comment)) { <p class="review-text" data-user-content>@review.Comment</p> }<span class="review-time">@review.CreatedAtUtc.ToString("yyyy-MM-dd")</span></div></div> }
+</div></div>
+</div>
+<aside class="profile-side animate-slide-in-right"><div class="profile-block"><div class="block-header"><h2>Experience</h2></div><div class="experience-list">@if (Model.TeachSkills.Count == 0) { <p class="wf-muted">No experience information added.</p> }@foreach (var skill in Model.TeachSkills) { <div class="experience-item"><div class="experience-header"><span class="experience-title">@skill.Name</span><span class="badge badge-info">@skill.Level</span></div></div> }</div></div>
+<div class="profile-block"><div class="block-header"><h2>Availability</h2></div><p class="availability-text">No expert availability configured.</p></div>
+</aside></div>
+</div></section>
+@await Html.PartialAsync("_Footer")
+<script src="js/animations.js"></script><script src="js/profile.js" asp-append-version="true"></script><script src="js/name-outline.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script><script src="js/icon-tones.js"></script><script src="js/interface-polish.js"></script>

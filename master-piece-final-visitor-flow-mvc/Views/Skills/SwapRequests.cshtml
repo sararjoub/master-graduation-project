@@ -1,0 +1,110 @@
+@model PeerRequestList
+@section Head {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swap Requests - Skills Swap</title>
+
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/swap-requests.css">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+}
+@await Html.PartialAsync("_Navigation")
+<section class="requests-section"><div class="container">
+    <header class="requests-header animate-fade-rise">
+        <div><h1>Learning Requests</h1><p>Manage incoming and outgoing requests and view their history.</p></div>
+        <a class="btn btn-primary" href="/categories.html">Find Partners</a>
+    </header>
+    <nav class="tabs" aria-label="Request lists">
+        <a class="tab @(Model.Tab == "incoming" ? "active" : "")" href="?tab=incoming">Incoming <span class="tab-badge">@Model.IncomingPending</span></a>
+        <a class="tab @(Model.Tab == "outgoing" ? "active" : "")" href="?tab=outgoing">Outgoing <span class="tab-badge">@Model.OutgoingPending</span></a>
+        <a class="tab @(Model.Tab == "completed" ? "active" : "")" href="?tab=completed">History</a>
+    </nav>
+    <form class="filters-bar" action="/swap-requests.html" method="get">
+        <input type="hidden" name="tab" value="@Model.Tab">
+        <label for="request-search">Search requests</label>
+        <input id="request-search" class="search-input" name="search" maxlength="120" value="@Model.Search" placeholder="Name or skill">
+        <label for="request-status">Status</label>
+        <select id="request-status" class="filter-chip" name="status">
+            <option value="">All statuses</option>
+            @foreach (var status in Enum.GetValues<RequestStatus>())
+            {
+                <option value="@status" selected="@(Model.Status == status)">@(status == RequestStatus.Declined ? "Rejected" : status.ToString())</option>
+            }
+        </select>
+        <button class="btn btn-outline" type="submit">Apply</button>
+    </form>
+    @if (TempData["PeerRequestResult"] is string result)
+    {
+        <p role="status">@result</p>
+    }
+    @if (Model.IncomingPending == 0 && Model.OutgoingPending == 0)
+    {
+        <p>No pending requests.</p>
+    }
+    <div class="tab-content active">
+        @if (Model.Rows.Count == 0)
+        {
+            <p class="empty-state">No @(Model.Tab == "completed" ? "request history" : Model.Tab + " requests") on this page.</p>
+        }
+        <div class="requests-grid">
+            @foreach (var row in Model.Rows)
+            {
+                <article class="request-card">
+                    <div class="request-header">
+                        <div class="request-user">
+                            @if (Uri.TryCreate(row.ProfileImageUrl, UriKind.Absolute, out var imageUrl) && imageUrl.Scheme == Uri.UriSchemeHttps && string.IsNullOrEmpty(imageUrl.UserInfo))
+                            {
+                                <img class="request-avatar" src="@imageUrl.AbsoluteUri" alt="" referrerpolicy="no-referrer">
+                            }
+                            else
+                            {
+                                <div class="request-avatar" aria-hidden="true">@NameFormatting.Initials(row.Person)</div>
+                            }
+                            <div class="request-user-info">
+                                <h3>@row.Person</h3>
+                                <time class="request-time" datetime="@row.Created.ToString("O")">@row.Created.ToString("yyyy-MM-dd HH:mm") UTC</time>
+                            </div>
+                        </div>
+                        <span class="badge @(row.Status == RequestStatus.Pending ? "badge-warning" : "badge-info")">@(row.Status == RequestStatus.Declined ? "Rejected" : row.Status.ToString())</span>
+                    </div>
+                    <div class="request-body">
+                        <div class="request-skill-row"><span class="skill-label-small">Requested skill</span><span class="skill-chip">@row.Skill</span></div>
+                        <p class="request-message">@row.Message</p>
+                    </div>
+                    <div class="request-actions">
+                        <a class="btn btn-outline btn-sm" href="/request-sent.html?id=@row.Id">View details</a>
+                        @if (row.Status == RequestStatus.Pending)
+                        {
+                            <form method="post" action="/swap-requests.html">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@row.Id">
+                                @if (row.Incoming)
+                                {
+                                    <button class="btn btn-success btn-sm" name="decision" value="accept">Accept</button>
+                                    <button class="btn btn-outline btn-sm" name="decision" value="reject">Reject</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline btn-sm" name="decision" value="cancel">Cancel</button>
+                                }
+                            </form>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+    <nav aria-label="Request pages">
+        @if (Model.Page > 1) { <a class="btn btn-outline" href="?tab=@Model.Tab&page=@(Model.Page - 1)&search=@Uri.EscapeDataString(Model.Search)&status=@Model.Status">Previous</a> }
+        @if (Model.HasNext) { <a class="btn btn-outline" href="?tab=@Model.Tab&page=@(Model.Page + 1)&search=@Uri.EscapeDataString(Model.Search)&status=@Model.Status">Next</a> }
+    </nav>
+</div></section>
+@await Html.PartialAsync("_Footer2")
+    <script src="js/animations.js"></script>
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>

@@ -1,0 +1,13 @@
+@model SubCategoryPageViewModel
+@section Head {
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>@Model.Name - Skills Swap</title>
+<link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/sub-category.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css"><link rel="stylesheet" href="css/responsive-refinements.css"><link rel="stylesheet" href="css/brand.css"><link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg"><link rel="stylesheet" href="css/interface-polish.css">
+}
+@await Html.PartialAsync("_Navigation")
+<section class="sub-category-section"><div class="container"><div class="breadcrumb animate-fade-rise"><a href="/home.html">Home</a><span class="separator">/</span><a href="/categories.html">Categories</a><span class="separator">/</span><a href="/category-overview.html?slug=@Uri.EscapeDataString(Model.CategorySlug)">@Model.CategoryName</a><span class="separator">/</span><span class="current">@Model.Name</span></div>
+<div class="sub-category-header animate-fade-rise-delay-1"><div class="header-icon-wrapper"><span class="header-icon">📚</span></div><h1>@Model.Name</h1><p>Explore published skills and start your learning journey.</p></div>
+@if (Model.Skills.Count == 0) { <div class="wf-note" role="status">No published skills are available in this subcategory yet.</div> }
+else { <div class="skills-grid stagger-children">@foreach (var skill in Model.Skills) { <article class="skill-card"><div class="skill-badges"><span class="badge badge-info">@skill.Level</span><span class="badge @(skill.AccessTier == AccessTier.Plus ? "badge-warning" : "badge-success")">@skill.AccessTier</span></div><h3 class="skill-title">@skill.Name</h3><p class="skill-desc">@skill.Description</p><a class="start-learning-btn" href="/skill-details.html?slug=@Uri.EscapeDataString(skill.Slug)">View skill →</a></article> }</div> }
+</div></section>
+@await Html.PartialAsync("_Footer2")
+<script src="js/animations.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script><script src="js/icon-tones.js"></script><script src="js/interface-polish.js"></script>

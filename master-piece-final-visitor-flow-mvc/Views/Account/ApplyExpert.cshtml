@@ -1,0 +1,19 @@
+@{
+    ViewData["BodyClass"] = "wf-page";
+}
+
+@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Apply as an expert - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/apply-expert.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+}
+
+@await Html.PartialAsync("_Navigation")
+<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>Apply as an expert</h1><p>A regular member can request skill-specific expert approval.</p></div><div class="wf-grid"><section class="wf-card"><h2>Your application</h2><form data-wf-form="expert-application"><div class="wf-errors" role="alert"></div><div class="form-group"><label class="form-label" for="skill">Skill</label><select class="form-input" id="skill" name="skill"><option value="web-development">Web Development</option><option value="javascript">JavaScript</option><option value="ui-ux">UI/UX Design</option></select></div><div class="form-group"><label class="form-label" for="route">Application route</label><select class="form-input" id="route" name="route"><option value="external">External experience &amp; teaching assessment</option><option value="community">Verified community teaching history</option></select></div><div class="form-group"><label class="form-label" for="evidence">Experience, evidence, and teaching approach</label><textarea class="form-textarea" rows="4" id="evidence" name="evidence" required minlength="80" maxlength="3000"></textarea></div><div class="form-group"><label class="form-label" for="portfolio">Portfolio URL (optional)</label><input class="form-input" id="portfolio" name="portfolio" type="url" value="" maxlength="500"></div><label class="wf-check"><input type="checkbox" name="consent" required> <span>I understand approval requires human review and applies only to the selected skill.</span></label><button class="btn btn-primary" type="submit">Preview application submission</button><p class="wf-feedback" role="status" aria-live="polite"></p></form></section><section class="wf-card"><h2>Proposed review criteria</h2><ul class="wf-list"><li>Confirmed email and complete profile</li><li>Approval per skill, not for every subject</li><li>Proposed community route: 10 teaching sessions, 5 different learners, eligible mean rating 4.5+</li><li>External route: portfolio review and practical teaching assessment</li><li>No unresolved serious conduct issues</li></ul><div class="wf-note " role="note">These thresholds are proposals. A high rating never grants approval automatically, and buying Plus does not grant expert status.</div></section></div><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+@await Html.PartialAsync("_Footer2")
+<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/apply-expert.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>

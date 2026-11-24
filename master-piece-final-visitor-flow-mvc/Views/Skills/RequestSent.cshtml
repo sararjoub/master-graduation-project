@@ -1,0 +1,39 @@
+@model PeerRequestRow
+@section Head {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Sent - Skills Swap</title>
+
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/request-sent.css">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+}
+@await Html.PartialAsync("_Navigation")
+<section class="sent-section"><div class="container"><article class="sent-card animate-scale-in">
+    <h1 class="sent-title">Learning Request</h1>
+    @if (!Model.Incoming && (TempData["PeerRequestSubmitted"] as string) == Model.Id.ToString())
+    {
+        <p role="status">Your learning request was sent.</p>
+    }
+    <p class="sent-description">@(Model.Incoming ? "From" : "To") @Model.Person</p>
+    <div class="sent-summary">
+        <p><strong>Skill</strong> @Model.Skill</p>
+        <p><strong>Status</strong> @(Model.Status == RequestStatus.Declined ? "Rejected" : Model.Status.ToString())</p>
+        <p><strong>Created</strong> @Model.Created.ToString("yyyy-MM-dd HH:mm") UTC</p>
+        @if (Model.Responded is DateTime timestamp)
+        {
+            <p><strong>Processed</strong> @timestamp.ToString("yyyy-MM-dd HH:mm") UTC</p>
+        }
+        <p><strong>Learning goal</strong> @Model.Message</p>
+    </div>
+    <div class="sent-actions"><a class="btn btn-primary" href="/swap-requests.html?tab=@(Model.Incoming ? "incoming" : "outgoing")">View Requests</a></div>
+</article></div></section>
+@await Html.PartialAsync("_Footer2")
+    <script src="js/animations.js"></script>
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>

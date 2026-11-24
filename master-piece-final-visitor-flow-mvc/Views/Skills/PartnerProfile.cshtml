@@ -1,0 +1,165 @@
+@section Head {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahmad Hassan - Skills Swap</title>
+
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/partners-profile.css">
+<link rel="stylesheet" href="css/name-outline.css">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+}
+
+
+    <!--  Navbar (Authed)  -->
+    @await Html.PartialAsync("_Navigation2")
+
+    <!--  Partner Profile Section  -->
+    <section class="profile-section">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb animate-fade-rise">
+                <a href="home.html">Home</a>
+                <span class="separator">/</span>
+                <a href="skill-partners.html">Skill Partners</a>
+                <span class="separator">/</span>
+                <span class="current">Ahmad Hassan</span>
+            </div>
+
+            <!--  Profile Header Card  -->
+            <div class="profile-header-card animate-fade-rise-delay-1">
+
+                <!-- Avatar -->
+                <div class="profile-avatar">
+                    <span>AH</span>
+                </div>
+
+                <!-- Info -->
+                <div class="profile-info">
+                    <h1 class="profile-name">Ahmad Hassan</h1>
+                    <p class="profile-role">Web Development Mentor</p>
+
+                    <!-- Rating -->
+                    <div class="profile-rating">
+                        <span class="rating-star">★</span>
+                        <span class="rating-value">4.8</span>
+                        <span class="rating-reviews">· 12 reviews</span>
+                    </div>
+
+                    <!-- Location & Status -->
+                    <div class="profile-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Jordan · Available for Skill Exchange</span>
+                    </div>
+                </div>
+
+                <!-- Illustration -->
+                <div class="profile-illustration">
+                    <img 
+                        src="assests/profile-ahmad.png" 
+                        alt="Skill Exchange"
+                    >
+                </div>
+
+            </div>
+
+            <!--  Main Grid  -->
+            <div class="profile-grid">
+
+                <!--  الجانب الأيسر: About + Skills  -->
+                <div class="profile-main animate-fade-rise-delay-2">
+
+                    <!-- About -->
+                    <div class="profile-block">
+                        <h2>About</h2>
+                        <p>
+                            I enjoy helping others learn web development and exchanging skills
+                            with people who are interested in design and technology.
+                        </p>
+                    </div>
+
+                    <!-- Can Teach -->
+                    <div class="profile-block">
+                        <h2>Can Teach</h2>
+                        <div class="skill-tags">
+                            <span class="skill-tag">Web Development</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">React</span>
+                        </div>
+                    </div>
+
+                    <!-- Wants to Learn -->
+                    <div class="profile-block">
+                        <h2>Wants to Learn</h2>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag-want">UI/UX Design</span>
+                            <span class="skill-tag skill-tag-want">Graphic Design</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!--  الجانب الأيمن: Experience + Availability  -->
+                <div class="profile-side animate-slide-in-right">
+
+                    <!-- Experience -->
+                    <div class="profile-block">
+                        <h2>Experience</h2>
+                        <div class="experience-list">
+                            <div class="experience-item">
+                                <div class="experience-header">
+                                    <span class="experience-title">Web Development</span>
+                                    <span class="badge badge-warning">Advanced</span>
+                                </div>
+                            </div>
+                            <div class="experience-item">
+                                <div class="experience-header">
+                                    <span class="experience-title">JavaScript</span>
+                                    <span class="badge badge-info">Intermediate</span>
+                                </div>
+                            </div>
+                            <div class="experience-item">
+                                <div class="experience-header">
+                                    <span class="experience-title">React</span>
+                                    <span class="badge badge-info">Intermediate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Availability -->
+                    <div class="profile-block">
+                        <h2>Availability</h2>
+                        <p class="availability-text">
+                            Mon–Fri · 5–8 PM · Online
+                        </p>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button class="btn btn-primary btn-large btn-full" id="sendRequestBtn">
+                        Send Exchange Request →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+    <!-- FOOTER -->
+@await Html.PartialAsync("_Footer2")
+    <script src="js/animations.js"></script>
+    <script src="js/partner-profile.js"></script>
+
+<script src="js/workflow-catalogue.js"></script>
+<script src="js/partner-context.js"></script>
+<script src="js/name-outline.js"></script>
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>

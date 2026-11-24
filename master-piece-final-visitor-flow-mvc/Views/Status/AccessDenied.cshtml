@@ -1,0 +1,19 @@
+@{
+    ViewData["BodyClass"] = "wf-page";
+}
+
+@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Access denied - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/access-denied.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+}
+
+@await Html.PartialAsync("_Navigation")
+<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>Access denied</h1><p>You do not have permission to access this resource.</p></div><section class="wf-card"><h2>Next step</h2><div class="wf-actions"><a href="home.html" class="btn btn-primary">Home</a><a href="login.html" class="btn btn-outline">Login</a><a href="help.html" class="btn btn-outline">Support</a></div></section><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+@await Html.PartialAsync("_Footer2")
+<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/access-denied.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>

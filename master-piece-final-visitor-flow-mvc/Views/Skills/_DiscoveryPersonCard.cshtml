@@ -1,0 +1,15 @@
+@model DiscoveryPersonViewModel
+<article class="discovery-person-card @(Model.IsVerifiedExpert?"verified-expert":"")">
+<div class="person-card-top">@if(!string.IsNullOrWhiteSpace(Model.ProfileImageUrl)){<img class="partner-avatar" src="@Model.ProfileImageUrl" alt="Profile photo of @Model.DisplayName">}else{<div class="partner-avatar" aria-hidden="true">@Model.Initials</div>}
+<div class="person-identity"><div class="person-title-row"><h3>@Model.DisplayName</h3>@if(Model.IsVerifiedExpert){<span class="verified-badge"><span aria-hidden="true">✓</span> Verified expert</span>}</div><p>Teaches <strong>@Model.SkillName</strong> · @Model.TeachingLevel</p></div></div>
+@if(!string.IsNullOrWhiteSpace(Model.Biography)){<p class="person-bio">@Model.Biography</p>}@if(!string.IsNullOrWhiteSpace(Model.Experience)){<p class="person-experience"><strong>Skill experience:</strong> @Model.Experience</p>}
+<div class="person-proof">@if(Model.Rating.HasValue){<span><strong>★ @Model.Rating.Value.ToString("0.0")</strong> from @Model.ReviewCount reviews</span>}else{<span class="new-partner">New Teaching Partner · No Reviews Yet</span>}@if(Model.CompletedTeachingSessions>0){<span>@Model.CompletedTeachingSessions completed teaching sessions</span>}</div>
+<div class="person-card-actions">@if (Model.IsVerifiedExpert)
+    {
+        <span class="action-note">Expert booking arrives in a future phase</span>
+    }
+    else
+    {
+        <a class="btn btn-primary" href="/exchange-request.html?teacherId=@Model.UserId&skillId=@Model.SkillId">Request learning</a>
+    }</div>
+</article>

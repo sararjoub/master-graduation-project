@@ -1,0 +1,18 @@
+.admin-main .admin-content,.admin-main .wf-admin-content{width:min(100%,1540px);margin-inline:auto;box-sizing:border-box}
+.admin-dashboard-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;margin-top:24px;align-items:start}
+.admin-dashboard-grid>.admin-card{min-width:0;margin:0}
+.plans-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+.plans-grid>.admin-card{min-width:0;margin:0}
+.plans-grid form{display:grid;gap:14px}.plans-grid .admin-btn{margin-top:8px}
+.admin-table-wrapper{max-width:100%;overflow-x:auto}.admin-table{width:100%}.admin-table td,.admin-table th{vertical-align:middle}
+.admin-table-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.admin-table-actions .admin-btn{white-space:nowrap}
+.wf-admin-content>.users-stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0 0 24px}
+.wf-admin-content>.users-stats-grid .users-stat-card{background:var(--bg-white);border:1px solid var(--border-light);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.wf-admin-content>.users-stats-grid strong{font-size:28px;color:var(--text-dark)}
+.wf-admin-content>.users-filter-group{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px}
+.wf-admin-content>.users-filter-group button{border:1px solid var(--border-light);background:var(--bg-white);color:var(--text-medium);padding:9px 14px;border-radius:999px;cursor:pointer}
+.admin-sidebar-footer .site-preferences-admin{margin-bottom:10px}
+.admin-sidebar-footer .site-preferences{display:flex;gap:8px;align-items:center}
+.admin-sidebar-footer .site-pref-button{width:36px;height:36px;border-radius:50%;border:1px solid #ffffff2b;background:#ffffff0d;color:#fff;cursor:pointer}
+@media(max-width:1100px){.admin-dashboard-grid,.plans-grid{grid-template-columns:1fr}.wf-admin-content>.users-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.admin-main .admin-content,.admin-main .wf-admin-content{padding-inline:16px!important}.admin-stats-grid,.users-stats-grid,.wf-admin-content>.users-stats-grid{grid-template-columns:1fr!important}.admin-page-header{align-items:flex-start}.admin-table{min-width:720px}.wf-grid{grid-template-columns:1fr!important}.plans-grid{gap:16px}}

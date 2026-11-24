@@ -1,0 +1,63 @@
+@model PeerRequestForm
+@section Head {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Exchange Request - Skills Swap</title>
+
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/exchange-request.css">
+<script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+}
+@await Html.PartialAsync("_Navigation")
+<section class="exchange-section"><div class="container">
+    <header class="exchange-header animate-fade-rise">
+        <h1>Send Learning Request</h1>
+        <p>Ask @Model.Target.TeacherName to help you learn @Model.Target.SkillName.</p>
+    </header>
+    <div class="exchange-grid">
+        <aside class="partner-summary animate-slide-in-left"><div class="partner-summary-card">
+            <div class="summary-avatar-section">
+                <div class="summary-avatar" aria-hidden="true">@NameFormatting.Initials(Model.Target.TeacherName)</div>
+                <h2 class="summary-name">@Model.Target.TeacherName</h2>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-block"><span class="summary-label">Can Teach</span>
+                <span class="summary-tag">@Model.Target.SkillName</span></div>
+        </div></aside>
+        <main class="exchange-form-wrapper animate-fade-rise-delay-1">
+            @if (Model.ActiveRequestId is long activeId)
+            {
+                <div class="exchange-form">
+                    <p role="status">You already have an active learning request for this teacher and skill.</p>
+                    <a class="btn btn-primary" href="/request-sent.html?id=@activeId">View Existing Request</a>
+                </div>
+            }
+            else
+            {
+            <form class="exchange-form" action="/exchange-request.html" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="TeacherId" value="@Model.Input.TeacherId">
+                <input type="hidden" name="SkillId" value="@Model.Input.SkillId">
+                @Html.ValidationSummary()
+                <div class="form-block">
+                    <label class="form-block-label" for="message">Learning goal and optional notes</label>
+                    <textarea id="message" name="Message" class="form-textarea" rows="5" maxlength="1500" required>@Model.Input.Message</textarea>
+                </div>
+                <div class="form-actions">
+                    <a class="btn btn-outline btn-large" href="/skill-partners.html?skillSlug=@Uri.EscapeDataString(Model.Target.SkillSlug)">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-large">Send Learning Request →</button>
+                </div>
+            </form>
+            }
+        </main>
+    </div>
+</div></section>
+@await Html.PartialAsync("_Footer2")
+    <script src="js/animations.js"></script>
+<script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>

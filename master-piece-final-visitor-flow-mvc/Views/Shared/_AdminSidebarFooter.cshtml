@@ -1,0 +1,9 @@
+@using System.Security.Claims
+@{ var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name ?? "Administrator"; }
+<div class="admin-sidebar-footer">
+    <a class="admin-sidebar-link admin-account-link" href="admin-profile.html">
+        <span class="admin-sidebar-text">Admin account</span>
+        <small class="admin-account-email">@adminEmail</small>
+    </a>
+    <button class="admin-sidebar-logout" id="adminLogout" type="button">Log out</button>
+</div>

@@ -1,0 +1,10 @@
+document.addEventListener('DOMContentLoaded',function(){
+ 'use strict';const q=new URLSearchParams(location.search),goals={
+ 'full-stack':{name:'Web foundations',skills:[['web-development','Web Development'],['javascript','JavaScript'],['react','React']]},
+ 'ui-ux':{name:'UI design',skills:[['ui-ux-design','UI/UX Design'],['graphic-design','Graphic Design'],['user-research','User Research']]},
+ data:{name:'Programming start',skills:[['python','Python'],['advanced-python','Advanced Python'],['machine-learning','Machine Learning']]},
+ graphic:{name:'Visual communication',skills:[['graphic-design','Graphic Design'],['ui-ux-design','UI/UX Design'],['user-research','User Research']]},
+ mobile:{name:'Programming before mobile development',skills:[['web-development','Web Development'],['javascript','JavaScript'],['react-native','React Native']]},
+ devops:{name:'Programming foundations before DevOps',skills:[['python','Python'],['advanced-python','Advanced Python'],['devops','DevOps']]}};
+ const g=goals[q.get('goal')]||goals['full-stack'];document.getElementById('wf-plan-title').textContent=g.name;document.getElementById('wf-plan-context').textContent='Agree on the starting level and a small goal with a teacher. Basic steps are free. Advanced steps require Plus for details and exchanges. Expert booking also requires Plus.';const root=document.getElementById('wf-roadmap');g.skills.forEach(([id,name],i)=>{const div=document.createElement('article');div.className='wf-stage';const h=document.createElement('h3');h.textContent=(i+1)+'. '+name;const p=document.createElement('p');p.textContent='Find someone who teaches this skill, then agree on a chat or meeting.';const a=document.createElement('a');a.href='skill-details.html?skill='+encodeURIComponent(id);a.className='btn btn-outline';a.textContent='Find people for this skill';div.append(h,p,a);root.append(div);});
+});

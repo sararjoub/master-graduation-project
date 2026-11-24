@@ -1,0 +1,20 @@
+@{
+    ViewData["BodyClass"] = "wf-page";
+}
+
+@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Review your recommended plan - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/career-path-preview.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+}
+
+@await Html.PartialAsync("_Navigation")
+<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Learning guide</span><h1>A suggested order. Your own journey.</h1><p>A simple direction for learning with people, not a course or a formal qualification.</p></div><section class="wf-card"><h2 id="wf-plan-title">Suggested skill order</h2><p id="wf-plan-context"></p><div id="wf-roadmap"></div><div class="wf-actions"><a class="btn btn-primary" id="confirmCareerPath" href="dashboard.html">Use this path and open my dashboard →</a><a class="btn btn-outline" href="career-path-setup.html" id="refineCareerPath">Refine my suggestion</a></div><p class="wf-note">The administrator maintains the skill catalogue and suggested sequences. You choose which suggestion to follow. No per-user approval or grading is required.</p></section></div></main>
+@await Html.PartialAsync("_Footer2")
+<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/career-path-preview.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
+<script src="js/career-context.js"></script>

@@ -1,0 +1,19 @@
+@{
+    ViewData["BodyClass"] = "wf-page";
+}
+
+@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Book an expert session - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/expert-booking.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
+<link rel="stylesheet" href="css/responsive-refinements.css">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
+<link rel="stylesheet" href="css/interface-polish.css">
+<script src="js/visitor-flow.js"></script>
+<script src="js/skill-access.js"></script>
+}
+
+@await Html.PartialAsync("_Navigation")
+<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>Book an expert session</h1><p>Experts are approved for specific skills. Plus is required to confirm a booking.</p></div><div class="wf-grid"><section class="wf-card"><h2>Booking details</h2><h3 id="wf-expert-name">Ahmad Hassan</h3><p id="wf-booking-skill">Web Development</p><div class="wf-note " role="note">Sample learner: Free plan · 0 expert credits. Plus includes a limited allowance, not unlimited sessions.</div><form data-wf-form="expert-booking"><div class="wf-errors" role="alert"></div><div class="form-group"><label class="form-label" for="slot">Available sample slot</label><select class="form-input" id="slot" name="slot"><option value="2026-11-10T17:00:00+03:00">10 Nov 2026 · 5:00 PM · Asia/Amman</option><option value="2026-11-11T18:00:00+03:00">11 Nov 2026 · 6:00 PM · Asia/Amman</option></select></div><div class="form-group"><label class="form-label" for="goal">What should the session help you achieve?</label><textarea class="form-textarea" rows="4" id="goal" name="goal" required minlength="20" maxlength="2000"></textarea></div><label class="wf-check"><input type="checkbox" name="consent" required> <span>I reviewed the proposed 24-hour cancellation window and the one-credit session cost.</span></label><button class="btn btn-primary" type="submit">Review booking eligibility</button><p class="wf-feedback" role="status" aria-live="polite"></p></form></section><section class="wf-card"><h2>Your session allowance</h2><p>Plus provides 1 proposed 30-minute expert-session credit per subscription month. Final price, expert compensation, and cancellation rules need approval.</p><a href="subscription-checkout.html" class="btn btn-primary">Review Plus subscription</a><div class="wf-note " role="note">No payment or booking is made by this static preview. Existing confirmed bookings are retained if a subscription later expires.</div></section></div><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+@await Html.PartialAsync("_Footer2")
+<script src="js/animations.js"></script><script src="js/workflow-catalogue.js"></script><script src="js/workflow-ui.js"></script><script src="js/expert-booking.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script>
+<script src="js/interface-polish.js"></script>
