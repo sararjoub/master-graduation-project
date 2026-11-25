@@ -536,6 +536,12 @@ namespace SkillsSwap.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTimeOffset?>("EndedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("EndedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsExpertBooking")
                         .HasColumnType("bit");
 
@@ -561,14 +567,23 @@ namespace SkillsSwap.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EndedByUserId");
+
                     b.HasIndex("LearnerId");
 
                     b.HasIndex("SkillId");
 
                     b.HasIndex("TeacherId");
 
+                    b.HasIndex("LearnerId", "TeacherId", "SkillId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_LearningRequests_ActivePeer")
+                        .HasFilter("[IsExpertBooking] = 0 AND [EndedAtUtc] IS NULL AND [Status] IN (0, 1)");
+
                     b.ToTable("LearningRequests", t =>
                         {
+                            t.HasCheckConstraint("CK_LearningRequest_EndMetadata", "([EndedAtUtc] IS NULL AND [EndedByUserId] IS NULL) OR ([EndedAtUtc] IS NOT NULL AND [EndedByUserId] IS NOT NULL AND [Status] = 1 AND [IsExpertBooking] = 0 AND ([EndedByUserId] = [LearnerId] OR [EndedByUserId] = [TeacherId]))");
+
                             t.HasCheckConstraint("CK_LearningRequest_NotSelf", "[LearnerId] <> [TeacherId]");
                         });
                 });
@@ -581,8 +596,31 @@ namespace SkillsSwap.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("CancelledAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CancelledByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LearnerCompletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LearningObjectives")
+                        .HasMaxLength(1500)
+                        .HasColumnType("nvarchar(1500)");
 
                     b.Property<long>("LearningRequestId")
                         .HasColumnType("bigint");
@@ -595,18 +633,49 @@ namespace SkillsSwap.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1500)
+                        .HasColumnType("nvarchar(1500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTimeOffset>("StartsAt")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<DateTimeOffset?>("TeacherCompletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("LearningRequestId")
-                        .IsUnique();
+                    b.HasIndex("CancelledByUserId");
 
-                    b.ToTable("LearningSessions");
+                    b.HasIndex("LearningRequestId");
+
+                    b.HasIndex("Status", "StartsAt");
+
+                    b.ToTable("LearningSessions", t =>
+                        {
+                            t.HasCheckConstraint("CK_LearningSession_CancellationMetadata", "([CancelledAtUtc] IS NULL AND [CancelledByUserId] IS NULL AND [CancellationReason] IS NULL) OR ([Status] = 2 AND [CancelledAtUtc] IS NOT NULL AND [CancelledByUserId] IS NOT NULL AND [CancellationReason] IS NOT NULL AND LEN(LTRIM(RTRIM([CancellationReason]))) > 0)");
+
+                            t.HasCheckConstraint("CK_LearningSession_CompletionMetadata", "([CompletedAtUtc] IS NULL AND ([LearnerCompletedAtUtc] IS NULL OR [TeacherCompletedAtUtc] IS NULL)) OR ([Status] = 1 AND [CompletedAtUtc] IS NOT NULL AND [LearnerCompletedAtUtc] IS NOT NULL AND [TeacherCompletedAtUtc] IS NOT NULL AND [CompletedAtUtc] >= [LearnerCompletedAtUtc] AND [CompletedAtUtc] >= [TeacherCompletedAtUtc])");
+
+                            t.HasCheckConstraint("CK_LearningSession_CompletionState", "([LearnerCompletedAtUtc] IS NULL AND [TeacherCompletedAtUtc] IS NULL) OR [Status] IN (0, 1)");
+
+                            t.HasCheckConstraint("CK_LearningSession_Duration", "[DurationMinutes] > 0");
+
+                            t.HasCheckConstraint("CK_LearningSession_Status", "[Status] BETWEEN 0 AND 7");
+                        });
                 });
 
             modelBuilder.Entity("SkillsSwap.Models.Message", b =>
@@ -780,12 +849,73 @@ namespace SkillsSwap.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LearningSessionId", "ReviewerId")
+                    b.HasIndex("LearningSessionId")
                         .IsUnique();
 
                     b.ToTable("Reviews", t =>
                         {
                             t.HasCheckConstraint("CK_Review_Rating", "[Rating] BETWEEN 1 AND 5");
+                        });
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.SessionScheduleProposal", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<long>("LearningSessionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("ProposedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ResolvedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ResolvedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("StartsAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LearningSessionId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_SessionScheduleProposals_Pending")
+                        .HasFilter("[Status] = 0");
+
+                    b.HasIndex("ProposedByUserId");
+
+                    b.HasIndex("ResolvedByUserId");
+
+                    b.HasIndex("LearningSessionId", "Revision")
+                        .IsUnique();
+
+                    b.ToTable("SessionScheduleProposals", t =>
+                        {
+                            t.HasCheckConstraint("CK_SessionScheduleProposal_Duration", "[DurationMinutes] IN (30, 45, 60, 90)");
+
+                            t.HasCheckConstraint("CK_SessionScheduleProposal_Resolution", "([Status] = 0 AND [ResolvedAtUtc] IS NULL AND [ResolvedByUserId] IS NULL) OR ([Status] BETWEEN 1 AND 4 AND [ResolvedAtUtc] IS NOT NULL AND [ResolvedAtUtc] >= [CreatedAtUtc] AND (([Status] IN (1, 2) AND [ResolvedByUserId] IS NOT NULL AND [ResolvedByUserId] <> [ProposedByUserId]) OR ([Status] = 3 AND [ResolvedByUserId] IS NOT NULL AND [ResolvedByUserId] = [ProposedByUserId]) OR [Status] = 4))");
+
+                            t.HasCheckConstraint("CK_SessionScheduleProposal_Revision", "[Revision] > 0");
+
+                            t.HasCheckConstraint("CK_SessionScheduleProposal_Status", "[Status] BETWEEN 0 AND 4");
                         });
                 });
 
@@ -1695,6 +1825,11 @@ namespace SkillsSwap.Migrations
 
             modelBuilder.Entity("SkillsSwap.Models.LearningRequest", b =>
                 {
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("EndedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SkillsSwap.Models.ApplicationUser", "Learner")
                         .WithMany()
                         .HasForeignKey("LearnerId")
@@ -1722,8 +1857,13 @@ namespace SkillsSwap.Migrations
 
             modelBuilder.Entity("SkillsSwap.Models.LearningSession", b =>
                 {
-                    b.HasOne("SkillsSwap.Models.LearningRequest", "LearningRequest")
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
                         .WithMany()
+                        .HasForeignKey("CancelledByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SkillsSwap.Models.LearningRequest", "LearningRequest")
+                        .WithMany("Sessions")
                         .HasForeignKey("LearningRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1768,6 +1908,28 @@ namespace SkillsSwap.Migrations
                         .HasForeignKey("LearningSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LearningSession");
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.SessionScheduleProposal", b =>
+                {
+                    b.HasOne("SkillsSwap.Models.LearningSession", "LearningSession")
+                        .WithMany("ScheduleProposals")
+                        .HasForeignKey("LearningSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ProposedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ResolvedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("LearningSession");
                 });
@@ -1840,6 +2002,16 @@ namespace SkillsSwap.Migrations
             modelBuilder.Entity("SkillsSwap.Models.Category", b =>
                 {
                     b.Navigation("SubCategories");
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.LearningRequest", b =>
+                {
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.LearningSession", b =>
+                {
+                    b.Navigation("ScheduleProposals");
                 });
 #pragma warning restore 612, 618
         }

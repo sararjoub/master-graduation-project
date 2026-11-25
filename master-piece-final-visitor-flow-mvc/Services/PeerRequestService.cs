@@ -1,4 +1,5 @@
 using System.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SkillsSwap.Data;
 using SkillsSwap.Models;
@@ -8,6 +9,8 @@ namespace SkillsSwap.Services;
 public sealed class PeerRequestService(ApplicationDbContext db)
 {
     private const int PageSize = 12;
+    private const string ExistingRequest = "You already have an active learning request for this teacher and skill.";
+    private const string RetryRequest = "Another request operation was in progress. Please try again.";
 
     private IQueryable<ApplicationUser> Members => db.Users.Where(u =>
         u.Status == AccountStatus.Active && u.EmailConfirmed && u.IsProfileComplete &&
@@ -42,20 +45,46 @@ public sealed class PeerRequestService(ApplicationDbContext db)
         var message = input.Message?.Trim();
         if (string.IsNullOrEmpty(message) || message.Length > 1500)
             return (null, "Enter a learning goal up to 1,500 characters.");
-        await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
-        if (await TargetAsync(learner, input.TeacherId, input.SkillId, ct) is null)
-            return (null, "This teaching partner or skill is unavailable for your account.");
-        if (await FindActiveIdAsync(learner, input.TeacherId, input.SkillId, ct) is not null)
-            return (null, "You already have an active learning request for this teacher and skill.");
-        var request = new LearningRequest
+        LearningRequest? request = null;
+        try
         {
-            LearnerId = learner, TeacherId = input.TeacherId, SkillId = input.SkillId, Message = message,
-            CreatedAtUtc = DateTime.UtcNow, Status = RequestStatus.Pending, IsExpertBooking = false
-        };
-        db.LearningRequests.Add(request);
-        await db.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
-        return (request.Id, null);
+            await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
+            if (await TargetAsync(learner, input.TeacherId, input.SkillId, ct) is null)
+                return (null, "This teaching partner or skill is unavailable for your account.");
+            if (await FindActiveIdAsync(learner, input.TeacherId, input.SkillId, ct) is not null)
+                return (null, ExistingRequest);
+            request = new LearningRequest
+            {
+                LearnerId = learner, TeacherId = input.TeacherId, SkillId = input.SkillId, Message = message,
+                CreatedAtUtc = DateTime.UtcNow, Status = RequestStatus.Pending, IsExpertBooking = false
+            };
+            db.LearningRequests.Add(request);
+            await db.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
+            return (request.Id, null);
+        }
+        catch (Exception ex) when (HasSqlError(ex, 1205, 2601, 2627))
+        {
+            // The transaction has been disposed. Remove only this attempt's tracked entity.
+            if (request is not null)
+                db.Entry(request).State = EntityState.Detached;
+
+            if (HasSqlError(ex, 1205))
+                return (null, RetryRequest);
+
+            if (request is not null && await FindActiveIdAsync(learner, input.TeacherId, input.SkillId, ct) is not null)
+                return (null, ExistingRequest);
+
+            throw;
+        }
+    }
+
+    internal static bool HasSqlError(Exception exception, params int[] numbers)
+    {
+        for (Exception? current = exception; current is not null; current = current.InnerException)
+            if (current is SqlException sql && sql.Errors.Cast<SqlError>().Any(error => numbers.Contains(error.Number)))
+                return true;
+        return false;
     }
 
     public Task<LearningRequest?> FindAsync(long id, CancellationToken ct) =>

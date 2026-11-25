@@ -11,7 +11,8 @@ public enum RequestStatus { Pending, Accepted, Declined, Cancelled, Completed }
 public enum ExpertApplicationStatus { UnderReview, NeedsInformation, Approved, Rejected, Withdrawn }
 public enum SubscriptionStatus { Pending, Active, PastDue, Cancelled, Expired }
 public enum PaymentStatus { Pending, Paid, Failed, Refunded }
-public enum SessionStatus { Scheduled, Completed, Cancelled, NoShow }
+public enum SessionStatus { Scheduled, Completed, Cancelled, NoShow, PendingConfirmation, Declined, Withdrawn, Expired }
+public enum ScheduleProposalStatus { Pending, Confirmed, Declined, Withdrawn, Expired }
 public enum CareerPathStatus { Draft, UnderReview, ChangesRequested, Approved, Active, Completed, Archived }
 public enum ProgressStatus { Locked, Available, InProgress, Completed }
 
@@ -144,6 +145,9 @@ public sealed class LearningRequest
     public RequestStatus Status { get; set; } = RequestStatus.Pending;
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public DateTime? RespondedAtUtc { get; set; }
+    public DateTimeOffset? EndedAtUtc { get; set; }
+    public Guid? EndedByUserId { get; set; }
+    public ICollection<LearningSession> Sessions { get; set; } = [];
 }
 
 public sealed class LearningSession
@@ -156,6 +160,33 @@ public sealed class LearningSession
     [MaxLength(500)] public string? MeetingJoinUrl { get; set; }
     [MaxLength(200)] public string? MeetingProviderId { get; set; }
     public SessionStatus Status { get; set; } = SessionStatus.Scheduled;
+    [MaxLength(120)] public string? Title { get; set; }
+    [MaxLength(1500)] public string? LearningObjectives { get; set; }
+    [MaxLength(1500)] public string? Notes { get; set; }
+    public DateTimeOffset? CreatedAtUtc { get; set; }
+    public Guid? CancelledByUserId { get; set; }
+    public DateTimeOffset? CancelledAtUtc { get; set; }
+    [MaxLength(500)] public string? CancellationReason { get; set; }
+    public DateTimeOffset? LearnerCompletedAtUtc { get; set; }
+    public DateTimeOffset? TeacherCompletedAtUtc { get; set; }
+    public DateTimeOffset? CompletedAtUtc { get; set; }
+    public byte[] RowVersion { get; set; } = null!;
+    public ICollection<SessionScheduleProposal> ScheduleProposals { get; set; } = [];
+}
+
+public sealed class SessionScheduleProposal
+{
+    public long Id { get; set; }
+    public long LearningSessionId { get; set; }
+    public LearningSession LearningSession { get; set; } = null!;
+    public int Revision { get; set; }
+    public Guid ProposedByUserId { get; set; }
+    public DateTimeOffset StartsAtUtc { get; set; }
+    public int DurationMinutes { get; set; }
+    public DateTimeOffset CreatedAtUtc { get; set; }
+    public ScheduleProposalStatus Status { get; set; }
+    public Guid? ResolvedByUserId { get; set; }
+    public DateTimeOffset? ResolvedAtUtc { get; set; }
 }
 
 public sealed class Message

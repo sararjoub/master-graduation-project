@@ -40,14 +40,14 @@ public sealed class PeerRequestsController(PeerRequestService requests, UserMana
                 return RedirectToAction(nameof(Detail), new { id });
             }
             ModelState.AddModelError("", result.Error!);
+            return await RenderForm(input, ct);
         }
-        catch (Exception ex) when (ex is DbException or DbUpdateException)
+        catch (Exception ex) when (ex is DbException or DbUpdateException || PeerRequestService.HasSqlError(ex, 1205, 2601, 2627))
         {
             logger.LogWarning("Peer request creation failed ({ExceptionType}).", ex.GetType().Name);
             Response.StatusCode = 503;
             return Content("The request could not be confirmed. Check your outgoing requests before trying again.");
         }
-        return await RenderForm(input, ct);
     }
 
     [HttpGet("/swap-requests.html")]
