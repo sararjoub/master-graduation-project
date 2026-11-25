@@ -96,6 +96,8 @@ public sealed class SkillDiscoveryViewModel
 
 public sealed class DiscoveryPersonViewModel
 {
+    public long? PendingPeerRequestId { get; set; }
+    public long? AcceptedRelationshipId { get; set; }
     public int SkillId { get; set; }
     public Guid UserId { get; set; }
     public string DisplayName { get; set; } = string.Empty;
@@ -119,6 +121,18 @@ public sealed class DashboardViewModel
     public string Initials { get; set; } = string.Empty;
     public int RequestsCount { get; set; }
     public int IncomingPendingPeerRequests { get; set; }
+    public int PendingLearnerSessionRequests { get; set; }
+    public int ActiveLearningRelationships { get; set; }
+    public IReadOnlyList<DashboardSchedulingRequestRow> SchedulingRequests { get; set; } = [];
+    public int PendingAbsences { get; set; }
+    public int AwaitingMyCompletion { get; set; }
+    public int AwaitingOtherCompletion { get; set; }
+    public int CompletedTeachingSessions { get; set; }
+    public int CompletedLearningSessions { get; set; }
+    public int AwaitingMyReviews { get; set; }
+    public int ReceivedReviews { get; set; }
+    public double? TeacherAverageRating { get; set; }
+    public IReadOnlyList<DashboardSessionRow> UpcomingSessions { get; set; } = [];
     public int ActiveSessionsCount { get; set; }
     public int LearnedSkillsCount { get; set; }
     public int ConnectionsCount { get; set; }

@@ -1,3 +1,4 @@
+@model PeerSessionPage
 @{
     ViewData["BodyClass"] = "wf-page";
 }
@@ -7,13 +8,13 @@
 <link rel="stylesheet" href="css/brand.css">
 <link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
 <link rel="stylesheet" href="css/interface-polish.css">
-<script src="js/visitor-flow.js"></script>
-<script src="js/skill-access.js"></script>
+<link rel="stylesheet" href="css/workflow-ui.css">
+
+
 }
 
 @await Html.PartialAsync("_Navigation")
-<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>Session details</h1><p>An illustrative confirmed appointment; no live meeting or booking exists.</p></div><div class="wf-grid"><section class="wf-card"><h2>Learning appointment</h2><dl><dt>Partner</dt><dd>Ahmad Hassan</dd><dt>Skill</dt><dd>Web Development</dd><dt>Duration</dt><dd>30 minutes</dd><dt>State</dt><dd>Scheduled · example</dd><dt>Credit cost</dt><dd>1 included expert credit</dd></dl><div class="wf-actions"><a href="zoom-meeting.html" class="btn btn-primary">View meeting interface</a><a href="chat.html" class="btn btn-outline">View chat interface</a></div></section><section class="wf-card"><h2>Change an appointment</h2><form data-wf-form="session-change"><div class="wf-errors" role="alert"></div><div class="form-group"><label class="form-label" for="operation">Request</label><select class="form-input" id="operation" name="operation"><option value="reschedule">Propose another time</option><option value="cancel">Cancel appointment</option><option value="absence">Report absence / technical problem</option></select></div><div class="form-group"><label class="form-label" for="newdate">Proposed new date (for rescheduling)</label><input class="form-input" id="newdate" name="newdate" type="datetime-local" value="" ></div><div class="form-group"><label class="form-label" for="reason">Reason</label><textarea class="form-textarea" rows="4" id="reason" name="reason" required minlength="20" maxlength="2000"></textarea></div><button class="btn btn-primary" type="submit">Preview request</button><p class="wf-feedback" role="status" aria-live="polite"></p></form><div class="wf-note " role="note">Rescheduling needs the other participant’s acceptance. Early expert cancellation can return a credit once; late cancellations and absence require the approved policy.</div></section></div><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+@await Html.PartialAsync("_PeerSessionManagement", Model)
 @await Html.PartialAsync("_Footer2")
-<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/session-details.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
-<script src="js/icon-tones.js"></script>
-<script src="js/interface-polish.js"></script>
+<script src="js/animations.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script><script src="js/interface-polish.js"></script>

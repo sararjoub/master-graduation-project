@@ -678,6 +678,63 @@ namespace SkillsSwap.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SkillsSwap.Models.LearningSessionRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("FulfilledSessionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("LearningRequestId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("RequestedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ResolvedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ResolvedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FulfilledSessionId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_LearningSessionRequests_FulfilledSession")
+                        .HasFilter("[FulfilledSessionId] IS NOT NULL");
+
+                    b.HasIndex("LearningRequestId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_LearningSessionRequests_Pending")
+                        .HasFilter("[Status] = 0");
+
+                    b.HasIndex("RequestedByUserId");
+
+                    b.HasIndex("ResolvedByUserId");
+
+                    b.HasIndex("LearningRequestId", "CreatedAtUtc", "Id");
+
+                    b.ToTable("LearningSessionRequests", t =>
+                        {
+                            t.HasCheckConstraint("CK_LearningSessionRequest_Chronology", "[ResolvedAtUtc] IS NULL OR [ResolvedAtUtc] >= [CreatedAtUtc]");
+
+                            t.HasCheckConstraint("CK_LearningSessionRequest_Resolution", "([Status] = 0 AND [FulfilledSessionId] IS NULL AND [ResolvedAtUtc] IS NULL AND [ResolvedByUserId] IS NULL)\nOR ([Status] IN (1, 2, 3) AND [ResolvedAtUtc] IS NOT NULL AND [ResolvedByUserId] IS NOT NULL\n    AND (([Status] = 1 AND [FulfilledSessionId] IS NOT NULL AND [ResolvedByUserId] <> [RequestedByUserId])\n         OR ([Status] = 2 AND [FulfilledSessionId] IS NULL AND [ResolvedByUserId] = [RequestedByUserId])\n         OR ([Status] = 3 AND [FulfilledSessionId] IS NULL)))");
+
+                            t.HasCheckConstraint("CK_LearningSessionRequest_Status", "[Status] BETWEEN 0 AND 3");
+                        });
+                });
+
             modelBuilder.Entity("SkillsSwap.Models.Message", b =>
                 {
                     b.Property<long>("Id")
@@ -855,6 +912,110 @@ namespace SkillsSwap.Migrations
                     b.ToTable("Reviews", t =>
                         {
                             t.HasCheckConstraint("CK_Review_Rating", "[Rating] BETWEEN 1 AND 5");
+                        });
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.SessionAbsenceRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("LearningSessionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("RequestedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("RequestedForStartsAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ResolvedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ResolvedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LearningSessionId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_SessionAbsenceRequests_Pending")
+                        .HasFilter("[Status] = 0");
+
+                    b.HasIndex("RequestedByUserId");
+
+                    b.HasIndex("ResolvedByUserId");
+
+                    b.HasIndex("LearningSessionId", "CreatedAtUtc", "Id");
+
+                    b.ToTable("SessionAbsenceRequests", t =>
+                        {
+                            t.HasCheckConstraint("CK_SessionAbsenceRequest_Chronology", "[CreatedAtUtc] < [RequestedForStartsAtUtc]\nAND ([ResolvedAtUtc] IS NULL OR [ResolvedAtUtc] >= [CreatedAtUtc])\nAND ([Status] <> 1 OR [ResolvedAtUtc] < [RequestedForStartsAtUtc])\nAND ([Status] <> 4 OR [ResolvedAtUtc] >= [RequestedForStartsAtUtc])");
+
+                            t.HasCheckConstraint("CK_SessionAbsenceRequest_Reason", "LEN(LTRIM(RTRIM([Reason]))) > 0");
+
+                            t.HasCheckConstraint("CK_SessionAbsenceRequest_Resolution", "([Status] = 0 AND [ResolvedAtUtc] IS NULL AND [ResolvedByUserId] IS NULL)\nOR ([Status] = 4 AND [ResolvedAtUtc] IS NOT NULL AND [ResolvedByUserId] IS NULL)\nOR ([Status] IN (1, 2, 3) AND [ResolvedAtUtc] IS NOT NULL AND [ResolvedByUserId] IS NOT NULL\n    AND (([Status] = 1 AND [ResolvedByUserId] = [RequestedByUserId])\n         OR ([Status] IN (2, 3) AND [ResolvedByUserId] <> [RequestedByUserId])))");
+
+                            t.HasCheckConstraint("CK_SessionAbsenceRequest_Status", "[Status] BETWEEN 0 AND 4");
+                        });
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.SessionScheduleHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("ChangedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("ChangedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("LearningSessionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("NewDurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("NewStartsAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("PreviousDurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("PreviousStartsAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangedByUserId");
+
+                    b.HasIndex("LearningSessionId", "ChangedAtUtc", "Id");
+
+                    b.ToTable("SessionScheduleHistory", t =>
+                        {
+                            t.HasCheckConstraint("CK_SessionScheduleHistory_ActualChange", "[PreviousStartsAtUtc] <> [NewStartsAtUtc] OR [PreviousDurationMinutes] <> [NewDurationMinutes]");
+
+                            t.HasCheckConstraint("CK_SessionScheduleHistory_Chronology", "[ChangedAtUtc] < [NewStartsAtUtc]");
+
+                            t.HasCheckConstraint("CK_SessionScheduleHistory_Durations", "[PreviousDurationMinutes] > 0 AND [NewDurationMinutes] IN (30, 45, 60, 90)");
                         });
                 });
 
@@ -1871,6 +2032,31 @@ namespace SkillsSwap.Migrations
                     b.Navigation("LearningRequest");
                 });
 
+            modelBuilder.Entity("SkillsSwap.Models.LearningSessionRequest", b =>
+                {
+                    b.HasOne("SkillsSwap.Models.LearningSession", null)
+                        .WithMany()
+                        .HasForeignKey("FulfilledSessionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SkillsSwap.Models.LearningRequest", null)
+                        .WithMany()
+                        .HasForeignKey("LearningRequestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ResolvedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("SkillsSwap.Models.Message", b =>
                 {
                     b.HasOne("SkillsSwap.Models.LearningRequest", "LearningRequest")
@@ -1910,6 +2096,41 @@ namespace SkillsSwap.Migrations
                         .IsRequired();
 
                     b.Navigation("LearningSession");
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.SessionAbsenceRequest", b =>
+                {
+                    b.HasOne("SkillsSwap.Models.LearningSession", null)
+                        .WithMany()
+                        .HasForeignKey("LearningSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ResolvedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.SessionScheduleHistory", b =>
+                {
+                    b.HasOne("SkillsSwap.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillsSwap.Models.LearningSession", null)
+                        .WithMany()
+                        .HasForeignKey("LearningSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SkillsSwap.Models.SessionScheduleProposal", b =>

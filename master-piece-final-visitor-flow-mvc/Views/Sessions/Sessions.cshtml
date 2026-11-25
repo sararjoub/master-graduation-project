@@ -1,3 +1,4 @@
+@model PeerSessionPage
 @{
     ViewData["BodyClass"] = "wf-page";
 }
@@ -7,13 +8,13 @@
 <link rel="stylesheet" href="css/brand.css">
 <link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
 <link rel="stylesheet" href="css/interface-polish.css">
-<script src="js/visitor-flow.js"></script>
-<script src="js/skill-access.js"></script>
+<link rel="stylesheet" href="css/workflow-ui.css">
+
+
 }
 
 @await Html.PartialAsync("_Navigation")
-<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>My sessions</h1><p>Session history is separate from the overall exchange agreement.</p></div><section class="wf-card"><h2>Sample sessions</h2><div class="wf-table-wrap"><table class="wf-table"><thead><tr><th scope="col">Skill</th><th scope="col">Partner</th><th scope="col">Time</th><th scope="col">State</th><th scope="col">Details</th></tr></thead><tbody><tr><td>Web Development</td><td>Ahmad Hassan</td><td>10 Nov 2026 · 5:00 PM (Amman)</td><td>Scheduled</td><td><a href="session-details.html" class="btn btn-outline">Open details</a></td></tr><tr><td>UI/UX Design</td><td>Lana Khalid</td><td>Past example</td><td>Completed</td><td><a href="session-review.html" class="btn btn-outline">Review completed example</a></td></tr></tbody></table></div></section><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+@await Html.PartialAsync("_PeerSessionManagement", Model)
 @await Html.PartialAsync("_Footer2")
-<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/sessions.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
-<script src="js/icon-tones.js"></script>
-<script src="js/interface-polish.js"></script>
+<script src="js/animations.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
+<script src="js/icon-tones.js"></script><script src="js/interface-polish.js"></script>

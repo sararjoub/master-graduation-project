@@ -8,6 +8,14 @@
     {
         <span class="action-note">Expert booking arrives in a future phase</span>
     }
+    else if (Model.AcceptedRelationshipId is long relationshipId)
+    {
+        <a class="btn btn-primary" href="/sessions.html?requestId=@relationshipId">Manage Sessions</a>
+    }
+    else if (Model.PendingPeerRequestId is long pendingId)
+    {
+        <a class="btn btn-primary" href="/request-sent.html?id=@pendingId">View Existing Request</a>
+    }
     else
     {
         <a class="btn btn-primary" href="/exchange-request.html?teacherId=@Model.UserId&skillId=@Model.SkillId">Request learning</a>

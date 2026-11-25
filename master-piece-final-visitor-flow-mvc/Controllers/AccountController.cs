@@ -10,6 +10,7 @@ using SkillsSwap.Data;
 using SkillsSwap.Models;
 using SkillsSwap.Security;
 using SkillsSwap.Services.Email;
+using SkillsSwap.Services;
 
 namespace SkillsSwap.Controllers;
 
@@ -296,7 +297,8 @@ public class AccountController(
         if (!user.IsProfileComplete) return RedirectToAction(nameof(ProfileSetup));
         var skills = await db.UserSkills.AsNoTracking().Where(x => x.UserId == user.Id)
             .Select(x => new { x.Intent, Item = new UserSkillSummaryViewModel(x.SkillId, x.Skill.NameEn, x.Level) }).ToListAsync();
-        var reviewRows = await (from review in db.Reviews.AsNoTracking()
+        var reviewsReceived = db.Reviews.AsNoTracking().ValidPeerReviews().Where(x => x.ReviewedUserId == user.Id);
+        var reviewRows = await (from review in reviewsReceived
                              join reviewer in db.Users.AsNoTracking() on review.ReviewerId equals reviewer.Id
                              where review.ReviewedUserId == user.Id
                              orderby review.CreatedAtUtc descending
@@ -312,9 +314,9 @@ public class AccountController(
             Location = user.Location, Bio = user.Bio,
             ActiveSessionsCount = await db.LearningSessions.CountAsync(x => x.Status == SessionStatus.Scheduled && (x.LearningRequest.LearnerId == user.Id || x.LearningRequest.TeacherId == user.Id)),
             LearnedSkillsCount = skills.Count(x => x.Intent == SkillIntent.Learn),
-            ReviewsCount = await db.Reviews.CountAsync(x => x.ReviewedUserId == user.Id),
+            ReviewsCount = await reviewsReceived.CountAsync(),
             ConnectionsCount = relatedIds.Count,
-            AverageRating = reviews.Count == 0 ? null : reviews.Average(x => x.Rating),
+            AverageRating = await reviewsReceived.Select(x => (double?)x.Rating).AverageAsync(),
             TeachSkills = skills.Where(x => x.Intent == SkillIntent.Teach).Select(x => x.Item).ToList(),
             LearnSkills = skills.Where(x => x.Intent == SkillIntent.Learn).Select(x => x.Item).ToList(),
             Reviews = reviews
@@ -391,24 +393,62 @@ public class AccountController(
             .OrderByDescending(x => x.CreatedAtUtc).Take(5)
             .Select(x => new { x.Id, PersonName = x.LearnerId == user.Id ? x.Teacher.FullName : x.Learner.FullName, SkillName = x.Skill.NameEn, x.Status }).ToListAsync();
         var recent = recentRows.Select(x => new DashboardRequestViewModel(x.Id, x.PersonName, NameFormatting.Initials(x.PersonName), x.SkillName, x.Status)).ToList();
+        var validReviews = db.Reviews.AsNoTracking().ValidPeerReviews();
         var learnIds = skills.Where(x => x.Intent == SkillIntent.Learn).Select(x => x.SkillId).ToList();
         var partnerRows = await db.UserSkills.AsNoTracking()
             .Where(x => x.Intent == SkillIntent.Teach && learnIds.Contains(x.SkillId) && x.UserId != user.Id && x.User.Status == AccountStatus.Active)
             .OrderBy(x => x.User.FullName).Take(6)
             .Select(x => new { x.UserId, x.User.FullName, SkillName = x.Skill.NameEn,
-                Rating = db.Reviews.Where(r => r.ReviewedUserId == x.UserId).Select(r => (double?)r.Rating).Average() })
+                Rating = validReviews.Where(r => r.ReviewedUserId == x.UserId &&
+                    r.LearningSession.LearningRequest.SkillId == x.SkillId).Select(r => (double?)r.Rating).Average() })
             .ToListAsync();
         var partners = partnerRows.Select(x => new PartnerSummaryViewModel(x.UserId, x.FullName, NameFormatting.Initials(x.FullName), x.SkillName, x.Rating)).ToList();
-        var connectionIds = await db.LearningRequests.AsNoTracking()
-            .Where(x => x.LearnerId == user.Id || x.TeacherId == user.Id)
+        var activeRelationships = db.LearningRequests.AsNoTracking()
+            .Where(x => !x.IsExpertBooking && x.Status == RequestStatus.Accepted && x.EndedAtUtc == null &&
+                (x.LearnerId == user.Id || x.TeacherId == user.Id));
+        var connectionIds = await activeRelationships
             .Select(x => x.LearnerId == user.Id ? x.TeacherId : x.LearnerId).Distinct().ToListAsync();
+        var now = DateTimeOffset.UtcNow;
+        var peerSessions = db.LearningSessions.AsNoTracking().Where(s => !s.LearningRequest.IsExpertBooking &&
+            s.LearningRequest.Status == RequestStatus.Accepted &&
+            (s.LearningRequest.LearnerId == user.Id || s.LearningRequest.TeacherId == user.Id));
+        var upcoming = peerSessions.Where(s => s.Status == SessionStatus.Scheduled && s.StartsAt > now);
+        var elapsed = peerSessions.Where(s => s.Status == SessionStatus.Scheduled &&
+            s.LearningRequest.EndedAtUtc == null && s.StartsAt.AddMinutes(s.DurationMinutes) <= now);
+        var completed = peerSessions.VerifiedPeerCompletions();
+        var myReceivedReviews = validReviews.Where(r => r.ReviewedUserId == user.Id);
+        var awaitingScheduling = from pending in db.LearningSessionRequests.AsNoTracking()
+            join relationship in db.LearningRequests on pending.LearningRequestId equals relationship.Id
+            where pending.Status == LearningSessionRequestStatus.Pending && !relationship.IsExpertBooking &&
+                  relationship.Status == RequestStatus.Accepted && relationship.EndedAtUtc == null &&
+                  (relationship.TeacherId == user.Id || relationship.LearnerId == user.Id)
+            orderby pending.CreatedAtUtc, pending.Id
+            select new DashboardSchedulingRequestRow(relationship.Id, relationship.Skill.NameEn);
         return View(new DashboardViewModel
         {
             FullName = user.FullName, Email = user.Email ?? string.Empty, Initials = NameFormatting.Initials(user.FullName),
             RequestsCount = await db.LearningRequests.CountAsync(x => x.LearnerId == user.Id || x.TeacherId == user.Id),
             IncomingPendingPeerRequests = await db.LearningRequests.CountAsync(x =>
                 x.TeacherId == user.Id && !x.IsExpertBooking && x.Status == RequestStatus.Pending),
-            ActiveSessionsCount = await db.LearningSessions.CountAsync(x => x.Status == SessionStatus.Scheduled && (x.LearningRequest.LearnerId == user.Id || x.LearningRequest.TeacherId == user.Id)),
+            ActiveSessionsCount = await upcoming.CountAsync(),
+            PendingLearnerSessionRequests = await awaitingScheduling.CountAsync(),
+            ActiveLearningRelationships = await activeRelationships.CountAsync(),
+            SchedulingRequests = await awaitingScheduling.Take(5).ToListAsync(),
+            PendingAbsences = await db.SessionAbsenceRequests.CountAsync(p =>
+                p.Status == SessionAbsenceRequestStatus.Pending && p.RequestedForStartsAtUtc > now &&
+                upcoming.Any(s => s.Id == p.LearningSessionId)),
+            AwaitingMyCompletion = await elapsed.CountAsync(s => s.LearningRequest.TeacherId == user.Id
+                ? s.TeacherCompletedAtUtc == null : s.LearnerCompletedAtUtc == null),
+            AwaitingOtherCompletion = await elapsed.CountAsync(s => s.LearningRequest.TeacherId == user.Id
+                ? s.TeacherCompletedAtUtc != null : s.LearnerCompletedAtUtc != null),
+            CompletedTeachingSessions = await completed.CountAsync(s => s.LearningRequest.TeacherId == user.Id),
+            CompletedLearningSessions = await completed.CountAsync(s => s.LearningRequest.LearnerId == user.Id),
+            AwaitingMyReviews = await completed.CountAsync(s => s.LearningRequest.LearnerId == user.Id &&
+                !db.Reviews.Any(r => r.LearningSessionId == s.Id)),
+            ReceivedReviews = await myReceivedReviews.CountAsync(),
+            TeacherAverageRating = await myReceivedReviews.Select(r => (double?)r.Rating).AverageAsync(),
+            UpcomingSessions = await upcoming.OrderBy(s => s.StartsAt).ThenBy(s => s.Id).Take(5)
+                .Select(s => new DashboardSessionRow(s.Id, s.Title ?? s.LearningRequest.Skill.NameEn, s.StartsAt)).ToListAsync(),
             LearnedSkillsCount = skills.Count(x => x.Intent == SkillIntent.Learn), ConnectionsCount = connectionIds.Count,
             TeachSkills = skills.Where(x => x.Intent == SkillIntent.Teach).Select(x => x.Name).ToList(),
             LearnSkills = skills.Where(x => x.Intent == SkillIntent.Learn).Select(x => x.Name).ToList(),

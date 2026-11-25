@@ -52,10 +52,18 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
         if (query.Level.HasValue)
             basePartners = basePartners.Where(x => x.Level == query.Level.Value);
 
+        var validReviews = db.Reviews.AsNoTracking().ValidPeerReviews();
+        var completedSessions = db.LearningSessions.AsNoTracking().VerifiedPeerCompletions();
         var partnerRows = basePartners.Select(x => new DiscoveryPersonViewModel
         {
             UserId = x.UserId,
             SkillId = x.SkillId,
+            PendingPeerRequestId = db.LearningRequests.Where(r => r.LearnerId == currentUserId &&
+                r.TeacherId == x.UserId && r.SkillId == x.SkillId && !r.IsExpertBooking &&
+                r.EndedAtUtc == null && r.Status == RequestStatus.Pending).Select(r => (long?)r.Id).FirstOrDefault(),
+            AcceptedRelationshipId = db.LearningRequests.Where(r => r.LearnerId == currentUserId &&
+                r.TeacherId == x.UserId && r.SkillId == x.SkillId && !r.IsExpertBooking &&
+                r.EndedAtUtc == null && r.Status == RequestStatus.Accepted).Select(r => (long?)r.Id).FirstOrDefault(),
             DisplayName = x.User.FullName,
             ProfileImageUrl = x.User.ProfileImageUrl,
             Biography = x.User.Bio,
@@ -63,13 +71,12 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
             TeachingLevel = x.Level,
             Experience = x.Experience,
             AddedAtUtc = x.AddedAtUtc,
-            ReviewCount = db.Reviews.Count(r => r.ReviewedUserId == x.UserId &&
+            ReviewCount = validReviews.Count(r => r.ReviewedUserId == x.UserId &&
                 r.LearningSession.LearningRequest.SkillId == skill.Id),
-            Rating = db.Reviews.Where(r => r.ReviewedUserId == x.UserId &&
+            Rating = validReviews.Where(r => r.ReviewedUserId == x.UserId &&
                     r.LearningSession.LearningRequest.SkillId == skill.Id)
                 .Select(r => (double?)r.Rating).Average(),
-            CompletedTeachingSessions = db.LearningSessions.Count(s =>
-                s.Status == SessionStatus.Completed && s.LearningRequest.TeacherId == x.UserId &&
+            CompletedTeachingSessions = completedSessions.Count(s => s.LearningRequest.TeacherId == x.UserId &&
                 s.LearningRequest.SkillId == skill.Id)
         });
 
@@ -105,13 +112,12 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
                 TeachingLevel = x.Level,
                 Experience = db.ExpertApplications.Where(a => a.UserId == x.UserId && a.SkillId == skill.Id &&
                     a.Status == ExpertApplicationStatus.Approved).Select(a => a.Experience).FirstOrDefault(),
-                ReviewCount = db.Reviews.Count(r => r.ReviewedUserId == x.UserId &&
+                ReviewCount = validReviews.Count(r => r.ReviewedUserId == x.UserId &&
                     r.LearningSession.LearningRequest.SkillId == skill.Id),
-                Rating = db.Reviews.Where(r => r.ReviewedUserId == x.UserId &&
+                Rating = validReviews.Where(r => r.ReviewedUserId == x.UserId &&
                         r.LearningSession.LearningRequest.SkillId == skill.Id)
                     .Select(r => (double?)r.Rating).Average(),
-                CompletedTeachingSessions = db.LearningSessions.Count(s =>
-                    s.Status == SessionStatus.Completed && s.LearningRequest.TeacherId == x.UserId &&
+                CompletedTeachingSessions = completedSessions.Count(s => s.LearningRequest.TeacherId == x.UserId &&
                     s.LearningRequest.SkillId == skill.Id),
                 IsVerifiedExpert = true
             });

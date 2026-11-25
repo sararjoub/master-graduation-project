@@ -1,0 +1,185 @@
+@model PeerSessionPage
+@{
+    var list = Context.Request.Path == "/sessions.html";
+    var reviewPage = Context.Request.Path == "/session-review.html";
+    var pending = Model.Requests.FirstOrDefault(x => x.Status == LearningSessionRequestStatus.Pending);
+}
+<main class="wf-section"><div class="wf-container">
+    <div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>@(reviewPage ? "Session Review" : "Learning Sessions")</h1>
+        <p>Scheduled times are shown in UTC. The teacher sets the schedule.</p></div>
+    @if (Model.FormError is string error) { <p class="wf-note" role="alert">@error</p> }
+    @if (TempData["PeerSessionFeedback"] is string feedback) { <p class="wf-note" role="status">@feedback</p> }
+    @if (list && Model.RequestId is long requestId)
+    {
+        <section class="wf-card">
+            <h2>Learning Relationship</h2>
+            @if (Model.RelationshipActive)
+            {
+                @if (!Model.IsTeacher)
+                {
+                    <form method="post" action="/sessions/change">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="requestId" value="@requestId">
+                        @if (pending is null)
+                        {
+                            <button class="btn btn-primary" name="action" value="request">Request a Learning Session</button>
+                        }
+                        else
+                        {
+                            <p>Awaiting Scheduling</p><input type="hidden" name="itemId" value="@pending.Id">
+                            <button class="btn btn-outline" name="action" value="withdraw-request">Withdraw Session Request</button>
+                        }
+                    </form>
+                }
+                <form method="post" action="/sessions/change">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="requestId" value="@requestId">
+                    <button class="btn btn-outline" name="action" value="end">End Learning Relationship</button>
+                </form>
+            }
+            else { <p>This relationship has ended. Its history remains available.</p> }
+            @if (Model.Requests.Count > 0)
+            {
+                <details><summary>Session request history</summary><ul>
+                    @foreach (var request in Model.Requests)
+                    {
+                        <li>@request.CreatedAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC ·
+                            @(request.Status == LearningSessionRequestStatus.Pending ? "Awaiting Scheduling" : request.Status.ToString())
+                            @if (request.SessionId is long linked) { <a href="/session-details.html?id=@linked">View Scheduled Session</a> }
+                        </li>
+                    }
+                </ul></details>
+            }
+        </section>
+        @if (Model.CanPropose)
+        {
+            @if (pending is not null)
+            {
+                @await Html.PartialAsync("_DirectSessionForm", Model, new ViewDataDictionary(ViewData) { ["FulfillmentId"] = pending.Id })
+            }
+            @await Html.PartialAsync("_DirectSessionForm", Model)
+        }
+    }
+    @if (Model.Sessions.Count == 0)
+    {
+        <div class="wf-card"><p>No learning sessions found.</p><a href="/swap-requests.html">View your requests</a></div>
+    }
+    @foreach (var row in Model.Sessions)
+    {
+        var future = row.IsActive && row.Status == SessionStatus.Scheduled && row.Start > Model.Now;
+        var elapsed = row.Status == SessionStatus.Scheduled && row.Start <= Model.Now.AddMinutes(-row.Duration);
+        var myConfirmation = row.IsTeacher ? row.TeacherConfirmed : row.LearnerConfirmed;
+        var completed = row.Status == SessionStatus.Completed && row.CompletedAt.HasValue &&
+            row.LearnerConfirmed.HasValue && row.TeacherConfirmed.HasValue;
+        var absence = row.Absences.FirstOrDefault(a => a.Status == SessionAbsenceRequestStatus.Pending && a.ForStart > Model.Now);
+        <section class="wf-card">
+            <h2>@(row.Title ?? row.Skill)</h2>
+            <p>@row.Skill · @row.Partner</p>
+            <p>@row.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC · @row.Duration min ·
+                 @(elapsed ? (myConfirmation.HasValue ? (row.IsTeacher ? "Awaiting Learner Confirmation" : "Awaiting Teacher Confirmation") : "Awaiting Completion Confirmation") : row.Status.ToString())</p>
+            @if (row.Objectives is not null) { <p><strong>Objectives</strong> @row.Objectives</p> }
+            @if (!string.IsNullOrWhiteSpace(row.Notes)) { <p><strong>Notes</strong> @row.Notes</p> }
+            @if (row.CancellationReason is not null) { <p><strong>Cancellation reason</strong> @row.CancellationReason</p> }
+            <a class="btn btn-outline" href="/sessions.html?requestId=@row.RequestId">Relationship Sessions</a>
+            @if (list) { <a class="btn btn-outline" href="/session-details.html?id=@row.Id">Open Details</a> }
+            else if (reviewPage)
+            {
+                @if (row.Review is { } review)
+                {
+                    <p>Rating @review.Rating / 5</p><p>@review.Comment</p>
+                }
+                else if (completed && !row.IsTeacher)
+                {
+                    <form class="wf-form" action="/sessions/change" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="requestId" value="@row.RequestId">
+                        <input type="hidden" name="sessionId" value="@row.Id">
+                        <label class="form-group form-label">Rating <input class="form-input" type="number" name="Rating" min="1" max="5" required value="@Model.PreviousInput?.Rating"></label>
+                        <label class="form-group form-label">Comment <textarea class="form-textarea" name="Comment" maxlength="1500">@Model.PreviousInput?.Comment</textarea></label>
+                        <button class="btn btn-primary" name="action" value="review">Submit Review</button>
+                    </form>
+                }
+                <a href="/session-details.html?id=@row.Id">Back to session</a>
+            }
+            else
+            {
+                @if (row.History.Count > 0 || row.Proposals.Count > 0)
+                {
+                    <details><summary>Schedule History</summary><ul>
+                        @foreach (var h in row.History)
+                        {
+                            <li>@h.PreviousStart.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC (@h.PreviousDuration min)
+                                → @h.NewStart.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC (@h.NewDuration min)</li>
+                        }
+                        @foreach (var proposal in row.Proposals)
+                        {
+                            <li>Legacy revision @proposal.Revision · @proposal.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC · @proposal.Status</li>
+                        }
+                    </ul></details>
+                }
+                @if (row.Absences.Count > 0)
+                {
+                    <h3>Absence Requests</h3><ul>
+                        @foreach (var a in row.Absences)
+                        {
+                            <li>@(a.Status == SessionAbsenceRequestStatus.Pending && a.ForStart <= Model.Now ? "Expired Unresolved" : a.Status.ToString()) · @a.Reason</li>
+                        }
+                    </ul>
+                }
+                @if (future && row.IsTeacher)
+                {
+                    <form class="wf-form" action="/sessions/change" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="requestId" value="@row.RequestId">
+                        <input type="hidden" name="sessionId" value="@row.Id">
+                        <input type="hidden" name="Version" value="@Convert.ToBase64String(row.Version)">
+                        @await Html.PartialAsync("_SessionScheduleFields", Model.PreviousAction == "reschedule"
+                            ? Model.PreviousInput : new SessionScheduleInput { LocalStart = row.Start.UtcDateTime.ToString("yyyy-MM-ddTHH:mm"), TimeZoneId = "UTC", DurationMinutes = row.Duration })
+                        <button class="btn btn-primary" name="action" value="reschedule">Reschedule Session</button>
+                    </form>
+                    <form class="wf-form" action="/sessions/change" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="requestId" value="@row.RequestId">
+                        <input type="hidden" name="sessionId" value="@row.Id">
+                        <input type="hidden" name="Version" value="@Convert.ToBase64String(row.Version)">
+                        <label class="form-group form-label">Cancellation reason <textarea class="form-textarea" name="Reason" maxlength="500" required>@(Model.PreviousAction == "cancel" ? Model.PreviousInput?.Reason : null)</textarea></label>
+                        <button class="btn btn-outline" name="action" value="cancel">Cancel Session</button>
+                    </form>
+                }
+                @if (future && !row.IsTeacher)
+                {
+                    <form class="wf-form" action="/sessions/change" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="requestId" value="@row.RequestId">
+                        <input type="hidden" name="sessionId" value="@row.Id">
+                        @if (absence is null)
+                        {
+                            <label class="form-group form-label">Absence reason <textarea class="form-textarea" name="Reason" maxlength="500" required>@(Model.PreviousAction == "absence" ? Model.PreviousInput?.Reason : null)</textarea></label>
+                            <button class="btn btn-outline" name="action" value="absence">Request Absence</button>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="itemId" value="@absence.Id">
+                            <button class="btn btn-outline" name="action" value="withdraw-absence">Withdraw Absence Request</button>
+                        }
+                    </form>
+                }
+                @if (row.IsActive && elapsed && myConfirmation is null)
+                {
+                    <form method="post" action="/sessions/change">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="requestId" value="@row.RequestId">
+                        <input type="hidden" name="sessionId" value="@row.Id">
+                        <button class="btn btn-primary" name="action" value="complete">Confirm Session Completion</button>
+                    </form>
+                }
+                @if (row.Review is not null || completed && !row.IsTeacher)
+                {
+                    <a class="btn btn-outline" href="/session-review.html?id=@row.Id">@(row.Review is null ? "Submit Review" : "View Review")</a>
+                }
+            }
+        </section>
+    }
+    @if (list && Model.Page > 1) { <a href="?requestId=@Model.RequestId&page=@(Model.Page - 1)">Previous</a> }
+    @if (list && Model.HasNext) { <a href="?requestId=@Model.RequestId&page=@(Model.Page + 1)">Next</a> }
+</div></main>

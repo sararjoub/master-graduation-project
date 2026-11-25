@@ -30,7 +30,13 @@
         }
         <p><strong>Learning goal</strong> @Model.Message</p>
     </div>
-    <div class="sent-actions"><a class="btn btn-primary" href="/swap-requests.html?tab=@(Model.Incoming ? "incoming" : "outgoing")">View Requests</a></div>
+    <div class="sent-actions">
+        <a class="btn btn-primary" href="/swap-requests.html?tab=@(Model.Incoming ? "incoming" : "outgoing")">View Requests</a>
+        @if (Model.Status == RequestStatus.Accepted)
+        {
+            <a class="btn btn-outline" href="/sessions.html?requestId=@Model.Id">Manage Sessions</a>
+        }
+    </div>
 </article></div></section>
 @await Html.PartialAsync("_Footer2")
     <script src="js/animations.js"></script>

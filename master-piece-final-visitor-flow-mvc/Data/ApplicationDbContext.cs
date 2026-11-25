@@ -20,6 +20,9 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<LearningRequest> LearningRequests => Set<LearningRequest>();
     public DbSet<LearningSession> LearningSessions => Set<LearningSession>();
     public DbSet<SessionScheduleProposal> SessionScheduleProposals => Set<SessionScheduleProposal>();
+    public DbSet<LearningSessionRequest> LearningSessionRequests => Set<LearningSessionRequest>();
+    public DbSet<SessionAbsenceRequest> SessionAbsenceRequests => Set<SessionAbsenceRequest>();
+    public DbSet<SessionScheduleHistory> SessionScheduleHistory => Set<SessionScheduleHistory>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<CareerPath> CareerPaths => Set<CareerPath>();
@@ -45,6 +48,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         b.Entity<LearningRequest>().HasOne(x => x.Teacher).WithMany().HasForeignKey(x => x.TeacherId).OnDelete(DeleteBehavior.Restrict);
         b.Entity<LearningRequest>().ToTable(t => t.HasCheckConstraint("CK_LearningRequest_NotSelf", "[LearnerId] <> [TeacherId]"));
         ConfigureSessionFoundation(b);
+        DirectSchedulingModel.Configure(b);
         b.Entity<Message>().HasOne(x => x.Sender).WithMany().HasForeignKey(x => x.SenderId).OnDelete(DeleteBehavior.Restrict);
         b.Entity<Message>().HasIndex(x => new { x.LearningRequestId, x.SentAtUtc });
         b.Entity<Review>().HasIndex(x => x.LearningSessionId).IsUnique();

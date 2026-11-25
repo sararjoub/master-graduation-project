@@ -1,0 +1,18 @@
+@model PeerSessionPage
+@{
+    var itemId = ViewData["FulfillmentId"] as long?;
+    var input = Model.PreviousAction == "schedule" && Model.PreviousItemId == itemId ? Model.PreviousInput : null;
+}
+<section class="wf-card">
+    <h2>@(itemId.HasValue ? "Schedule Session for Learner Request" : "Schedule an Independent Session")</h2>
+    <form class="wf-form" action="/sessions/change" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="requestId" value="@Model.RequestId">
+        @if (itemId.HasValue) { <input type="hidden" name="itemId" value="@itemId"> }
+        <label class="form-group form-label">Title <input class="form-input" name="Title" value="@input?.Title" required maxlength="120"></label>
+        <label class="form-group form-label">Learning objectives <textarea class="form-textarea" name="Objectives" required maxlength="1500">@input?.Objectives</textarea></label>
+        <label class="form-group form-label">Notes <textarea class="form-textarea" name="Notes" maxlength="1500">@input?.Notes</textarea></label>
+        @await Html.PartialAsync("_SessionScheduleFields", input ?? new SessionScheduleInput())
+        <button class="btn btn-primary" name="action" value="schedule">Schedule Session</button>
+    </form>
+</section>

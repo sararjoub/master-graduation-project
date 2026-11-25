@@ -21,7 +21,7 @@ public sealed class PeerRequestService(ApplicationDbContext db)
 
     public Task<long?> FindActiveIdAsync(Guid learner, Guid teacher, int skill, CancellationToken ct) =>
         PeerRequests.Where(r => r.LearnerId == learner && r.TeacherId == teacher && r.SkillId == skill &&
-                (r.Status == RequestStatus.Pending || r.Status == RequestStatus.Accepted))
+                r.EndedAtUtc == null && (r.Status == RequestStatus.Pending || r.Status == RequestStatus.Accepted))
             .OrderBy(r => r.Id).Select(r => (long?)r.Id).FirstOrDefaultAsync(ct);
 
     public async Task<PeerRequestTarget?> TargetAsync(Guid learner, Guid teacher, int skill, CancellationToken ct)

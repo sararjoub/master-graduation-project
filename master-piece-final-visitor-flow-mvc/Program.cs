@@ -15,6 +15,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<CatalogueService>();
 builder.Services.AddScoped<SkillDiscoveryService>();
 builder.Services.AddScoped<PeerRequestService>();
+builder.Services.AddScoped<PeerSessionService>();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IAuthorizationHandler, RequestAuthorization>();
 builder.Services.AddScoped<AdminPeopleService>();
 builder.Services.AddScoped<AdminOperationsService>();

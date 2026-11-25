@@ -1,0 +1,19 @@
+@model SessionScheduleInput
+<label class="form-group form-label">Local date and time <input class="form-input" type="datetime-local" name="LocalStart" value="@Model?.LocalStart" required></label>
+<label class="form-group form-label">Time zone
+    <select class="form-input" name="TimeZoneId" required>
+        <option value="">Select a time zone</option>
+        @foreach (var zone in TimeZoneInfo.GetSystemTimeZones())
+        {
+            <option value="@zone.Id" selected="@(Model?.TimeZoneId == zone.Id)">@zone.DisplayName</option>
+        }
+    </select>
+</label>
+<label class="form-group form-label">Duration
+    <select class="form-input" name="DurationMinutes">
+        @foreach (var duration in new[] { 30, 45, 60, 90 })
+        {
+            <option value="@duration" selected="@(Model?.DurationMinutes == duration)">@duration minutes</option>
+        }
+    </select>
+</label>
