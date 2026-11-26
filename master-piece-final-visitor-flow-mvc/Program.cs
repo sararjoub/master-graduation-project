@@ -17,6 +17,10 @@ builder.Services.AddScoped<SkillDiscoveryService>();
 builder.Services.AddScoped<PeerRequestService>();
 builder.Services.AddScoped<PeerSessionService>();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddOptions<SessionCompletionOptions>().BindConfiguration("SessionCompletion")
+    .Validate(o => o.IntervalSeconds is >= 1 and <= 3600, "Invalid session completion interval.")
+    .ValidateOnStart();
+builder.Services.AddHostedService<SessionCompletionWorker>();
 builder.Services.AddSingleton<IAuthorizationHandler, RequestAuthorization>();
 builder.Services.AddScoped<AdminPeopleService>();
 builder.Services.AddScoped<AdminOperationsService>();
@@ -35,6 +39,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(SecurityPolicies.CompleteProfile, policy =>
         policy.RequireAuthenticatedUser().AddRequirements(new CompleteProfileRequirement()));
 });
+builder.Services.AddOptions<SkillsSwap.Models.VideoMeetingOptions>().BindConfiguration("VideoMeeting")
+    .Validate(o => o.Domain == "meet.jit.si" && o.OpeningMinutes is >= 0 and <= 120,
+        "Invalid video meeting domain or opening margin.")
+    .ValidateOnStart();
 var rateLimits = builder.Configuration.GetSection(AccountRateLimitOptions.SectionName).Get<AccountRateLimitOptions>() ?? new();
 builder.Services.AddRateLimiter(options =>
 {
@@ -44,6 +52,9 @@ builder.Services.AddRateLimiter(options =>
         context.HttpContext.Response.ContentType = "text/plain; charset=utf-8";
         await context.HttpContext.Response.WriteAsync("Too many requests. Please wait and try again.", cancellationToken);
     };
+    options.AddPolicy("learning-chat-send", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "anonymous",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.AddPolicy("account-sensitive", httpContext => RateLimitPartition.GetFixedWindowLimiter(
         httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = Math.Max(1, rateLimits.SensitivePermitLimit), Window = TimeSpan.FromMinutes(Math.Max(1, rateLimits.WindowMinutes)), QueueLimit = 0 }));
@@ -95,8 +106,8 @@ using (var scope = app.Services.CreateScope())
 
 app.UseStaticFiles();
 app.UseRouting();
-app.UseRateLimiter();
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 app.MapControllerRoute("areas", "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 app.MapControllerRoute("default", "{controller}/{action}/{id?}");

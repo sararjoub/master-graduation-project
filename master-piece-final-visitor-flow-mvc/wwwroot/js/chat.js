@@ -1,234 +1,140 @@
+(() => {
+    const chat = document.querySelector('#learningChat[data-request]');
+    if (!chat?.dataset.request) return;
+    const id = chat.dataset.request;
+    const endpoint = '/chat/' + id + '/messages';
+    const list = document.querySelector('#chatMessages');
+    const status = document.querySelector('#chatStatus');
+    const form = document.querySelector('#chatCompose');
+    const input = document.querySelector('#messageInput');
+    const submit = form.querySelector('button');
+    const older = document.querySelector('#chatOlder');
+    const token = form.elements.__RequestVerificationToken.value;
+    const selected = document.querySelector('[data-conversation="' + id + '"]');
+    const rendered = new Set();
+    const waitingRead = new Set();
+    let latest, earliest, timer;
+    let delay = 5000;
+    let fetching = false;
+    let sending = false;
+    let canSend = !input.disabled;
+    let sendError = '';
 
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    // 1. عناصر الصفحة
-    let conversationItems = document.querySelectorAll('.conversation-item');
-    let chatMessages = document.getElementById('chatMessages');
-    let messageInput = document.getElementById('messageInput');
-    let sendBtn = document.getElementById('sendBtn');
-    let typingIndicator = document.getElementById('typingIndicator');
-    let chatSearchInput = document.getElementById('chatSearchInput');
-    let newChatBtn = document.getElementById('newChatBtn');
-
-    // 2. التبديل بين المحادثات
-    conversationItems.forEach(item => {
-        item.addEventListener('click', () => {
-            // إزالة active من الجميع
-            conversationItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-
-            // تحديث رأس المحادثة
-            let name = item.querySelector('.conversation-top strong').textContent;
-            let avatar = item.querySelector('.conversation-avatar span').textContent;
-            let isOnline = item.querySelector('.online-dot') !== null;
-
-            updateChatHeader(name, avatar, isOnline);
-
-            // إخفاء Unread Badge
-            let badge = item.querySelector('.unread-badge');
-            if (badge) badge.remove();
-
-            // محاكاة تحميل الرسائل
-            showNotification(`Opening chat with ${name}...`, 'info');
-
-            // تأثير ظهور الرسائل
-            let messages = chatMessages.querySelectorAll('.message');
-            messages.forEach((msg, index) => {
-                msg.style.opacity = '0';
-                msg.style.transform = 'translateY(10px)';
-                setTimeout(() => {
-                    msg.style.transition = 'all 0.3s ease';
-                    msg.style.opacity = '1';
-                    msg.style.transform = 'translateY(0)';
-                }, index * 80);
-            });
-        });
-    });
-
-    // 3. تحديث رأس المحادثة
-    function updateChatHeader(name, avatar, isOnline) {
-        let headerName = document.querySelector('.chat-header-info strong');
-        let headerAvatar = document.querySelector('.chat-header-avatar span:first-child');
-        let headerStatus = document.querySelector('.chat-status');
-
-        if (headerName) headerName.textContent = name;
-        if (headerAvatar) headerAvatar.textContent = avatar;
-
-        if (headerStatus) {
-            if (isOnline) {
-                headerStatus.innerHTML = '<span class="status-dot-inline"></span> Online';
-                headerStatus.style.color = 'var(--success)';
-            } else {
-                headerStatus.textContent = 'Offline';
-                headerStatus.style.color = 'var(--text-light)';
-            }
+    function post(url, values) {
+        values.set('__RequestVerificationToken', token);
+        return fetch(url, { method: 'POST', body: values });
+    }
+    function show(message) { status.textContent = sendError || message; }
+    function updateComposer() {
+        input.disabled = !canSend;
+        submit.disabled = sending || !canSend;
+    }
+    function render(rows, before) {
+        const fragment = document.createDocumentFragment();
+        for (const row of rows) {
+            if (row.unread) waitingRead.add(row.id);
+            if (rendered.has(row.id)) continue;
+            rendered.add(row.id);
+            const message = document.createElement('div');
+            message.className = 'message ' + (row.mine ? 'sent' : 'received');
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = row.body;
+            const time = document.createElement('time');
+            time.className = 'message-time';
+            time.dateTime = row.utc;
+            time.textContent = new Date(row.utc).toLocaleString();
+            content.append(bubble, time);
+            message.append(content);
+            fragment.append(message);
+        }
+        if (before) {
+            const height = list.scrollHeight;
+            list.prepend(fragment);
+            list.scrollTop += list.scrollHeight - height;
+        } else {
+            const atBottom = list.scrollHeight - list.clientHeight - list.scrollTop < 50;
+            list.append(fragment);
+            if (atBottom) list.scrollTop = list.scrollHeight;
         }
     }
-
-    // 4. إرسال الرسائل
-
-    function sendMessage() {
-        let text = messageInput.value.trim();
-        if (!text) return;
-
-        // إنشاء رسالة جديدة
-        let message = document.createElement('div');
-        message.className = 'message sent animate-fade-rise';
-        message.innerHTML = `
-            <div class="message-content">
-                <div class="message-bubble">${escapeHtml(text)}</div>
-                <span class="message-time">${getCurrentTime()}</span>
-            </div>
-        `;
-
-        chatMessages.appendChild(message);
-        messageInput.value = '';
-        scrollToBottom();
-
-        // محاكاة رد من الطرف الآخر
-        simulateReply();
+    async function markDisplayed() {
+        if (document.hidden || waitingRead.size === 0) return;
+        const ids = [...waitingRead].slice(0, 40);
+        const response = await post('/chat/' + id + '/read',
+            new URLSearchParams(ids.map(value => ['ids', value])));
+        if (response.status !== 204) return;
+        ids.forEach(value => waitingRead.delete(value));
+        const badge = selected.querySelector('.unread-badge');
+        const count = Math.max(0, Number(badge.textContent) - ids.length);
+        badge.textContent = count;
+        badge.hidden = count === 0;
+        document.dispatchEvent(new Event('learning-chat-read'));
     }
-
-    // عند الضغط على زر الإرسال
-    if (sendBtn) {
-        sendBtn.addEventListener('click', sendMessage);
+    function schedule() {
+        clearTimeout(timer);
+        if (!document.hidden) timer = setTimeout(poll, delay);
     }
-
-    // عند الضغط على Enter
-    if (messageInput) {
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-    }
-
-    // 5. محاكاة الرد (Typing + Reply)
-    function simulateReply() {
-        // إظهار مؤشر الكتابة
-        setTimeout(() => {
-            if (typingIndicator) {
-                typingIndicator.classList.remove('hidden');
-                scrollToBottom();
-            }
-        }, 500);
-
-        // إخفاء المؤشر وإضافة رد
-        setTimeout(() => {
-            if (typingIndicator) typingIndicator.classList.add('hidden');
-
-            let replies = [
-                "That sounds great! 👍",
-                "Sure, I'll let you know.",
-                "Perfect, see you then!",
-                "Thanks for the update!",
-                "I'll prepare some materials for our session."
-            ];
-            let randomReply = replies[Math.floor(Math.random() * replies.length)];
-
-            let activeConv = document.querySelector('.conversation-item.active');
-            let avatar = activeConv ? activeConv.querySelector('.conversation-avatar span').textContent : 'LK';
-
-            let message = document.createElement('div');
-            message.className = 'message received animate-fade-rise';
-            message.innerHTML = `
-                <div class="message-avatar"><span>${avatar}</span></div>
-                <div class="message-content">
-                    <div class="message-bubble">${randomReply}</div>
-                    <span class="message-time">${getCurrentTime()}</span>
-                </div>
-            `;
-
-            chatMessages.appendChild(message);
-            scrollToBottom();
-        }, 2500);
-    }
-
-    // 6. Scroll للأسفل
-    function scrollToBottom() {
-        if (chatMessages) {
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 100);
-        }
-    }
-
-    // Scroll عند فتح الصفحة
-    scrollToBottom();
-
-    // 7. الحصول على الوقت الحالي
-    function getCurrentTime() {
-        let now = new Date();
-        let hours = now.getHours();
-        let minutes = now.getMinutes().toString().padStart(2, '0');
-        let period = hours >= 12 ? 'PM' : 'AM';
-        let displayHours = hours % 12 || 12;
-        return `${displayHours}:${minutes} ${period}`;
-    }
-
-    
-    // 8. حماية من XSS
-    
-    function escapeHtml(text) {
-        let div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // 9. بحث المحادثات
-    if (chatSearchInput) {
-        chatSearchInput.addEventListener('input', () => {
-            let query = chatSearchInput.value.toLowerCase().trim();
-            conversationItems.forEach(item => {
-                let name = item.querySelector('.conversation-top strong').textContent.toLowerCase();
-                let preview = item.querySelector('.conversation-preview').textContent.toLowerCase();
-                
-                if (name.includes(query) || preview.includes(query)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
+    async function poll(previous = false) {
+        if (fetching || document.hidden) return;
+        fetching = true;
+        older.disabled = true;
+        try {
+            const query = previous ? '?before=' + earliest : latest ? '?after=' + latest : '';
+            const response = await fetch(endpoint + query, { headers: { Accept: 'application/json' } });
+            if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error();
+            const data = await response.json();
+            const rows = data.messages;
+            const firstPage = !latest;
+            render(rows, previous);
+            if (rows.length) {
+                if (firstPage || previous) earliest = rows[0].id;
+                if (!previous) {
+                    latest = rows.at(-1).id;
+                    const last = rows.at(-1);
+                    selected.querySelector('.conversation-preview').textContent = last.body;
                 }
-            });
-        });
+            }
+            if (firstPage || previous) older.hidden = !data.more;
+            canSend = data.canSend;
+            updateComposer();
+            show(data.archived ? 'Archived conversation · Read only' :
+                !canSend ? 'Messaging is currently unavailable for this relationship.' :
+                rendered.size === 0 ? 'No messages yet. Send the first message.' : '');
+            await markDisplayed();
+            delay = !previous && !firstPage && data.more ? 100 : 5000;
+        } catch {
+            show('Could not update messages. The conversation will retry automatically.');
+            delay = Math.min(30000, Math.max(delay, 5000) * 2);
+        } finally {
+            fetching = false;
+            older.disabled = false;
+            schedule();
+        }
     }
-
-    // 10. زر "New Chat"
-    if (newChatBtn) {
-        newChatBtn.addEventListener('click', () => {
-            showNotification('Opening new chat...', 'info');
-            setTimeout(() => {
-                window.SitePrefs.navigate('skill-partners.html');
-            }, 700);
-        });
-    }
-
-    // 11. أزرار رأس المحادثة
-    let headerIconBtns = document.querySelectorAll('.chat-header-actions .chat-icon-btn');
-    headerIconBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            let title = btn.getAttribute('title');
-            showNotification(`${title} coming soon...`, 'info');
-        });
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (sending || !canSend || !input.value.trim()) return;
+        sending = true;
+        sendError = '';
+        updateComposer();
+        const body = input.value;
+        try {
+            const response = await post(endpoint, new URLSearchParams({ body }));
+            if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error();
+            if (input.value === body) input.value = '';
+        } catch {
+            sendError = 'Sending could not be confirmed. Check the conversation before retrying.';
+            show('');
+        } finally {
+            sending = false;
+            updateComposer();
+            poll();
+        }
     });
-
-    // 12. دالة التنبيهات
-
-    function showNotification(message, type = 'info') {
-        let oldNotification = document.querySelector('.notification');
-        if (oldNotification) oldNotification.remove();
-
-        let notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.innerHTML = `
-            <span class="notification-icon">
-                ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
-            </span>
-            <span class="notification-message">${message}</span>
-        `;
-
-        document.body.appendChild(notification);
-    
-    }
-});
+    older.addEventListener('click', () => poll(true));
+    document.addEventListener('visibilitychange', () => document.hidden ? schedule() : poll());
+    poll();
+})();

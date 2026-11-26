@@ -1185,6 +1185,8 @@ footer::before {
     animation: pulse-badge 2s ease-in-out infinite;
 }
 
+.navbar-icon-btn .notification-badge[hidden] { display: none; }
+
 @keyframes pulse-badge {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }

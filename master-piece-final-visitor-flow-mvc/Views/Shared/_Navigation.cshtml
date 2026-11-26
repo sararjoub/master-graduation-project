@@ -28,7 +28,7 @@
 
             @if (navigationUser is not null)
             {
-                <button class="navbar-icon-btn" id="messagesBtn" title="Messages">💬</button>
+                @await Html.PartialAsync("_LearningChatNavigation")
                 <div class="navbar-user" id="userMenu">
                 <button class="navbar-avatar" id="avatarBtn">
                     <span>@navigationInitials</span>

@@ -41,7 +41,7 @@
             <div class="navbar-actions">
                 @if (Model.IsAuthenticated)
                 {
-                    <button class="navbar-icon-btn" id="messagesBtn" title="Messages">💬</button>
+                    @await Html.PartialAsync("_LearningChatNavigation")
                     <div class="navbar-user" id="userMenu">
                         <button class="navbar-avatar" id="avatarBtn"><span>@Model.CurrentUserInitials</span></button>
                         <div class="user-dropdown" id="userDropdown">

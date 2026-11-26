@@ -19,8 +19,8 @@ public sealed record ScheduleProposalRow(long Id, int Revision, DateTimeOffset S
 public sealed record SessionRow(long Id, long RequestId, string? Title, string Skill, string Partner, string? Objectives,
     string? Notes, DateTimeOffset Start, int Duration, SessionStatus Status, string? CancellationReason,
     IReadOnlyList<ScheduleProposalRow> Proposals, byte[] Version, bool IsTeacher, bool IsActive,
-    DateTimeOffset? LearnerConfirmed, DateTimeOffset? TeacherConfirmed, DateTimeOffset? CompletedAt,
-    IReadOnlyList<AbsenceRow> Absences, IReadOnlyList<ScheduleHistoryRow> History, SessionReviewRow? Review);
+    DateTimeOffset? CompletedAt,
+    IReadOnlyList<AbsenceRow> Absences, IReadOnlyList<ScheduleHistoryRow> History, SessionReviewRow? Review, string? MeetingRoom = null, string? LegacyMeetingUrl = null);
 public sealed record PeerSessionPage(long? RequestId, bool CanPropose, int Page, bool HasNext,
     IReadOnlyList<SessionRow> Sessions, DateTimeOffset Now)
 {

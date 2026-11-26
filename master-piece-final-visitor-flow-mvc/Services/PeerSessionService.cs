@@ -33,7 +33,7 @@ public sealed class PeerSessionService(ApplicationDbContext db, TimeProvider clo
 
     public static bool IsAction(string action) => action is
         "request" or "withdraw-request" or "schedule" or "reschedule" or "cancel" or
-        "absence" or "withdraw-absence" or "complete" or "review" or "end";
+        "absence" or "withdraw-absence" or "review" or "end";
 
     public async Task<string?> ChangeAsync(long requestId, long? sessionId, long? itemId, Guid actor,
         string action, SessionScheduleInput input, CancellationToken ct)
@@ -56,17 +56,13 @@ public sealed class PeerSessionService(ApplicationDbContext db, TimeProvider clo
                 if (!await LockParticipantsAsync(request, ct)) return "Scheduling is busy. Try again.";
 
             var now = clock.GetUtcNow();
-            var eligible = await db.Users.Where(u => (u.Id == request.LearnerId || u.Id == request.TeacherId) &&
-                u.Status == AccountStatus.Active && u.EmailConfirmed && u.IsProfileComplete &&
-                db.UserRoles.Any(ur => ur.UserId == u.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.NormalizedName == "MEMBER")) &&
-                !db.UserRoles.Any(ur => ur.UserId == u.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.NormalizedName == "ADMIN")))
-                .Select(u => u.Id).ToListAsync(ct);
+            var eligible = await EligibleParticipants(request).ToListAsync(ct);
             if (!eligible.Contains(actor) || (eligible.Count != 2 && action is "request" or "schedule" or "reschedule"))
                 return "The required participant accounts are unavailable.";
 
             var session = sessionId is long id ? await db.LearningSessions
                 .SingleOrDefaultAsync(s => s.Id == id && s.LearningRequestId == requestId, ct) : null;
-            if (action is "reschedule" or "cancel" or "absence" or "withdraw-absence" or "complete" or "review")
+            if (action is "reschedule" or "cancel" or "absence" or "withdraw-absence" or "review")
             {
                 if (session is null) return "The session is unavailable.";
                 if (action is "reschedule" or "cancel" &&
@@ -216,30 +212,9 @@ public sealed class PeerSessionService(ApplicationDbContext db, TimeProvider clo
                 pending.ResolvedByUserId = actor;
                 pending.ResolvedAtUtc = now;
                 return null;
-            case "complete":
-                if (session.Status != SessionStatus.Scheduled || session.StartsAt > now.AddMinutes(-session.DurationMinutes))
-                    return "Completion can only be confirmed after the scheduled end.";
-                if (request.LearnerId == actor)
-                {
-                    if (session.LearnerCompletedAtUtc.HasValue) return "You already confirmed completion.";
-                    session.LearnerCompletedAtUtc = now;
-                }
-                else
-                {
-                    if (session.TeacherCompletedAtUtc.HasValue) return "You already confirmed completion.";
-                    session.TeacherCompletedAtUtc = now;
-                }
-                if (session.LearnerCompletedAtUtc.HasValue && session.TeacherCompletedAtUtc.HasValue)
-                {
-                    session.Status = SessionStatus.Completed;
-                    session.CompletedAtUtc = now;
-                }
-                await ResolveAbsenceAsync(session.Id, SessionAbsenceRequestStatus.ExpiredUnresolved, actor, now, ct);
-                return null;
             case "review":
-                if (session.Status != SessionStatus.Completed || session.CompletedAtUtc is null ||
-                    session.LearnerCompletedAtUtc is null || session.TeacherCompletedAtUtc is null)
-                    return "Review is available only after both participants confirm completion.";
+                if (session.Status != SessionStatus.Completed || session.CompletedAtUtc is null)
+                    return "Review is available after the session completes.";
                 if (input.Rating is not (>= 1 and <= 5) || input.Comment?.Length > 1500)
                     return "Enter a rating from 1 to 5 and a comment of up to 1,500 characters.";
                 if (await db.Reviews.AnyAsync(r => r.LearningSessionId == session.Id, ct))
@@ -253,6 +228,27 @@ public sealed class PeerSessionService(ApplicationDbContext db, TimeProvider clo
             default:
                 return "This action is unavailable.";
         }
+    }
+
+    public async Task<bool> CompleteDueSessionAsync(long requestId, long sessionId, CancellationToken ct)
+    {
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        if (!await LockAsync($"SkillSwap:Request:{requestId}", ct)) return false;
+
+        var session = await db.LearningSessions.SingleOrDefaultAsync(s =>
+            s.Id == sessionId && s.LearningRequestId == requestId && s.Status == SessionStatus.Scheduled &&
+            !s.LearningRequest.IsExpertBooking && s.LearningRequest.Status == RequestStatus.Accepted &&
+            s.LearningRequest.EndedAtUtc == null, ct);
+        var now = clock.GetUtcNow();
+        if (session is null || now - session.StartsAt < TimeSpan.FromMinutes(session.DurationMinutes))
+            return false;
+
+        session.Status = SessionStatus.Completed;
+        session.CompletedAtUtc = now;
+        await ResolveAbsenceAsync(session.Id, SessionAbsenceRequestStatus.ExpiredUnresolved, null, now, ct);
+        await db.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+        return true;
     }
 
     private async Task<string?> EndAsync(LearningRequest request, Guid actor, DateTimeOffset now, CancellationToken ct)
@@ -276,7 +272,7 @@ public sealed class PeerSessionService(ApplicationDbContext db, TimeProvider clo
         db.SessionAbsenceRequests.SingleOrDefaultAsync(r => r.LearningSessionId == sessionId &&
             r.Status == SessionAbsenceRequestStatus.Pending, ct);
 
-    private async Task ResolveAbsenceAsync(long sessionId, SessionAbsenceRequestStatus status, Guid actor,
+    private async Task ResolveAbsenceAsync(long sessionId, SessionAbsenceRequestStatus status, Guid? actor,
         DateTimeOffset now, CancellationToken ct)
     {
         var pending = await PendingAbsenceAsync(sessionId, ct);
@@ -302,7 +298,14 @@ public sealed class PeerSessionService(ApplicationDbContext db, TimeProvider clo
         return true;
     }
 
-    private async Task<bool> LockAsync(string resource, CancellationToken ct)
+    internal IQueryable<Guid> EligibleParticipants(LearningRequest request) =>
+        db.Users.Where(u => (u.Id == request.LearnerId || u.Id == request.TeacherId) &&
+            u.Status == AccountStatus.Active && u.EmailConfirmed && u.IsProfileComplete &&
+            db.UserRoles.Any(ur => ur.UserId == u.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.NormalizedName == "MEMBER")) &&
+            !db.UserRoles.Any(ur => ur.UserId == u.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.NormalizedName == "ADMIN")))
+            .Select(u => u.Id);
+
+    internal async Task<bool> LockAsync(string resource, CancellationToken ct)
     {
         await using var command = db.Database.GetDbConnection().CreateCommand();
         command.Transaction = db.Database.CurrentTransaction!.GetDbTransaction();

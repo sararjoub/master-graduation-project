@@ -53,7 +53,7 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
             basePartners = basePartners.Where(x => x.Level == query.Level.Value);
 
         var validReviews = db.Reviews.AsNoTracking().ValidPeerReviews();
-        var completedSessions = db.LearningSessions.AsNoTracking().VerifiedPeerCompletions();
+        var completedSessions = db.LearningSessions.AsNoTracking().PeerCompletions();
         var partnerRows = basePartners.Select(x => new DiscoveryPersonViewModel
         {
             UserId = x.UserId,
@@ -156,7 +156,7 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
         Search = query.Search, Level = query.Level, Sort = query.Sort, Page = 1, TotalPages = 1
     };
 
-    private static string? SafePublicImageUrl(string? value)
+    internal static string? SafePublicImageUrl(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
         if (value.StartsWith('/') && !value.StartsWith("//")) return value;

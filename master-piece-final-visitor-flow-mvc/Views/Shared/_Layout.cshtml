@@ -25,5 +25,9 @@
         <script src="/js/site-preferences.js"></script>
         <script src="/js/interface-polish.js"></script>
     }
+    @if (Context.Items.ContainsKey("LearningChatNavigation"))
+    {
+        <script src="/js/chat-unread.js" asp-append-version="true" defer></script>
+    }
 </body>
 </html>

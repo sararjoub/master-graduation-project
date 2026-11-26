@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService Authorization
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Member") && !User.IsInRole("Admin") &&
+    (await Authorization.AuthorizeAsync(User, SkillsSwap.Security.SecurityPolicies.CompleteProfile)).Succeeded)
+{
+    Context.Items["LearningChatNavigation"] = true;
+    <a class="navbar-icon-btn" href="/chat.html" title="Messages" aria-label="Messages" data-learning-chat-unread>
+        <svg viewBox="0 0 24 24" width="21" height="21" stroke="currentColor" fill="none" stroke-width="1.8" aria-hidden="true">
+            <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-2 2V11.5a9.5 9.5 0 0 1 19 0Z"/>
+            <path d="M7 11h10M7 15h6"/>
+        </svg>
+        <span class="notification-badge" aria-hidden="true" hidden></span>
+    </a>
+}

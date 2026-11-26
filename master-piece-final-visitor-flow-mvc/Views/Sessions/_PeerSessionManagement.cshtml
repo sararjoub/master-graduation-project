@@ -1,7 +1,7 @@
 @model PeerSessionPage
 @{
-    var list = Context.Request.Path == "/sessions.html";
-    var reviewPage = Context.Request.Path == "/session-review.html";
+    var list = ViewData["PeerSessionScreen"] as string == "list";
+    var reviewPage = ViewData["PeerSessionScreen"] as string == "review";
     var pending = Model.Requests.FirstOrDefault(x => x.Status == LearningSessionRequestStatus.Pending);
 }
 <main class="wf-section"><div class="wf-container">
@@ -38,9 +38,10 @@
                 </form>
             }
             else { <p>This relationship has ended. Its history remains available.</p> }
+            <a class="btn btn-outline" href="/chat.html?requestId=@Model.RequestId">Learning Chat</a>
             @if (Model.Requests.Count > 0)
             {
-                <details><summary>Session request history</summary><ul>
+                <details class="peer-session-history"><summary>Session request history</summary><ul class="wf-list">
                     @foreach (var request in Model.Requests)
                     {
                         <li>@request.CreatedAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC ·
@@ -64,29 +65,40 @@
     {
         <div class="wf-card"><p>No learning sessions found.</p><a href="/swap-requests.html">View your requests</a></div>
     }
-    @foreach (var row in Model.Sessions)
+    @if (list && Model.Sessions.Count > 0)
+    {
+        @await Html.PartialAsync("_PeerSessionList", Model)
+    }
+    @foreach (var row in list ? Array.Empty<SessionRow>() : Model.Sessions)
     {
         var future = row.IsActive && row.Status == SessionStatus.Scheduled && row.Start > Model.Now;
         var elapsed = row.Status == SessionStatus.Scheduled && row.Start <= Model.Now.AddMinutes(-row.Duration);
-        var myConfirmation = row.IsTeacher ? row.TeacherConfirmed : row.LearnerConfirmed;
-        var completed = row.Status == SessionStatus.Completed && row.CompletedAt.HasValue &&
-            row.LearnerConfirmed.HasValue && row.TeacherConfirmed.HasValue;
+        var completed = row.Status == SessionStatus.Completed && row.CompletedAt.HasValue;
         var absence = row.Absences.FirstOrDefault(a => a.Status == SessionAbsenceRequestStatus.Pending && a.ForStart > Model.Now);
         <section class="wf-card">
             <h2>@(row.Title ?? row.Skill)</h2>
             <p>@row.Skill · @row.Partner</p>
             <p>@row.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC · @row.Duration min ·
-                 @(elapsed ? (myConfirmation.HasValue ? (row.IsTeacher ? "Awaiting Learner Confirmation" : "Awaiting Teacher Confirmation") : "Awaiting Completion Confirmation") : row.Status.ToString())</p>
+                 @row.Status</p>
+            @if (elapsed) { <p>The scheduled time has ended. Completion updates automatically.</p> }
             @if (row.Objectives is not null) { <p><strong>Objectives</strong> @row.Objectives</p> }
             @if (!string.IsNullOrWhiteSpace(row.Notes)) { <p><strong>Notes</strong> @row.Notes</p> }
             @if (row.CancellationReason is not null) { <p><strong>Cancellation reason</strong> @row.CancellationReason</p> }
             <a class="btn btn-outline" href="/sessions.html?requestId=@row.RequestId">Relationship Sessions</a>
+            @if (!reviewPage)
+            {
+                <a class="btn btn-outline" href="/chat.html?requestId=@row.RequestId">Learning Chat</a>
+                @await Html.PartialAsync("_VideoMeetingActions", row)
+            }
             @if (list) { <a class="btn btn-outline" href="/session-details.html?id=@row.Id">Open Details</a> }
             else if (reviewPage)
             {
                 @if (row.Review is { } review)
                 {
-                    <p>Rating @review.Rating / 5</p><p>@review.Comment</p>
+                    <p class="session-rating-display" role="img" aria-label="@($"{review.Rating} out of 5 stars")">
+                        <span aria-hidden="true"><span class="session-rating-filled">@(new string('★', review.Rating))</span>@(new string('☆', 5 - review.Rating))</span>
+                    </p>
+                    <p>@review.Comment</p>
                 }
                 else if (completed && !row.IsTeacher)
                 {
@@ -94,7 +106,19 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="requestId" value="@row.RequestId">
                         <input type="hidden" name="sessionId" value="@row.Id">
-                        <label class="form-group form-label">Rating <input class="form-input" type="number" name="Rating" min="1" max="5" required value="@Model.PreviousInput?.Rating"></label>
+                        <fieldset class="session-rating">
+                            <legend>Rating</legend>
+                            <div class="session-rating-options">
+                                @for (var stars = 1; stars <= 5; stars++)
+                                {
+                                    var optionId = $"session-rating-{row.Id}-{stars}";
+                                    <input type="radio" name="Rating" id="@optionId" value="@stars"
+                                           aria-label="@(stars == 1 ? "1 star" : $"{stars} stars")"
+                                           checked="@(Model.PreviousInput?.Rating == stars)" required>
+                                    <label for="@optionId"><span aria-hidden="true">★</span></label>
+                                }
+                            </div>
+                        </fieldset>
                         <label class="form-group form-label">Comment <textarea class="form-textarea" name="Comment" maxlength="1500">@Model.PreviousInput?.Comment</textarea></label>
                         <button class="btn btn-primary" name="action" value="review">Submit Review</button>
                     </form>
@@ -105,7 +129,7 @@
             {
                 @if (row.History.Count > 0 || row.Proposals.Count > 0)
                 {
-                    <details><summary>Schedule History</summary><ul>
+                    <details class="peer-session-history"><summary>Schedule History</summary><ul class="wf-list">
                         @foreach (var h in row.History)
                         {
                             <li>@h.PreviousStart.ToUniversalTime().ToString("yyyy-MM-dd HH:mm") UTC (@h.PreviousDuration min)
@@ -119,12 +143,13 @@
                 }
                 @if (row.Absences.Count > 0)
                 {
-                    <h3>Absence Requests</h3><ul>
+                    <details class="peer-session-history" open="@(absence is not null)">
+                        <summary>Absence Requests</summary><ul class="wf-list">
                         @foreach (var a in row.Absences)
                         {
                             <li>@(a.Status == SessionAbsenceRequestStatus.Pending && a.ForStart <= Model.Now ? "Expired Unresolved" : a.Status.ToString()) · @a.Reason</li>
                         }
-                    </ul>
+                    </ul></details>
                 }
                 @if (future && row.IsTeacher)
                 {
@@ -164,22 +189,13 @@
                         }
                     </form>
                 }
-                @if (row.IsActive && elapsed && myConfirmation is null)
-                {
-                    <form method="post" action="/sessions/change">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="requestId" value="@row.RequestId">
-                        <input type="hidden" name="sessionId" value="@row.Id">
-                        <button class="btn btn-primary" name="action" value="complete">Confirm Session Completion</button>
-                    </form>
-                }
                 @if (row.Review is not null || completed && !row.IsTeacher)
                 {
-                    <a class="btn btn-outline" href="/session-review.html?id=@row.Id">@(row.Review is null ? "Submit Review" : "View Review")</a>
+                    <a class="btn btn-outline" href="/session-review.html?id=@row.Id">@(row.Review is null ? "Rate Your Teacher" : "View Review")</a>
                 }
             }
         </section>
     }
-    @if (list && Model.Page > 1) { <a href="?requestId=@Model.RequestId&page=@(Model.Page - 1)">Previous</a> }
-    @if (list && Model.HasNext) { <a href="?requestId=@Model.RequestId&page=@(Model.Page + 1)">Next</a> }
+    @if (list && Model.Page > 1) { <a href="/sessions.html?requestId=@Model.RequestId&page=@(Model.Page - 1)">Previous</a> }
+    @if (list && Model.HasNext) { <a href="/sessions.html?requestId=@Model.RequestId&page=@(Model.Page + 1)">Next</a> }
 </div></main>

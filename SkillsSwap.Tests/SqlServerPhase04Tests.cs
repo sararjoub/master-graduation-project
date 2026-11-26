@@ -24,7 +24,17 @@ public sealed class SqlServerPhase04FactAttribute : FactAttribute
     }
 }
 
-public sealed class SqlServerPhase04Tests(ITestOutputHelper output)
+public sealed class SqlServerAutomaticCompletionFactAttribute : FactAttribute
+{
+    public SqlServerAutomaticCompletionFactAttribute()
+    {
+        if (Environment.GetEnvironmentVariable("SKILLSWAP_PHASE04_SQL") != "1" ||
+            Environment.GetEnvironmentVariable("SKILLSWAP_PHASE05_AUTOMATIC_SQL") != "1")
+            Skip = "Requires the automatic completion migration on the isolated SQL Server database.";
+    }
+}
+
+public sealed partial class SqlServerPhase04Tests(ITestOutputHelper output)
 {
     private const string Connection = "Server=localhost;Database=SkillsSwap_Phase04_Integration;Integrated Security=True;TrustServerCertificate=True";
 
@@ -266,7 +276,7 @@ public sealed class SqlServerPhase04Tests(ITestOutputHelper output)
         }
     }
 
-    [SqlServerPhase04Fact]
+    [SqlServerAutomaticCompletionFact]
     public async Task Direct_peer_lifecycle_persists_requests_completion_reviews_and_closure()
     {
         await using var connection = await OpenAsync();
@@ -334,7 +344,7 @@ public sealed class SqlServerPhase04Tests(ITestOutputHelper output)
                     reverseRelationship.Id, null, null, learner, "schedule", schedule, default);
                 Assert.Contains("overlaps", conflict);
             }
-            var reverseSlot = new SessionScheduleInput { Title = "Reverse role fixture", Objectives = "Confirm independently",
+            var reverseSlot = new SessionScheduleInput { Title = "Reverse role fixture", Objectives = "Practice the skill",
                 TimeZoneId = "UTC", LocalStart = "2090-01-02T15:00", DurationMinutes = 30 };
             await using (var reverseConnection = await OpenAsync())
             {
@@ -375,43 +385,64 @@ public sealed class SqlServerPhase04Tests(ITestOutputHelper output)
             Assert.Equal(SessionAbsenceRequestStatus.ResolvedByCancellation,
                 await db.SessionAbsenceRequests.Where(a => a.LearningSessionId == firstId).Select(a => a.Status).SingleAsync());
             Assert.NotNull(await Act(learner, "complete", secondId));
+            async Task<bool> Complete(long requestId, long sessionId)
+            {
+                await using var sql = await OpenAsync();
+                await using var worker = Context(sql);
+                return await new PeerSessionService(worker, clock).CompleteDueSessionAsync(requestId, sessionId, default);
+            }
+
+            Assert.False(await Complete(relationship.Id, secondId));
             Assert.NotNull(await Act(teacher, "end"));
             Assert.Null(await Act(learner, "absence", secondId, input: new() { Reason = "Late change" }));
-            clock.Now = now.AddDays(2);
-            var completionGate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            var completionReady = 0;
-            async Task<string?> ConfirmReverse(Guid actor)
-            {
-                await using var connectionForActor = await OpenAsync();
-                await using var contextForActor = Context(connectionForActor);
-                if (Interlocked.Increment(ref completionReady) == 2) completionGate.TrySetResult();
-                await completionGate.Task.WaitAsync(TimeSpan.FromSeconds(10));
-                return await new PeerSessionService(contextForActor, clock).ChangeAsync(
-                    reverseRelationship.Id, reverseSessionId, null, actor, "complete", new(), default);
-            }
-            Assert.All(await Task.WhenAll(ConfirmReverse(learner), ConfirmReverse(teacher)), Assert.Null);
-            var reverseCompleted = await ReadSession(reverseSessionId);
-            Assert.Equal(SessionStatus.Completed, reverseCompleted.Status);
-            Assert.Equal(clock.Now, reverseCompleted.LearnerCompletedAtUtc);
-            Assert.Equal(clock.Now, reverseCompleted.TeacherCompletedAtUtc);
-            Assert.Null(await Act(learner, "complete", secondId));
-            var half = await ReadSession(secondId);
-            Assert.Equal(SessionStatus.Scheduled, half.Status);
-            Assert.Equal(clock.Now, half.LearnerCompletedAtUtc);
-            Assert.Null(half.TeacherCompletedAtUtc);
+            var updated = await ReadSession(secondId);
+            clock.Now = updated.StartsAt.AddMinutes(updated.DurationMinutes).AddTicks(-1);
+            Assert.False(await Complete(relationship.Id, secondId));
             Assert.NotNull(await Act(learner, "review", secondId, input: new() { Rating = 5 }));
-            Assert.NotNull(await Act(learner, "complete", secondId));
-            clock.Now = clock.Now.AddMinutes(1);
-            Assert.Null(await Act(teacher, "complete", secondId));
+
+            clock.Now = updated.StartsAt.AddMinutes(updated.DurationMinutes);
+            Assert.False(await Complete(relationship.Id, firstId));
+            Assert.Single(await Task.WhenAll(Complete(relationship.Id, secondId), Complete(relationship.Id, secondId)), x => x);
+            var reverse = await ReadSession(reverseSessionId);
+            var legacyConfirmation = reverse.StartsAt.AddMinutes(reverse.DurationMinutes);
+            await db.LearningSessions.Where(x => x.Id == reverseSessionId).ExecuteUpdateAsync(set => set
+                .SetProperty(x => x.Status, SessionStatus.Completed)
+                .SetProperty(x => x.CompletedAtUtc, legacyConfirmation)
+                .SetProperty(x => x.LearnerCompletedAtUtc, legacyConfirmation)
+                .SetProperty(x => x.TeacherCompletedAtUtc, legacyConfirmation));
+            Assert.False(await Complete(reverseRelationship.Id, reverseSessionId));
+            var legacy = await ReadSession(reverseSessionId);
+            Assert.Equal(legacyConfirmation, legacy.LearnerCompletedAtUtc);
+            Assert.Equal(legacyConfirmation, legacy.TeacherCompletedAtUtc);
+            Assert.Equal(legacyConfirmation, legacy.CompletedAtUtc);
             var completed = await ReadSession(secondId);
             Assert.Equal(SessionStatus.Completed, completed.Status);
-            Assert.Equal(half.LearnerCompletedAtUtc, completed.LearnerCompletedAtUtc);
+            Assert.Null(completed.LearnerCompletedAtUtc);
+            Assert.Null(completed.TeacherCompletedAtUtc);
             Assert.Equal(clock.Now, completed.CompletedAtUtc);
+            Assert.False(await Complete(relationship.Id, secondId));
+
             var expired = await db.SessionAbsenceRequests.AsNoTracking().SingleAsync(a => a.LearningSessionId == secondId &&
                 a.Status == SessionAbsenceRequestStatus.ExpiredUnresolved);
             Assert.Null(expired.ResolvedByUserId);
+            var chatServices = new ServiceCollection();
+            chatServices.AddLogging();
+            chatServices.AddAuthorizationCore();
+            chatServices.AddSingleton<IAuthorizationHandler, RequestAuthorization>();
+            await using var chatProvider = chatServices.BuildServiceProvider();
+            var chat = new LearningChatController(db, new PeerSessionService(db, clock),
+                chatProvider.GetRequiredService<IAuthorizationService>(), clock)
+            {
+                ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(
+                        [new Claim(ClaimTypes.NameIdentifier, learner.ToString()), new Claim(ClaimTypes.Role, "Member")], "test"))
+                } }
+            };
+            Assert.IsType<JsonResult>(await chat.Send(relationship.Id, "After automatic completion", default));
             Assert.Null(await Act(learner, "request"));
             Assert.Null(await Act(teacher, "end"));
+            Assert.IsType<ConflictObjectResult>(await chat.Send(relationship.Id, "After closure", default));
             Assert.Equal(clock.Now, await db.LearningRequests.Where(r => r.Id == relationship.Id).Select(r => r.EndedAtUtc).SingleAsync());
             Assert.Single(await Requests().Where(r => r.Status == LearningSessionRequestStatus.ClosedWithRelationship).ToListAsync());
             Assert.NotNull(await Act(learner, "request"));
@@ -491,6 +522,80 @@ public sealed class SqlServerPhase04Tests(ITestOutputHelper output)
             var newCommitment = await db.LearningSessions.AnyAsync(s => s.LearningRequestId == reverseRelationship.Id &&
                 s.Status == SessionStatus.Scheduled);
             Assert.NotEqual(reverseClosed, newCommitment);
+
+            // A newly started worker must catch an overdue session without a browser.
+            // Use a timestamp well before the shared fixtures and assert the sweep cannot touch them.
+            var restartClock = new SessionTestClock(new DateTimeOffset(1900, 1, 2, 0, 0, 0, TimeSpan.Zero));
+            Assert.False(await db.LearningSessions.AnyAsync(x =>
+                x.Status == SessionStatus.Scheduled && x.StartsAt <= restartClock.Now));
+            var recoveryRequest = new LearningRequest
+            {
+                LearnerId = teacher, TeacherId = learner, SkillId = skill.Id, Status = RequestStatus.Accepted,
+                EndedAtUtc = null
+            };
+            var recoverySession = new LearningSession
+            {
+                LearningRequest = recoveryRequest, StartsAt = restartClock.Now.AddHours(-1), DurationMinutes = 30
+            };
+            try
+            {
+                // Use a separate skill so the fixture cannot conflict with the accepted pair.
+                recoveryRequest.SkillId = await db.Skills.Where(x => x.Id != skill.Id).Select(x => x.Id).FirstAsync();
+                db.LearningSessions.Add(recoverySession);
+                await db.SaveChangesAsync();
+                var workerServices = new ServiceCollection();
+                workerServices.AddLogging();
+                workerServices.AddSingleton<TimeProvider>(restartClock);
+                workerServices.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Connection));
+                workerServices.AddScoped<PeerSessionService>();
+                await using var workerProvider = workerServices.BuildServiceProvider();
+                using var worker = new SessionCompletionWorker(workerProvider.GetRequiredService<IServiceScopeFactory>(),
+                    restartClock, Microsoft.Extensions.Options.Options.Create(new SessionCompletionOptions()),
+                    Microsoft.Extensions.Logging.Abstractions.NullLogger<SessionCompletionWorker>.Instance);
+                await worker.StartAsync(default);
+                try
+                {
+                    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                    while ((await ReadSession(recoverySession.Id)).Status == SessionStatus.Scheduled)
+                        await Task.Delay(25, timeout.Token);
+                    var recovered = await ReadSession(recoverySession.Id);
+                    Assert.Equal(SessionStatus.Completed, recovered.Status);
+                    Assert.Equal(restartClock.Now, recovered.CompletedAtUtc);
+                    Assert.Null(recovered.LearnerCompletedAtUtc);
+                    Assert.Null(recovered.TeacherCompletedAtUtc);
+                }
+                finally
+                {
+                    await worker.StopAsync(default);
+                }
+                var raceSession = new LearningSession
+                {
+                    LearningRequestId = recoveryRequest.Id, StartsAt = restartClock.Now.AddHours(-1), DurationMinutes = 30
+                };
+                db.LearningSessions.Add(raceSession);
+                await db.SaveChangesAsync();
+
+                async Task<string?> RaceEnd()
+                {
+                    await using var sql = await OpenAsync();
+                    await using var workerDb = Context(sql);
+                    return await new PeerSessionService(workerDb, restartClock)
+                        .ChangeAsync(recoveryRequest.Id, null, null, learner, "end", new(), default);
+                }
+
+                var automatic = Complete(recoveryRequest.Id, raceSession.Id);
+                var close = RaceEnd();
+                await Task.WhenAll(automatic, close);
+                Assert.True(await automatic);
+                Assert.Equal(SessionStatus.Completed, (await ReadSession(raceSession.Id)).Status);
+                if (await close is not null)
+                    Assert.Null(await RaceEnd());
+            }
+            finally
+            {
+                await db.LearningSessions.Where(x => x.LearningRequestId == recoveryRequest.Id).ExecuteDeleteAsync();
+                await db.LearningRequests.Where(x => x.Id == recoveryRequest.Id).ExecuteDeleteAsync();
+            }
         }
         finally
         {

@@ -1,0 +1,16 @@
+#learningChat [hidden], .conversations-list [hidden], #retryMeeting[hidden] { display: none !important; }
+#learningMeeting:not(:empty) { width: 100%; height: clamp(340px, 65dvh, 720px); margin-block: 1rem; }
+#learningMeeting iframe { display: block; max-width: 100%; border: 0; }
+.learning-chat-note { padding: .8rem 1rem; }
+.learning-chat-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.conversation-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.chat-main, .conversation-info { min-width: 0; }
+.chat-main .message-bubble { white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-main .chat-send-btn { width: auto; padding-inline: 1rem; }
+#chatOlder { align-self: center; margin-block: .5rem; }
+@media (max-width: 768px) {
+    .chat-container:has(#learningChat) { display: flex; flex-direction: column; height: auto; }
+    .chat-container:has(#learningChat) .chat-sidebar { display: flex; width: 100%; max-height: 14rem; }
+    #learningChat { min-height: 28rem; }
+    #chatMessages { max-height: 55dvh; }
+}

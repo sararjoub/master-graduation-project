@@ -1,0 +1,21 @@
+@model SessionRow
+@inject Microsoft.Extensions.Options.IOptions<VideoMeetingOptions> MeetingOptions
+@inject TimeProvider Clock
+@{
+    var availability = MeetingOptions.Value.Availability(Model.Status, Model.IsActive, Model.Start,
+        Model.Duration, Clock.GetUtcNow(), Model.MeetingRoom, Model.LegacyMeetingUrl);
+}
+@if (Model.Status == SessionStatus.Scheduled)
+{
+    @if (availability == "Meeting is available.")
+    {
+        <form method="post" action="/meetings/@Model.Id">
+            @Html.AntiForgeryToken()
+            <button class="btn btn-outline btn-sm" type="submit">@(Model.IsTeacher ? "Start Meeting" : "Join Meeting")</button>
+        </form>
+    }
+    else
+    {
+        <small>@availability</small>
+    }
+}

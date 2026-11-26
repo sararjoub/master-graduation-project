@@ -1,14 +1,15 @@
 @model PeerSessionPage
 @{
     ViewData["BodyClass"] = "wf-page";
+    ViewData["PeerSessionScreen"] = "review";
 }
 
-@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Review a completed experience - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/session-review.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
-<link rel="stylesheet" href="css/responsive-refinements.css">
-<link rel="stylesheet" href="css/brand.css">
-<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
-<link rel="stylesheet" href="css/interface-polish.css">
-<link rel="stylesheet" href="css/workflow-ui.css">
+@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Review a completed experience - Skills Swap</title><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/session-review.css"><script src="/js/site-preferences-init.js"></script><link rel="stylesheet" href="/css/site-preferences.css">
+<link rel="stylesheet" href="/css/responsive-refinements.css">
+<link rel="stylesheet" href="/css/brand.css">
+<link rel="icon" type="image/svg+xml" href="/assests/brand-mark.svg">
+<link rel="stylesheet" href="/css/interface-polish.css">
+<link rel="stylesheet" href="/css/workflow-ui.css">
 
 
 }
@@ -16,5 +17,5 @@
 @await Html.PartialAsync("_Navigation")
 @await Html.PartialAsync("_PeerSessionManagement", Model)
 @await Html.PartialAsync("_Footer2")
-<script src="js/animations.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
-<script src="js/icon-tones.js"></script><script src="js/interface-polish.js"></script>
+<script src="/js/animations.js"></script><script src="/js/site-ar.js"></script><script src="/js/site-preferences.js"></script>
+<script src="/js/icon-tones.js"></script><script src="/js/interface-polish.js"></script>

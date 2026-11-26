@@ -413,9 +413,7 @@ public class AccountController(
             s.LearningRequest.Status == RequestStatus.Accepted &&
             (s.LearningRequest.LearnerId == user.Id || s.LearningRequest.TeacherId == user.Id));
         var upcoming = peerSessions.Where(s => s.Status == SessionStatus.Scheduled && s.StartsAt > now);
-        var elapsed = peerSessions.Where(s => s.Status == SessionStatus.Scheduled &&
-            s.LearningRequest.EndedAtUtc == null && s.StartsAt.AddMinutes(s.DurationMinutes) <= now);
-        var completed = peerSessions.VerifiedPeerCompletions();
+        var completed = peerSessions.PeerCompletions();
         var myReceivedReviews = validReviews.Where(r => r.ReviewedUserId == user.Id);
         var awaitingScheduling = from pending in db.LearningSessionRequests.AsNoTracking()
             join relationship in db.LearningRequests on pending.LearningRequestId equals relationship.Id
@@ -437,10 +435,6 @@ public class AccountController(
             PendingAbsences = await db.SessionAbsenceRequests.CountAsync(p =>
                 p.Status == SessionAbsenceRequestStatus.Pending && p.RequestedForStartsAtUtc > now &&
                 upcoming.Any(s => s.Id == p.LearningSessionId)),
-            AwaitingMyCompletion = await elapsed.CountAsync(s => s.LearningRequest.TeacherId == user.Id
-                ? s.TeacherCompletedAtUtc == null : s.LearnerCompletedAtUtc == null),
-            AwaitingOtherCompletion = await elapsed.CountAsync(s => s.LearningRequest.TeacherId == user.Id
-                ? s.TeacherCompletedAtUtc != null : s.LearnerCompletedAtUtc != null),
             CompletedTeachingSessions = await completed.CountAsync(s => s.LearningRequest.TeacherId == user.Id),
             CompletedLearningSessions = await completed.CountAsync(s => s.LearningRequest.LearnerId == user.Id),
             AwaitingMyReviews = await completed.CountAsync(s => s.LearningRequest.LearnerId == user.Id &&

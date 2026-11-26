@@ -1,0 +1,45 @@
+@model PeerSessionPage
+@{
+    var archived = Model.Sessions.Where(s => s.Status is not (SessionStatus.Scheduled or SessionStatus.PendingConfirmation)).ToList();
+    var current = Model.Sessions.Except(archived).ToList();
+    var groups = new[]
+    {
+        (Title: "Current sessions", Rows: current),
+        (Title: "Session history", Rows: archived)
+    };
+}
+@foreach (var group in groups)
+{
+    <details class="wf-card peer-session-group" open="@(group.Title == "Current sessions" || current.Count == 0)">
+        <summary><strong>@group.Title</strong><span class="wf-badge">@group.Rows.Count on this page</span></summary>
+        @if (group.Rows.Count == 0)
+        {
+            <p>No sessions in this section on this page.</p>
+        }
+        else
+        {
+            <ul class="peer-session-list">
+                @foreach (var row in group.Rows)
+                {
+                    var elapsed = row.Status == SessionStatus.Scheduled && row.Start <= Model.Now.AddMinutes(-row.Duration);
+                    var state = row.Status == SessionStatus.Declined ? "Declined" : row.Status.ToString();
+                    <li class="peer-session-row">
+                        <div class="peer-session-main">
+                            <strong>@(row.Title ?? row.Skill)</strong>
+                            <span>@row.Skill · @row.Partner</span>
+                        </div>
+                        <div class="peer-session-time">
+                            <time datetime="@row.Start.ToUniversalTime().ToString("O")">@row.Start.ToUniversalTime().ToString("dd MMM yyyy · HH:mm") UTC</time>
+                            <span>@row.Duration min</span>
+                        </div>
+                        <span class="wf-badge peer-session-state">@(elapsed ? "Scheduled · Completion pending" : state)</span>
+                        <div>
+                            <a class="btn btn-outline btn-sm" href="/session-details.html?id=@row.Id">View details</a>
+                            @await Html.PartialAsync("_VideoMeetingActions", row)
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </details>
+}

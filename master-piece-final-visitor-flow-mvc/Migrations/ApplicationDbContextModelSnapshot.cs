@@ -668,7 +668,7 @@ namespace SkillsSwap.Migrations
                         {
                             t.HasCheckConstraint("CK_LearningSession_CancellationMetadata", "([CancelledAtUtc] IS NULL AND [CancelledByUserId] IS NULL AND [CancellationReason] IS NULL) OR ([Status] = 2 AND [CancelledAtUtc] IS NOT NULL AND [CancelledByUserId] IS NOT NULL AND [CancellationReason] IS NOT NULL AND LEN(LTRIM(RTRIM([CancellationReason]))) > 0)");
 
-                            t.HasCheckConstraint("CK_LearningSession_CompletionMetadata", "([CompletedAtUtc] IS NULL AND ([LearnerCompletedAtUtc] IS NULL OR [TeacherCompletedAtUtc] IS NULL)) OR ([Status] = 1 AND [CompletedAtUtc] IS NOT NULL AND [LearnerCompletedAtUtc] IS NOT NULL AND [TeacherCompletedAtUtc] IS NOT NULL AND [CompletedAtUtc] >= [LearnerCompletedAtUtc] AND [CompletedAtUtc] >= [TeacherCompletedAtUtc])");
+                            t.HasCheckConstraint("CK_LearningSession_CompletionMetadata", "([CompletedAtUtc] IS NULL AND ([LearnerCompletedAtUtc] IS NULL OR [TeacherCompletedAtUtc] IS NULL)) OR ([Status] = 1 AND [CompletedAtUtc] IS NOT NULL AND ([LearnerCompletedAtUtc] IS NULL OR [CompletedAtUtc] >= [LearnerCompletedAtUtc]) AND ([TeacherCompletedAtUtc] IS NULL OR [CompletedAtUtc] >= [TeacherCompletedAtUtc]))");
 
                             t.HasCheckConstraint("CK_LearningSession_CompletionState", "([LearnerCompletedAtUtc] IS NULL AND [TeacherCompletedAtUtc] IS NULL) OR [Status] IN (0, 1)");
 

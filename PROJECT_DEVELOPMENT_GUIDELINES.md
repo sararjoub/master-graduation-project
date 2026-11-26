@@ -27,6 +27,8 @@
 - Teaching skill اختياري، ولا يشترط reciprocal exchange.
 - Peer chat/Zoom متاحان مستقبلًا لـBasic وPlus بعد قبول session؛ Expert booking وحده Premium.
 - Expert approval خاص بمهارة محددة وليس Role، وPlus لا يجعل العضو Expert.
+- طلب اعتماد الخبير يتطلب تحديد المهارة، سيرة ذاتية بصيغة PDF، شهادات أو أدلة تأهيل مرتبطة بالمهارة بصيغة PDF، وخبرة مهنية أو عملية ذات صلة. يراجع الأدمن الطلب ويوافق عليه وفق شروط الحساب وعضوية Plus المعتمدة.
+- لا يُشترط عدد جلسات مكتملة أو مُدرَّسة أو عدد مراجعات أو حد أدنى للتقييم أو خبرة مكتسبة داخل Skill Swap. يمكن عرض التقييمات ضمن سمعة العضو.
 - لا Migration ولا `database update` ولا تغيير connection string بدون موافقة صريحة.
 - JavaScript يستخدم فقط عندما يضيف progressive enhancement ضروريًا؛ الوظيفة الأساسية تعمل بـMVC وHTML/CSS.
 

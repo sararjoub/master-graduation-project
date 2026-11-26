@@ -1,0 +1,48 @@
+.peer-session-group > summary,
+.peer-session-history > summary {
+    cursor: pointer;
+}
+.peer-session-group > summary .wf-badge {
+    margin-inline-start: .5rem;
+}
+.peer-session-list {
+    list-style: none;
+    margin: .75rem 0 0;
+    padding: 0;
+}
+.peer-session-row {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.35fr) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .75rem;
+    padding: .7rem 0;
+    border-block-start: 1px solid var(--border-light);
+}
+.peer-session-main, .peer-session-time {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.peer-session-main span, .peer-session-time span {
+    font-size: .85rem;
+    color: var(--text-medium);
+}
+.peer-session-state {
+    justify-self: start;
+}
+.peer-session-history {
+    margin-block: .75rem;
+    padding: .6rem .8rem;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 680px) {
+    .peer-session-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .peer-session-main, .peer-session-time {
+        grid-column: 1 / -1;
+    }
+}

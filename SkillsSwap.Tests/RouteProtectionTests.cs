@@ -10,6 +10,8 @@ public sealed class RouteProtectionTests
     [Theory]
     [InlineData(typeof(SkillsController))]
     [InlineData(typeof(SessionsController))]
+    [InlineData(typeof(VideoMeetingController))]
+    [InlineData(typeof(LearningChatController))]
     [InlineData(typeof(MembershipController))]
     [InlineData(typeof(CareerController))]
     public void Protected_member_controllers_require_complete_profile(Type controllerType)
@@ -36,6 +38,16 @@ public sealed class RouteProtectionTests
             .Single(item=>item.GetCustomAttributes(inherit:true).Any(attribute=>attribute.GetType().Name=="HttpPostAttribute"));
         var attribute=(EnableRateLimitingAttribute)Assert.Single(method.GetCustomAttributes(typeof(EnableRateLimitingAttribute),true));
         Assert.Equal(policy,attribute.PolicyName);
+    }
+
+    [Theory]
+    [InlineData(typeof(VideoMeetingController), nameof(VideoMeetingController.Open))]
+    [InlineData(typeof(LearningChatController), nameof(LearningChatController.Send))]
+    [InlineData(typeof(LearningChatController), nameof(LearningChatController.Read))]
+    public void Communication_posts_require_antiforgery(Type controller, string action)
+    {
+        Assert.NotNull(controller.GetMethod(action)!.GetCustomAttributes(
+            typeof(Microsoft.AspNetCore.Mvc.ValidateAntiForgeryTokenAttribute), true).SingleOrDefault());
     }
 
     [Fact]

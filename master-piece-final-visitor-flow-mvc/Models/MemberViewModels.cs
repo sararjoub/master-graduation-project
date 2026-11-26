@@ -125,8 +125,6 @@ public sealed class DashboardViewModel
     public int ActiveLearningRelationships { get; set; }
     public IReadOnlyList<DashboardSchedulingRequestRow> SchedulingRequests { get; set; } = [];
     public int PendingAbsences { get; set; }
-    public int AwaitingMyCompletion { get; set; }
-    public int AwaitingOtherCompletion { get; set; }
     public int CompletedTeachingSessions { get; set; }
     public int CompletedLearningSessions { get; set; }
     public int AwaitingMyReviews { get; set; }

@@ -30,7 +30,7 @@ public class SessionsController(ApplicationDbContext db, IAuthorizationService a
             .Select(p => new ScheduleProposalRow(p.Id, p.Revision, p.StartsAtUtc, p.DurationMinutes,
                 p.Status, p.ProposedByUserId == Actor)).ToList(),
         s.RowVersion, s.LearningRequest.TeacherId == Actor, s.LearningRequest.EndedAtUtc == null,
-        s.LearnerCompletedAtUtc, s.TeacherCompletedAtUtc, s.CompletedAtUtc,
+        s.CompletedAtUtc,
         db.SessionAbsenceRequests.Where(a => a.LearningSessionId == s.Id).OrderByDescending(a => a.Id).Take(20)
             .Select(a => new AbsenceRow(a.Id, a.Reason, a.CreatedAtUtc, a.RequestedForStartsAtUtc, a.Status)).ToList(),
         db.SessionScheduleHistory.Where(h => h.LearningSessionId == s.Id).OrderByDescending(h => h.ChangedAtUtc).ThenByDescending(h => h.Id).Take(20)
@@ -38,10 +38,7 @@ public class SessionsController(ApplicationDbContext db, IAuthorizationService a
                 h.NewDurationMinutes, h.ChangedAtUtc)).ToList(),
         db.Reviews.Where(r => r.LearningSessionId == s.Id && r.ReviewerId == s.LearningRequest.LearnerId &&
                 r.ReviewedUserId == s.LearningRequest.TeacherId)
-            .Select(r => new SessionReviewRow(r.Rating, r.Comment, r.CreatedAtUtc)).FirstOrDefault()));
-
-    [HttpGet("/chat.html")]
-    public IActionResult Chat() => View();
+            .Select(r => new SessionReviewRow(r.Rating, r.Comment, r.CreatedAtUtc)).FirstOrDefault(), s.MeetingProviderId, s.MeetingJoinUrl));
 
     [HttpGet("/expert-booking.html")]
     public IActionResult ExpertBooking() => View();
@@ -65,7 +62,7 @@ public class SessionsController(ApplicationDbContext db, IAuthorizationService a
         var row = await Project(VisibleSessions.Where(s => s.Id == id)).SingleOrDefaultAsync(ct);
         if (row is null || await AuthorizedRelationshipAsync(row.RequestId, ct) is null) return NotFound();
         if (row.Review is null && (row.IsTeacher || row.Status != SessionStatus.Completed ||
-            row.CompletedAt is null || row.LearnerConfirmed is null || row.TeacherConfirmed is null))
+            row.CompletedAt is null))
             return NotFound();
         return View(new PeerSessionPage(row.RequestId, false, 1, false, [row], clock.GetUtcNow()));
     }
@@ -99,7 +96,7 @@ public class SessionsController(ApplicationDbContext db, IAuthorizationService a
         if (!PeerSessionService.IsAction(action))
             return BadRequest();
         if (await AuthorizedRelationshipAsync(requestId, ct) is null) return NotFound();
-        if (action is "reschedule" or "cancel" or "absence" or "withdraw-absence" or "complete" or "review" &&
+        if (action is "reschedule" or "cancel" or "absence" or "withdraw-absence" or "review" &&
             !await VisibleSessions.AnyAsync(s => s.Id == sessionId && s.LearningRequestId == requestId, ct))
             return NotFound();
         string? error;
@@ -150,5 +147,5 @@ public class SessionsController(ApplicationDbContext db, IAuthorizationService a
     }
 
     [HttpGet("/zoom-meeting.html")]
-    public IActionResult ZoomMeeting() => View();
+    public IActionResult ZoomMeeting() => RedirectToAction(nameof(Sessions));
 }

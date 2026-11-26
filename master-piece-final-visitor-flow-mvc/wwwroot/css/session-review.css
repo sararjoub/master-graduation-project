@@ -1,2 +1,135 @@
 /* Page-specific styles for session-review. Original shared design retained. */
 @import url("workflow-ui.css");
+
+.session-rating {
+  border: 0;
+  padding: 0;
+  margin: 0 0 1rem;
+  min-inline-size: 0;
+}
+
+.session-rating-options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: .125rem;
+}
+
+.session-rating-options input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+.session-rating-options label {
+  display: grid;
+  place-items: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border-radius: .5rem;
+  cursor: pointer;
+  color: var(--text-medium);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.session-rating-options input:focus-visible + label {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.session-rating-options input:checked + label,
+.session-rating-options label:has(~ input:checked),
+.session-rating-options label:hover,
+.session-rating-options label:has(~ label:hover),
+.session-rating-filled {
+  color: var(--primary-dark, #7041b5);
+}
+
+.session-rating-options label span {
+  -webkit-text-stroke: 1px currentColor;
+}
+
+.session-rating-options label:not(:hover) span {
+  color: transparent;
+  -webkit-text-stroke-color: var(--text-medium);
+}
+
+.session-rating-options input:checked + label span,
+.session-rating-options label:has(~ input:checked) span,
+.session-rating-options label:has(~ label:hover) span {
+  color: inherit;
+  -webkit-text-stroke-color: currentColor;
+}
+
+.session-rating-display {
+  font-size: 1.5rem;
+  letter-spacing: .1em;
+}
+
+
+.session-rating {
+  border: 0;
+  padding: 0;
+  margin: 0 0 1rem;
+  min-inline-size: 0;
+}
+
+.session-rating-options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: .125rem;
+}
+
+.session-rating-options input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+.session-rating-options label {
+  display: grid;
+  place-items: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border-radius: .5rem;
+  cursor: pointer;
+  color: var(--text-medium);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.session-rating-options input:focus-visible + label {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.session-rating-options input:checked + label,
+.session-rating-options label:has(~ input:checked),
+.session-rating-options label:hover,
+.session-rating-options label:has(~ label:hover),
+.session-rating-filled {
+  color: var(--primary-dark, #7041b5);
+}
+
+.session-rating-options label span {
+  -webkit-text-stroke: 1px currentColor;
+}
+
+.session-rating-options label:not(:hover) span {
+  color: transparent;
+  -webkit-text-stroke-color: var(--text-medium);
+}
+
+.session-rating-options input:checked + label span,
+.session-rating-options label:has(~ input:checked) span,
+.session-rating-options label:has(~ label:hover) span {
+  color: inherit;
+  -webkit-text-stroke-color: currentColor;
+}
+
+.session-rating-display {
+  font-size: 1.5rem;
+  letter-spacing: .1em;
+}
