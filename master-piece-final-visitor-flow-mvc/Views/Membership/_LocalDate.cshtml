@@ -1,0 +1,5 @@
+@model DateTime
+@{
+    var utc = DateTime.SpecifyKind(Model, DateTimeKind.Utc);
+}
+<time datetime="@utc.ToString("O")" data-membership-date data-no-translate><bdi>@utc.ToString("yyyy-MM-dd HH:mm") UTC</bdi></time>

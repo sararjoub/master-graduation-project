@@ -6,7 +6,7 @@ using SkillsSwap.Models;
 
 namespace SkillsSwap.Services;
 
-public sealed class PeerRequestService(ApplicationDbContext db)
+public sealed class PeerRequestService(ApplicationDbContext db, TimeProvider? clock = null)
 {
     private const int PageSize = 12;
     private const string ExistingRequest = "You already have an active learning request for this teacher and skill.";
@@ -27,15 +27,14 @@ public sealed class PeerRequestService(ApplicationDbContext db)
     public async Task<PeerRequestTarget?> TargetAsync(Guid learner, Guid teacher, int skill, CancellationToken ct)
     {
         if (learner == teacher || teacher == Guid.Empty || skill <= 0) return null;
-        var now = DateTime.UtcNow;
+        var now = (clock ?? TimeProvider.System).GetUtcNow().UtcDateTime;
+        var plus = PlusEntitlement.Active(db, now);
         return await db.UserSkills.AsNoTracking().Where(x =>
             x.UserId == teacher && x.SkillId == skill && x.Intent == SkillIntent.Teach &&
             Members.Any(u => u.Id == teacher) && Members.Any(u => u.Id == learner) &&
             x.Skill.Status == PublicationStatus.Published && x.Skill.SubCategory.IsActive &&
             x.Skill.SubCategory.Category.IsActive &&
-            (x.Skill.AccessTier == AccessTier.Free || db.Subscriptions.Any(s =>
-                s.UserId == learner && s.Plan.Code == "PLUS" && s.Plan.IsActive &&
-                s.Status == SubscriptionStatus.Active && s.StartsAtUtc <= now && s.EndsAtUtc > now)))
+            (x.Skill.AccessTier == AccessTier.Free || plus.Any(s => s.UserId == learner)))
             .Select(x => new PeerRequestTarget(x.User.FullName, x.Skill.NameEn, x.Skill.Slug))
             .SingleOrDefaultAsync(ct);
     }
@@ -131,7 +130,7 @@ public sealed class PeerRequestService(ApplicationDbContext db)
             return "Your account is no longer eligible.";
         if (next == RequestStatus.Accepted && await TargetAsync(request.LearnerId, request.TeacherId, request.SkillId, ct) is null)
             return "The learner, teacher, or skill is no longer eligible.";
-        var now = DateTime.UtcNow;
+        var now = (clock ?? TimeProvider.System).GetUtcNow().UtcDateTime;
         var updated = await PeerRequests.Where(r => r.Id == request.Id && r.Status == RequestStatus.Pending &&
             (next == RequestStatus.Cancelled && r.LearnerId == actor ||
             (next == RequestStatus.Accepted || next == RequestStatus.Declined) && r.TeacherId == actor))

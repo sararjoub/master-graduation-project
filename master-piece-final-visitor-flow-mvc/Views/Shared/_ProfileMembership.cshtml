@@ -1,0 +1,29 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService Authorization
+@inject SkillsSwap.Services.PlusEntitlement Entitlement
+@model string
+@{
+    const string key = "ProfileMembershipPlus";
+    if (!Context.Items.ContainsKey(key) && User.IsInRole("Member") && !User.IsInRole("Admin") &&
+        Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var memberId) &&
+        (await Authorization.AuthorizeAsync(User, SkillsSwap.Security.SecurityPolicies.CompleteProfile)).Succeeded)
+    {
+        Context.Items[key] = await Entitlement.HasAccessAsync(memberId, Context.RequestAborted);
+    }
+}
+@if (Context.Items[key] is bool plus)
+{
+    if (Model == "status")
+    {
+        <span class="profile-membership-status">@(plus ? "Plus Member" : "Basic Member")</span>
+    }
+    else
+    {
+        <a href="/subscription.html" class="dropdown-item">My Subscription</a>
+        @if (!plus)
+        {
+            <a href="/pricing.html" class="dropdown-item">Upgrade to Plus</a>
+        }
+    }
+}

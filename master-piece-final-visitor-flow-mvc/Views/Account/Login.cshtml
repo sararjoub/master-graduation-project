@@ -1,4 +1,8 @@
 @model LoginViewModel
+@{
+    var membershipPeriod = Enum.GetValues<BillingPeriod>().FirstOrDefault(period =>
+        Model.ReturnUrl == $"/subscription-checkout.html?period={period}");
+}
 @section Head {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -134,7 +138,7 @@
 
                     <!-- رابط التسجيل -->
                     <p class="auth-switch animate-fade-rise-delay-3">
-                        Don't have an account? <a href="signup.html">Sign Up</a>
+                        Don't have an account? <a href="@(membershipPeriod == default ? "/signup.html" : $"/signup.html?membershipPeriod={membershipPeriod}")">Sign Up</a>
                     </p>
 
                 </form>

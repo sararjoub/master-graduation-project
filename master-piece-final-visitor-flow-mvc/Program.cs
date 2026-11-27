@@ -16,6 +16,10 @@ builder.Services.AddScoped<CatalogueService>();
 builder.Services.AddScoped<SkillDiscoveryService>();
 builder.Services.AddScoped<PeerRequestService>();
 builder.Services.AddScoped<PeerSessionService>();
+builder.Services.AddScoped<PlusEntitlement>();
+builder.Services.AddScoped<SubscriptionPayments>();
+builder.Services.AddSingleton<IPaymentGateway, SimulatedPaymentGateway>();
+builder.Services.AddHostedService<ExpertCreditWorker>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddOptions<SessionCompletionOptions>().BindConfiguration("SessionCompletion")
     .Validate(o => o.IntervalSeconds is >= 1 and <= 3600, "Invalid session completion interval.")
@@ -25,11 +29,25 @@ builder.Services.AddSingleton<IAuthorizationHandler, RequestAuthorization>();
 builder.Services.AddScoped<AdminPeopleService>();
 builder.Services.AddScoped<AdminOperationsService>();
 builder.Services.Configure<AccountEmailOptions>(builder.Configuration.GetSection(AccountEmailOptions.SectionName));
+builder.Services.AddSingleton<AccountEmailLinks>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<AccountEmailCooldown>();
+builder.Services.AddOptions<ConfirmationTokenOptions>().BindConfiguration("AccountEmail:ConfirmationToken")
+    .Validate(o => o.TokenLifespan >= TimeSpan.FromMinutes(1) && o.TokenLifespan <= TimeSpan.FromDays(7), "Invalid confirmation token lifetime.").ValidateOnStart();
+builder.Services.AddOptions<ResetTokenOptions>().BindConfiguration("AccountEmail:ResetToken")
+    .Validate(o => o.TokenLifespan >= TimeSpan.FromMinutes(1) && o.TokenLifespan <= TimeSpan.FromDays(1), "Invalid reset token lifetime.").ValidateOnStart();
+builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 builder.Services.Configure<AccountRateLimitOptions>(builder.Configuration.GetSection(AccountRateLimitOptions.SectionName));
-if (builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>($"{AccountEmailOptions.SectionName}:EnableDevelopmentPreview"))
+if (AccountEmailOptions.PreviewAllowed(builder.Environment,
+    builder.Configuration.GetValue<bool>($"{AccountEmailOptions.SectionName}:EnableDevelopmentPreview")))
     builder.Services.AddScoped<IAccountEmailSender, DevelopmentAccountEmailSender>();
 else
-    builder.Services.AddScoped<IAccountEmailSender, SmtpAccountEmailSender>();
+{
+    builder.Services.AddScoped<SmtpAccountEmailSender>();
+    builder.Services.AddSingleton<QueuedAccountEmailSender>();
+    builder.Services.AddSingleton<IAccountEmailSender>(sp => sp.GetRequiredService<QueuedAccountEmailSender>());
+    builder.Services.AddHostedService(sp => sp.GetRequiredService<QueuedAccountEmailSender>());
+}
 builder.Services.AddScoped<IAuthorizationHandler, MemberStateAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, MemberAuthorizationResultHandler>();
 builder.Services.AddAuthorization(options =>
@@ -52,6 +70,9 @@ builder.Services.AddRateLimiter(options =>
         context.HttpContext.Response.ContentType = "text/plain; charset=utf-8";
         await context.HttpContext.Response.WriteAsync("Too many requests. Please wait and try again.", cancellationToken);
     };
+    options.AddPolicy("subscription-payment", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "anonymous",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.AddPolicy("learning-chat-send", context => RateLimitPartition.GetFixedWindowLimiter(
         context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "anonymous",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
@@ -68,12 +89,16 @@ builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     {
         options.SignIn.RequireConfirmedEmail = true;
+        options.Tokens.EmailConfirmationTokenProvider = "SkillsSwapConfirmation";
+        options.Tokens.PasswordResetTokenProvider = "SkillsSwapReset";
         options.User.RequireUniqueEmail = true;
         options.Password.RequiredLength = 8;
         options.Lockout.MaxFailedAccessAttempts = 5;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddTokenProvider<ConfirmationTokenProvider>("SkillsSwapConfirmation")
+    .AddTokenProvider<ResetTokenProvider>("SkillsSwapReset");
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

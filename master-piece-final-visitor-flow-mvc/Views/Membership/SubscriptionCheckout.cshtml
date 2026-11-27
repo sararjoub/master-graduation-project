@@ -1,19 +1,52 @@
-@{
-    ViewData["BodyClass"] = "wf-page";
+@model CheckoutPage
+@section Head {
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plus checkout - Skills Swap</title>
+<link rel="stylesheet" href="/css/shared.css">
+<link rel="stylesheet" href="/css/site-preferences.css">
+<link rel="stylesheet" href="/css/responsive-refinements.css">
+<link rel="stylesheet" href="/css/brand.css">
+<link rel="stylesheet" href="/css/interface-polish.css">
+<link rel="stylesheet" href="/css/membership.css" asp-append-version="true">
+<script src="/js/site-preferences-init.js"></script>
 }
-
-@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Review Plus - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/subscription-checkout.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
-<link rel="stylesheet" href="css/responsive-refinements.css">
-<link rel="stylesheet" href="css/brand.css">
-<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
-<link rel="stylesheet" href="css/interface-polish.css">
-<script src="js/visitor-flow.js"></script>
-<script src="js/skill-access.js"></script>
-}
-
 @await Html.PartialAsync("_Navigation")
-<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>Review Plus</h1><p>Keep the existing pricing design; confirm the service details before payment.</p></div><div class="wf-grid"><section class="wf-card"><h2>Plus subscription</h2><form data-wf-form="checkout"><div class="wf-errors" role="alert"></div><div class="form-group"><label class="form-label" for="billing">Billing period</label><select class="form-input" id="billing" name="billing"><option value="monthly">Monthly · proposed $9 / month</option><option value="yearly">Annual · proposed $84 / year</option></select></div><label class="wf-check"><input type="checkbox" name="consent" required> <span>I understand the proposed billing period, monthly allowance, renewal, and cancellation policy.</span></label><button class="btn btn-primary" type="submit">Preview checkout summary</button><p class="wf-feedback" role="status" aria-live="polite"></p></form></section><section class="wf-card"><h2>Included benefits</h2><ul class="wf-list"><li>All community features plus approved expert booking</li><li>1 proposed 30-minute expert credit per month</li><li>Community exchange and volunteer learning remain free</li><li>Progress is retained when paid access ends</li></ul><div class="wf-note " role="note">This page does not collect card data or activate an account. Payment confirmation and entitlement changes must be verified by the backend.</div></section></div><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+<main class="membership-page">
+<header class="membership-intro"><h1>Plus checkout</h1><p>Review your membership and payment total.</p></header>
+<div class="membership-grid">
+    <section class="membership-card">
+        <h2>Membership details</h2>
+        <dl class="membership-summary">
+            <dt>Plan</dt><dd>Plus</dd>
+            <dt>Billing period</dt><dd>@Model.Period</dd>
+            <dt>Duration</dt><dd>@(Model.Period == BillingPeriod.Yearly ? "One calendar year" : "One calendar month")</dd>
+            <dt>Estimated start</dt><dd>@await Html.PartialAsync("_LocalDate", Model.StartsAt)</dd>
+            <dt>Estimated expiration</dt><dd>@await Html.PartialAsync("_LocalDate", Model.EndsAt)</dd>
+        </dl>
+        <h3>Included benefits</h3>
+        <ul><li>Advanced skills</li><li>Peer learning, video meetings and chat</li><li>@Model.Plan.MonthlyExpertCredits <span>credits per month for future bookings</span></li></ul>
+    </section>
+    <section class="membership-card membership-plus">
+        <h2>Order summary</h2>
+        <p>Total payment</p>
+        <p class="membership-price"><bdi>@((Model.Period == BillingPeriod.Yearly ? Model.Plan.YearlyPrice : Model.Plan.MonthlyPrice).ToString("0.00")) USD</bdi></p>
+        <p class="membership-demo-note">Simulated payment. No money will be charged.</p>
+        @if (Model.DemoEnabled)
+        {
+            <form class="membership-actions" method="post" action="/subscription-checkout/quote">@Html.AntiForgeryToken()
+                <input type="hidden" name="period" value="@Model.Period">
+                <button class="btn btn-primary" type="submit">Continue to simulation</button>
+            </form>
+        }
+        else { <p>Simulated payments are disabled.</p> }
+        <a href="/pricing.html?period=@Model.Period">Back to pricing</a>
+    </section>
+</div>
+</main>
 @await Html.PartialAsync("_Footer2")
-<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/subscription-checkout.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
-<script src="js/icon-tones.js"></script>
-<script src="js/interface-polish.js"></script>
+<script src="/js/site-ar.js"></script>
+<script src="/js/membership-ar.js" asp-append-version="true"></script>
+<script src="/js/site-preferences.js"></script>
+<script src="/js/animations.js"></script>
+<script src="/js/icon-tones.js"></script>
+<script src="/js/membership-dates.js" asp-append-version="true"></script>

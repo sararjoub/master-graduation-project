@@ -1,0 +1,84 @@
+@model Payment
+@{
+    var outcome = Model.Status switch
+    {
+        PaymentStatus.Paid => ("Payment simulation succeeded", "paid", "✓"),
+        PaymentStatus.Failed => ("Payment simulation failed", "failed", "×"),
+        PaymentStatus.Cancelled => ("Payment cancelled", "cancelled", "–"),
+        _ => ("Simulated payment", "pending", "•")
+    };
+}
+@section Head {
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulated payment - Skills Swap</title>
+<link rel="stylesheet" href="/css/shared.css">
+<link rel="stylesheet" href="/css/site-preferences.css">
+<link rel="stylesheet" href="/css/responsive-refinements.css">
+<link rel="stylesheet" href="/css/brand.css">
+<link rel="stylesheet" href="/css/interface-polish.css">
+<link rel="stylesheet" href="/css/membership.css" asp-append-version="true">
+<script src="/js/site-preferences-init.js"></script>
+}
+@await Html.PartialAsync("_Navigation")
+<main class="membership-page">
+<section class="membership-card membership-narrow">
+    <header class="membership-result membership-status-@outcome.Item2">
+        <span aria-hidden="true">@outcome.Item3</span><h1>@outcome.Item1</h1>
+    </header>
+    <p class="membership-demo-note">Simulated payment. No money will be charged.</p>
+    @if (Model.Status == PaymentStatus.Paid)
+    {
+        <p>@(ViewData["StartsLater"] is true ? "Your renewal is paid. It starts on the date shown below." : "Your Plus payment has been recorded.")</p>
+    }
+    else if (Model.Status is PaymentStatus.Failed or PaymentStatus.Cancelled)
+    {
+        <p>This transaction did not activate or extend Plus.</p>
+    }
+    <dl class="membership-summary">
+        <dt>Plan</dt><dd>Plus</dd>
+        <dt>Billing period</dt><dd>@Model.Subscription.BillingPeriod</dd>
+        <dt>Total payment</dt><dd><bdi>@Model.Amount.ToString("0.00") @Model.Currency</bdi></dd>
+        <dt>Status</dt><dd><span class="membership-badge membership-status-@outcome.Item2">@Model.Status</span></dd>
+        <dt>Transaction date</dt><dd>@await Html.PartialAsync("_LocalDate", Model.CreatedAtUtc)</dd>
+        @if (Model.Status is PaymentStatus.Paid or PaymentStatus.Pending)
+        {
+            <dt>@(Model.Status == PaymentStatus.Paid ? "Access starts" : "Estimated start")</dt>
+            <dd>@await Html.PartialAsync("_LocalDate", Model.Subscription.StartsAtUtc)</dd>
+            <dt>@(Model.Status == PaymentStatus.Paid ? "Expires" : "Estimated expiration")</dt>
+            <dd>@await Html.PartialAsync("_LocalDate", Model.Subscription.EndsAtUtc)</dd>
+            <dt>Monthly expert credits</dt><dd>@Model.Subscription.PurchasedMonthlyCredits</dd>
+        }
+    </dl>
+    @if (Model.Status == PaymentStatus.Pending && ViewData["DemoEnabled"] is true)
+    {
+        <form class="membership-actions" method="post" action="/subscription-payment/process">@Html.AntiForgeryToken()
+            <input type="hidden" name="reference" value="@Model.ProviderReference">
+            <button class="btn btn-primary" name="outcome" value="Success">Simulate success</button>
+            <button class="btn btn-outline" name="outcome" value="Failure">Simulate failure</button>
+            <button class="btn btn-outline" name="outcome" value="Cancel">Cancel payment</button>
+        </form>
+    }
+    <div class="membership-actions">
+        @if (Model.Status == PaymentStatus.Paid)
+        {
+            <a class="btn btn-primary" href="/dashboard.html">Go to Dashboard</a>
+            <a class="btn btn-outline" href="/subscription.html">Manage subscription</a>
+        }
+        else
+        {
+            @if ((Model.Status is PaymentStatus.Failed or PaymentStatus.Cancelled) && ViewData["DemoEnabled"] is true)
+            {
+                <a class="btn btn-primary" href="/subscription-checkout.html?period=@Model.Subscription.BillingPeriod">Try again</a>
+            }
+            <a class="btn btn-outline" href="/pricing.html?period=@Model.Subscription.BillingPeriod">Back to pricing</a>
+        }
+    </div>
+</section>
+</main>
+@await Html.PartialAsync("_Footer2")
+<script src="/js/site-ar.js"></script>
+<script src="/js/membership-ar.js" asp-append-version="true"></script>
+<script src="/js/site-preferences.js"></script>
+<script src="/js/animations.js"></script>
+<script src="/js/icon-tones.js"></script>
+<script src="/js/membership-dates.js" asp-append-version="true"></script>

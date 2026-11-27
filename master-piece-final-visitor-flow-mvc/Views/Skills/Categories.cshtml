@@ -49,10 +49,10 @@
                                 <div class="avatar avatar-md"><span>@Model.CurrentUserInitials</span></div>
                                 <div>
                                     <strong>@Model.CurrentUserFullName</strong>
-                                    <span>@Model.CurrentUserEmail</span>
+                                    <span>@Model.CurrentUserEmail</span> @await Html.PartialAsync("_ProfileMembership", "status")
                                 </div>
                             </div>
-                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-divider"></div> @await Html.PartialAsync("_ProfileMembership", "links")
                             <a href="profile.html" class="dropdown-item"><span class="dropdown-icon">👤</span> My Profile</a>
                             <a href="dashboard.html" class="dropdown-item"><span class="dropdown-icon">📊</span> Dashboard</a>
                             <a href="my-skills.html" class="dropdown-item"><span class="dropdown-icon">🎯</span> My Skills</a>

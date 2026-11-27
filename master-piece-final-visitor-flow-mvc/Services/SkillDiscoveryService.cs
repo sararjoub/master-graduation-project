@@ -4,19 +4,22 @@ using SkillsSwap.Models;
 
 namespace SkillsSwap.Services;
 
-public sealed class SkillDiscoveryService(ApplicationDbContext db)
+public sealed class SkillDiscoveryService(ApplicationDbContext db, TimeProvider? clock = null)
 {
     public const int PageSize = 8;
 
     public async Task<SkillDiscoveryViewModel?> DiscoverAsync(
         string skillSlug, Guid currentUserId, SkillDiscoveryQuery query, CancellationToken cancellationToken = default)
     {
+        var now = (clock ?? TimeProvider.System).GetUtcNow().UtcDateTime;
+        var activePlus = PlusEntitlement.Active(db, now);
         var skill = await db.Skills.AsNoTracking()
             .Where(x => x.Slug == skillSlug && x.Status == PublicationStatus.Published &&
-                        x.SubCategory.IsActive && x.SubCategory.Category.IsActive)
+                        x.SubCategory.IsActive && x.SubCategory.Category.IsActive &&
+                        (x.AccessTier == AccessTier.Free || activePlus.Any(s => s.UserId == currentUserId)))
             .Select(x => new
             {
-                x.Id, Name = x.NameEn, x.Slug,
+                x.Id, Name = x.NameEn, x.Slug, x.AccessTier,
                 CategoryName = x.SubCategory.Category.NameEn,
                 CategorySlug = x.SubCategory.Category.Slug,
                 SubCategoryName = x.SubCategory.NameEn,
@@ -30,7 +33,7 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
             .SingleOrDefaultAsync(cancellationToken);
         if (!memberRoleId.HasValue)
             return CreateEmpty(skill.Id, skill.Name, skill.Slug, skill.CategoryName, skill.CategorySlug,
-                skill.SubCategoryName, skill.SubCategorySlug, query);
+                skill.SubCategoryName, skill.SubCategorySlug, skill.AccessTier, query);
 
         var eligibleMemberIds = db.UserRoles.AsNoTracking()
             .Where(x => x.RoleId == memberRoleId.Value).Select(x => x.UserId);
@@ -139,7 +142,7 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
 
         return new SkillDiscoveryViewModel
         {
-            SkillId = skill.Id, SkillName = skill.Name, SkillSlug = skill.Slug,
+            SkillId = skill.Id, SkillName = skill.Name, SkillSlug = skill.Slug, AccessTier = skill.AccessTier,
             CategoryName = skill.CategoryName, CategorySlug = skill.CategorySlug,
             SubCategoryName = skill.SubCategoryName, SubCategorySlug = skill.SubCategorySlug,
             Search = query.Search?.Trim(), Level = query.Level, Sort = query.Sort,
@@ -149,9 +152,9 @@ public sealed class SkillDiscoveryService(ApplicationDbContext db)
     }
 
     private static SkillDiscoveryViewModel CreateEmpty(int id, string name, string slug, string category,
-        string categorySlug, string subCategory, string subCategorySlug, SkillDiscoveryQuery query) => new()
+        string categorySlug, string subCategory, string subCategorySlug, AccessTier accessTier, SkillDiscoveryQuery query) => new()
     {
-        SkillId = id, SkillName = name, SkillSlug = slug, CategoryName = category,
+        SkillId = id, SkillName = name, SkillSlug = slug, CategoryName = category, AccessTier = accessTier,
         CategorySlug = categorySlug, SubCategoryName = subCategory, SubCategorySlug = subCategorySlug,
         Search = query.Search, Level = query.Level, Sort = query.Sort, Page = 1, TotalPages = 1
     };

@@ -4,12 +4,20 @@ namespace SkillsSwap.Models;
 
 public sealed class SignupViewModel
 {
+    public BillingPeriod? MembershipPeriod { get; set; }
     [Required, StringLength(120, MinimumLength = 2)] public string FullName { get; set; } = string.Empty;
     [Required, EmailAddress] public string Email { get; set; } = string.Empty;
     [Required, DataType(DataType.Password), StringLength(100, MinimumLength = 8)] public string Password { get; set; } = string.Empty;
     [Required, DataType(DataType.Password), Compare(nameof(Password))] public string ConfirmPassword { get; set; } = string.Empty;
     [Range(typeof(bool), "true", "true", ErrorMessage = "You must accept the terms and privacy policy.")]
     public bool AcceptTerms { get; set; }
+}
+
+public sealed class ChangePasswordViewModel
+{
+    [Required, DataType(DataType.Password)] public string CurrentPassword { get; set; } = string.Empty;
+    [Required, DataType(DataType.Password), StringLength(100, MinimumLength = 8)] public string NewPassword { get; set; } = string.Empty;
+    [Required, DataType(DataType.Password), Compare(nameof(NewPassword))] public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public sealed class LoginViewModel

@@ -15,7 +15,7 @@ public sealed record AdminRecentMemberViewModel(Guid Id,string Name,string Email
 public sealed record AdminRecentExpertApplicationViewModel(int Id,string Member,string Skill,ExpertApplicationStatus Status,DateTime Submitted);
 
 public sealed class AdminPlansViewModel { public IReadOnlyList<AdminPlanViewModel> Plans { get; init; }=[]; }
-public sealed record AdminPlanViewModel(int Id,string Code,string Name,decimal MonthlyPrice,decimal YearlyPrice,int MonthlyExpertCredits,bool IsActive,int Subscribers);
+public sealed record AdminPlanViewModel(int Id,string Code,string Name,decimal MonthlyPrice,decimal YearlyPrice,int MonthlyExpertCredits,bool IsActive,int Subscribers, decimal AdditionalExpertPrice, int ExpertSessionMinutes, decimal ExpertSharePercent);
 public sealed class AdminPlanFormViewModel
 {
     public int Id { get; set; }
@@ -24,6 +24,10 @@ public sealed class AdminPlanFormViewModel
     [Range(0,100000)] public decimal YearlyPrice { get; set; }
     [Range(0,1000)] public int MonthlyExpertCredits { get; set; }
     public bool IsActive { get; set; }
+    [Range(typeof(decimal), "0", "100000")] public decimal AdditionalExpertPrice { get; set; }
+    [Range(0, 180)] public int ExpertSessionMinutes { get; set; }
+    [Range(typeof(decimal), "0", "100")] public decimal ExpertSharePercent { get; set; }
+    [Range(typeof(decimal), "0", "100")] public decimal PlatformSharePercent { get; set; }
 }
 public sealed class AdminSubscriptionsViewModel
 {

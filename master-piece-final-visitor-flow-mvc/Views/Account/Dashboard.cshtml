@@ -7,7 +7,7 @@
 <nav class="navbar navbar-authed"><div class="navbar-container">
 <a href="home.html" class="navbar-logo"><span class="brand-symbol">↔</span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
 <div class="navbar-links"><a href="dashboard.html" class="navbar-link active">Dashboard</a><a href="categories.html" class="navbar-link">Categories</a><a href="career-path.html" class="navbar-link">Career Path</a><a href="skill-partners.html" class="navbar-link">Find Partners</a></div>
-<div class="navbar-actions">@await Html.PartialAsync("_LearningChatNavigation")<div class="navbar-user" id="userMenu"><button class="navbar-avatar" id="avatarBtn"><span>@Model.Initials</span></button><div class="user-dropdown" id="userDropdown"><div class="dropdown-header"><div class="avatar avatar-md"><span>@Model.Initials</span></div><div><strong>@Model.FullName</strong><span>@Model.Email</span></div></div><div class="dropdown-divider"></div><a href="profile.html" class="dropdown-item">👤 My Profile</a><a href="my-skills.html" class="dropdown-item">🎯 My Skills</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="dropdown-item dropdown-logout" type="submit">🚪 Logout</button></form></div></div></div>
+<div class="navbar-actions">@await Html.PartialAsync("_LearningChatNavigation")<div class="navbar-user" id="userMenu"><button class="navbar-avatar" id="avatarBtn"><span>@Model.Initials</span></button><div class="user-dropdown" id="userDropdown"><div class="dropdown-header"><div class="avatar avatar-md"><span>@Model.Initials</span></div><div><strong>@Model.FullName</strong><span>@Model.Email</span> @await Html.PartialAsync("_ProfileMembership", "status")</div></div><div class="dropdown-divider"></div> @await Html.PartialAsync("_ProfileMembership", "links")<a href="profile.html" class="dropdown-item">👤 My Profile</a><a href="my-skills.html" class="dropdown-item">🎯 My Skills</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="dropdown-item dropdown-logout" type="submit">🚪 Logout</button></form></div></div></div>
 </div></nav>
 <section class="dashboard-section"><div class="container">
 <div class="welcome-header animate-fade-rise"><div><h1>Welcome back, <span class="text-primary">@firstName</span>! 👋</h1><p>Your dashboard shows only activity stored in your account.</p></div><a class="btn btn-primary btn-large" href="skill-partners.html">+ Find New Partners</a></div>
@@ -24,6 +24,7 @@
     {
         <div class="request-item"><a href="/sessions.html?requestId=@request.RelationshipId">@request.Skill · Awaiting Scheduling</a></div>
     }
+    @if (Model.AvailableExpertCredits is int credits) { <p><a href="/subscription.html">Expert credits available: @credits</a></p> }
     <p>Completed teaching: @Model.CompletedTeachingSessions · Completed learning: @Model.CompletedLearningSessions · Awaiting your review: @Model.AwaitingMyReviews</p>
     <p>Received reviews: @Model.ReceivedReviews · Rating: @(Model.TeacherAverageRating?.ToString("0.0") ?? "No reviews yet")</p>
     @if (Model.UpcomingSessions.Count == 0) { <p class="wf-muted">No upcoming sessions.</p> }

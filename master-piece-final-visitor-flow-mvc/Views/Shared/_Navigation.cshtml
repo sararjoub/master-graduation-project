@@ -4,6 +4,8 @@
     var navigationUser = User.Identity?.IsAuthenticated == true
         ? await UserManager.GetUserAsync(User)
         : null;
+    var categoriesActive = ViewContext.RouteData.Values["controller"] as string == "Skills" &&
+        ViewContext.RouteData.Values["action"] as string is "Categories" or "CategoryOverview" or "SubCategory" or "SkillDetails" or "TechnologyCategory";
     var navigationInitials = NameFormatting.Initials(navigationUser?.FullName);
 }
 <nav class="navbar navbar-authed">
@@ -15,7 +17,7 @@
         <!-- روابط التنقل -->
         <div class="navbar-links">
             <a href="home.html" class="navbar-link">Home</a>
-            <a href="categories.html" class="navbar-link active">Categories</a>
+            <a href="categories.html" class="navbar-link @(categoriesActive ? "active" : "")" aria-current="@(categoriesActive ? "page" : null)">Categories</a>
             <a href="career-path.html" class="navbar-link">Career Path</a>
             <a href="skill-partners.html" class="navbar-link">Find Partners</a>
         </div>
@@ -42,11 +44,11 @@
                         </div>
                         <div>
                             <strong>@navigationUser.FullName</strong>
-                            <span>@navigationUser.Email</span>
+                            <span>@navigationUser.Email</span> @await Html.PartialAsync("_ProfileMembership", "status")
                         </div>
                     </div>
                     
-                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-divider"></div> @await Html.PartialAsync("_ProfileMembership", "links")
                     
                     <a href="profile.html" class="dropdown-item">
                         <span class="dropdown-icon">👤</span>

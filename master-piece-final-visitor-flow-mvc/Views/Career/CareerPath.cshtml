@@ -1,3 +1,5 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> DropdownUsers
+@{ var dropdownMember = User.Identity?.IsAuthenticated == true ? await DropdownUsers.GetUserAsync(User) : null; }
 @section Head {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,11 +36,11 @@
                         <div class="dropdown-header">
                             <div class="avatar avatar-md"><span>AH</span></div>
                             <div>
-                                <strong>Ahmad Hassan</strong>
-                                <span>ahmad@example.com</span>
+                                <strong>@dropdownMember?.FullName</strong>
+                                <span>@dropdownMember?.Email</span> @await Html.PartialAsync("_ProfileMembership", "status")
                             </div>
                         </div>
-                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div> @await Html.PartialAsync("_ProfileMembership", "links")
                         <a href="profile.html" class="dropdown-item"><span class="dropdown-icon">👤</span> My Profile</a>
                         <a href="dashboard.html" class="dropdown-item"><span class="dropdown-icon">📊</span> Dashboard</a>
                         <a href="my-skills.html" class="dropdown-item"><span class="dropdown-icon">🎯</span> My Skills</a>

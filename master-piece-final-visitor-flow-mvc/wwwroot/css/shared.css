@@ -1185,6 +1185,7 @@ footer::before {
     animation: pulse-badge 2s ease-in-out infinite;
 }
 
+.dropdown-header .profile-membership-status { display: block; font-weight: 600; color: var(--text-dark); }
 .navbar-icon-btn .notification-badge[hidden] { display: none; }
 
 @keyframes pulse-badge {

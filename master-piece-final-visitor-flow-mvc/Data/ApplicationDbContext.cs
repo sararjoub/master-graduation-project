@@ -41,6 +41,12 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         b.Entity<Plan>().HasIndex(x => x.Code).IsUnique();
         b.Entity<Plan>().Property(x => x.MonthlyPrice).HasPrecision(10, 2);
         b.Entity<Plan>().Property(x => x.YearlyPrice).HasPrecision(10, 2);
+        b.Entity<Plan>().Property(x => x.AdditionalExpertPrice).HasPrecision(10, 2);
+        b.Entity<Plan>().Property(x => x.ExpertSharePercent).HasPrecision(5, 2);
+        b.Entity<Subscription>().HasIndex(x => new { x.UserId, x.Status, x.EndsAtUtc });
+        b.Entity<ExpertCreditAllocation>().HasKey(x => new { x.SubscriptionId, x.StartsAtUtc });
+        b.Entity<ExpertCreditAllocation>().ToTable(t => t.HasCheckConstraint("CK_ExpertCredits_PeriodBalance",
+            "[StartsAtUtc] < [EndsAtUtc] AND [Allocated] >= 0 AND [Remaining] BETWEEN 0 AND [Allocated]"));
         b.Entity<Payment>().Property(x => x.Amount).HasPrecision(10, 2);
         b.Entity<Payment>().HasIndex(x => new { x.Provider, x.ProviderReference }).IsUnique();
 
@@ -64,7 +70,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
         b.Entity<Plan>().HasData(
             new Plan { Id = 1, Code = "FREE", Name = "Free", MonthlyPrice = 0, YearlyPrice = 0, MonthlyExpertCredits = 0 },
-            new Plan { Id = 2, Code = "PLUS", Name = "Plus", MonthlyPrice = 9, YearlyPrice = 84, MonthlyExpertCredits = 1 });
+            new Plan { Id = 2, Code = "PLUS", Name = "Plus", MonthlyPrice = 14.99m, YearlyPrice = 149.99m, MonthlyExpertCredits = 2, AdditionalExpertPrice = 5m, ExpertSessionMinutes = 30, ExpertSharePercent = 70m });
         ModelSeed.Configure(b);
     }
 

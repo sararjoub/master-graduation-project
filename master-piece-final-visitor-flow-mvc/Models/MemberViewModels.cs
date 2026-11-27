@@ -46,6 +46,7 @@ public sealed record SkillCardViewModel(
 
 public sealed class SkillDetailsViewModel
 {
+    public bool HasPlus { get; set; }
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
@@ -74,6 +75,7 @@ public sealed class SkillDiscoveryQuery
 
 public sealed class SkillDiscoveryViewModel
 {
+    public AccessTier AccessTier { get; init; }
     public int SkillId { get; set; }
     public string SkillName { get; set; } = string.Empty;
     public string SkillSlug { get; set; } = string.Empty;
@@ -116,6 +118,7 @@ public sealed class DiscoveryPersonViewModel
 
 public sealed class DashboardViewModel
 {
+    public int? AvailableExpertCredits { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Initials { get; set; } = string.Empty;

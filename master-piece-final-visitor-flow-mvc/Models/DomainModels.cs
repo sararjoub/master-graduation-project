@@ -10,7 +10,7 @@ public enum PublicationStatus { Draft, Published, Archived }
 public enum RequestStatus { Pending, Accepted, Declined, Cancelled, Completed }
 public enum ExpertApplicationStatus { UnderReview, NeedsInformation, Approved, Rejected, Withdrawn }
 public enum SubscriptionStatus { Pending, Active, PastDue, Cancelled, Expired }
-public enum PaymentStatus { Pending, Paid, Failed, Refunded }
+public enum PaymentStatus { Pending, Paid, Failed, Refunded, Cancelled }
 public enum SessionStatus { Scheduled, Completed, Cancelled, NoShow, PendingConfirmation, Declined, Withdrawn, Expired }
 public enum ScheduleProposalStatus { Pending, Confirmed, Declined, Withdrawn, Expired }
 public enum CareerPathStatus { Draft, UnderReview, ChangesRequested, Approved, Active, Completed, Archived }
@@ -101,6 +101,9 @@ public sealed class Plan
     public decimal MonthlyPrice { get; set; }
     public decimal YearlyPrice { get; set; }
     public int MonthlyExpertCredits { get; set; }
+    public decimal AdditionalExpertPrice { get; set; }
+    public int ExpertSessionMinutes { get; set; }
+    public decimal ExpertSharePercent { get; set; }
     public bool IsActive { get; set; } = true;
 }
 
@@ -115,6 +118,9 @@ public sealed class Subscription
     public DateTime StartsAtUtc { get; set; }
     public DateTime EndsAtUtc { get; set; }
     public bool AutoRenew { get; set; }
+    public BillingPeriod? BillingPeriod { get; set; }
+    public int PurchasedMonthlyCredits { get; set; }
+    public ICollection<ExpertCreditAllocation> CreditAllocations { get; set; } = [];
 }
 
 public sealed class Payment

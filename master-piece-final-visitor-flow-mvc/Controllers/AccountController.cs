@@ -18,7 +18,8 @@ public class AccountController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     ApplicationDbContext db,
-    IAccountEmailSender emailSender) : Controller
+    IAccountEmailSender emailSender, TimeProvider clock, AccountEmailLinks emailLinks,
+    AccountEmailCooldown cooldown) : Controller
 {
     [HttpGet("/login.html")]
     [AllowAnonymous]
@@ -54,6 +55,16 @@ public class AccountController(
         if (result.Succeeded)
         {
             // إذا كان الرابط المطلوب داخلياً وآمناً نرجع إليه.
+            if (!user.IsProfileComplete && await userManager.IsInRoleAsync(user, "Member"))
+            {
+                foreach (var period in Enum.GetValues<BillingPeriod>())
+                {
+                    if (model.ReturnUrl != $"/subscription-checkout.html?period={period}") continue;
+                    TempData["MembershipPeriod"] = (int)period;
+                    return RedirectToAction(nameof(ProfileSetup));
+                }
+            }
+
             if (Url.IsLocalUrl(model.ReturnUrl))
             {
                 return LocalRedirect(model.ReturnUrl!);
@@ -88,7 +99,8 @@ public class AccountController(
 
     [HttpGet("/signup.html")]
     [AllowAnonymous]
-    public IActionResult Signup() => View(new SignupViewModel());
+    public IActionResult Signup(BillingPeriod? membershipPeriod = null) =>
+        View(new SignupViewModel { MembershipPeriod = membershipPeriod is { } period && Enum.IsDefined(period) ? period : null });
 
     [HttpPost("/signup.html")]
     [AllowAnonymous]
@@ -110,21 +122,19 @@ public class AccountController(
         var result = await userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
+            if (result.Errors.Any(error => error.Code is "DuplicateEmail" or "DuplicateUserName"))
+                return EmailVerificationRequested(EmailLanguage());
             foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
             return View(model);
         }
 
         await userManager.AddToRoleAsync(user, "Member");
-        var url = await BuildConfirmationUrlAsync(user);
-        var delivery = await emailSender.SendConfirmationAsync(email, url, HttpContext.RequestAborted);
-        TempData["ConfirmationEmail"] = email;
-        TempData["DevelopmentConfirmationUrl"] = delivery.DevelopmentPreviewUrl;
-        TempData["VerifyMessage"] = delivery.Accepted
-            ? "A confirmation email has been sent."
-            : delivery.DevelopmentPreviewUrl is not null
-                ? "Development email preview is enabled."
-                : "We could not send the confirmation email. Please try resending it later.";
-        return RedirectToAction(nameof(VerifyEmail));
+        if (model.MembershipPeriod is { } period && Enum.IsDefined(period))
+            TempData["MembershipPeriod"] = (int)period;
+        var language = EmailLanguage();
+        cooldown.TryBegin("verification", userManager.NormalizeEmail(email)!);
+        var delivery = await DeliverAccountEmailAsync(AccountEmailKind.Verify, user, language);
+        return EmailVerificationRequested(language, delivery.DevelopmentPreviewUrl);
     }
 
     [HttpGet("/forgot-password.html")]
@@ -137,22 +147,20 @@ public class AccountController(
     [EnableRateLimiting("account-sensitive")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
     {
+        PrivateTokenResponse();
         if (!ModelState.IsValid) return View(model);
 
         var email = model.Email.Trim();
-        var user = await userManager.FindByEmailAsync(email);
+        var language = EmailLanguage();
+        var user = cooldown.TryBegin("recovery", userManager.NormalizeEmail(email)!)
+            ? await userManager.FindByEmailAsync(email) : null;
 
         // Always return the same message so this page cannot be used to discover accounts.
         model.Message = "If an eligible account exists and email delivery is available, a password reset link will be sent.";
 
         if (user is not null && user.EmailConfirmed && user.Status == AccountStatus.Active)
         {
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-            var resetUrl = Url.Action(nameof(ResetPassword), "Account",
-                new { userId = user.Id, code }, Request.Scheme)!;
-
-            var delivery = await emailSender.SendPasswordResetAsync(email, resetUrl, HttpContext.RequestAborted);
+            var delivery = await DeliverAccountEmailAsync(AccountEmailKind.Reset, user, language);
             model.DevelopmentResetUrl = delivery.DevelopmentPreviewUrl;
         }
 
@@ -164,19 +172,22 @@ public class AccountController(
     [AllowAnonymous]
     public IActionResult ResetPassword(Guid userId, string? code)
     {
-        if (userId == Guid.Empty || string.IsNullOrWhiteSpace(code)) return BadRequest();
+        PrivateTokenResponse();
+        if (userId == Guid.Empty || string.IsNullOrWhiteSpace(code) || code.Length > 2048) return BadRequest();
         return View(new ResetPasswordViewModel { UserId = userId, Code = code });
     }
 
     [HttpPost("/reset-password.html")]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account-sensitive")]
     public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
     {
-        if (!ModelState.IsValid) return View(model);
+        PrivateTokenResponse();
+        if (!ModelState.IsValid || model.Code.Length > 2048) return View(model);
 
         var user = await userManager.FindByIdAsync(model.UserId.ToString());
-        if (user is null)
+        if (user is null || !user.EmailConfirmed || user.Status != AccountStatus.Active)
         {
             ModelState.AddModelError(string.Empty, "The password reset link is invalid or expired.");
             return View(model);
@@ -206,17 +217,27 @@ public class AccountController(
 
     [HttpGet("/verify-email.html")]
     [AllowAnonymous]
-    public IActionResult VerifyEmail() => View(new VerifyEmailViewModel
+    public IActionResult VerifyEmail()
     {
-        Email = TempData.Peek("ConfirmationEmail") as string ?? string.Empty,
-        DevelopmentConfirmationUrl = TempData.Peek("DevelopmentConfirmationUrl") as string,
-        Message = TempData["VerifyMessage"] as string
-    });
+        PrivateTokenResponse();
+        return View(new VerifyEmailViewModel
+        {
+            DevelopmentConfirmationUrl = TempData["DevelopmentConfirmationUrl"] as string,
+            Message = TempData["VerifyMessage"] as string
+        });
+    }
 
     [HttpGet("/account/confirm-email")]
     [AllowAnonymous]
-    public async Task<IActionResult> ConfirmEmail(Guid userId, string code)
+    [EnableRateLimiting("account-sensitive")]
+    public async Task<IActionResult> ConfirmEmail(Guid userId, string? code)
     {
+        PrivateTokenResponse();
+        if (string.IsNullOrWhiteSpace(code) || code.Length > 2048)
+        {
+            TempData["VerifyMessage"] = "The confirmation link is invalid or expired.";
+            return RedirectToAction(nameof(VerifyEmail), new { lang = EmailLanguage() });
+        }
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
         {
@@ -238,6 +259,12 @@ public class AccountController(
             return RedirectToAction(nameof(VerifyEmail));
         }
 
+        if (user.Status != AccountStatus.Active || await userManager.IsLockedOutAsync(user))
+        {
+            TempData["VerifyMessage"] = "The confirmation link is invalid or expired.";
+            return RedirectToAction(nameof(VerifyEmail), new { lang = EmailLanguage() });
+        }
+
         var result = await userManager.ConfirmEmailAsync(user, decoded);
         if (!result.Succeeded)
         {
@@ -253,7 +280,7 @@ public class AccountController(
         }
 
         await signInManager.SignInAsync(user, isPersistent: false);
-        return Redirect("/profile-setup.html");
+        return RedirectToAction(nameof(ProfileSetup), new { lang = EmailLanguage() });
     }
 
     [HttpPost("/account/resend-confirmation")]
@@ -262,20 +289,42 @@ public class AccountController(
     [EnableRateLimiting("account-sensitive")]
     public async Task<IActionResult> ResendConfirmation(string? email)
     {
-        var normalizedEmail = email?.Trim();
-        if (!string.IsNullOrWhiteSpace(normalizedEmail))
+        var language = EmailLanguage();
+        var address = email?.Trim();
+        if (address is not { Length: > 0 and <= 254 } ||
+            !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(address) ||
+            !cooldown.TryBegin("verification", userManager.NormalizeEmail(address)!))
+            return EmailVerificationRequested(language);
+
+        var user = await userManager.FindByEmailAsync(address);
+        var delivery = user is { EmailConfirmed: false, Status: AccountStatus.Active }
+            ? await DeliverAccountEmailAsync(AccountEmailKind.Resend, user, language)
+            : new AccountEmailDeliveryResult(false);
+        return EmailVerificationRequested(language, delivery.DevelopmentPreviewUrl);
+    }
+
+    [HttpGet("/change-password.html")]
+    [Authorize(Policy = SecurityPolicies.ActiveMember)]
+    public IActionResult ChangePassword() => View(new ChangePasswordViewModel());
+
+    [HttpPost("/change-password.html"), ValidateAntiForgeryToken, EnableRateLimiting("account-sensitive")]
+    [Authorize(Policy = SecurityPolicies.ActiveMember)]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+        var user = await userManager.GetUserAsync(User);
+        if (user is not { Status: AccountStatus.Active, EmailConfirmed: true } ||
+            await userManager.IsLockedOutAsync(user)) return Forbid();
+        var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        if (!result.Succeeded)
         {
-            var user = await userManager.FindByEmailAsync(normalizedEmail);
-            if (user is not null && !user.EmailConfirmed)
-            {
-                var url = await BuildConfirmationUrlAsync(user);
-                var delivery = await emailSender.SendConfirmationAsync(normalizedEmail, url, HttpContext.RequestAborted);
-                TempData["ConfirmationEmail"] = normalizedEmail;
-                TempData["DevelopmentConfirmationUrl"] = delivery.DevelopmentPreviewUrl;
-            }
+            foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
+            return View(model);
         }
-        TempData["VerifyMessage"] = "If an eligible unconfirmed account exists and delivery is available, a new confirmation email will be sent.";
-        return RedirectToAction(nameof(VerifyEmail));
+
+        await signInManager.RefreshSignInAsync(user);
+        TempData["ChangePasswordMessage"] = "Your password has been changed.";
+        return RedirectToAction(nameof(ChangePassword), new { lang = AccountEmailLinks.Language(Request.Query["lang"].ToString()) });
     }
 
     [HttpGet("/welcome.html")]
@@ -367,6 +416,8 @@ public class AccountController(
         db.UserSkills.AddRange(model.TeachSkillIds.Select(id => new UserSkill { UserId = user.Id, SkillId = id, Intent = SkillIntent.Teach, Level = SkillLevel.Intermediate }));
         await userManager.UpdateAsync(user);
         await db.SaveChangesAsync();
+        if (TempData["MembershipPeriod"] is int selected && Enum.IsDefined((BillingPeriod)selected))
+            return RedirectToAction("SubscriptionCheckout", "Membership", new { period = (BillingPeriod)selected });
         return Redirect("/welcome.html?mode=member");
     }
 
@@ -408,7 +459,12 @@ public class AccountController(
                 (x.LearnerId == user.Id || x.TeacherId == user.Id));
         var connectionIds = await activeRelationships
             .Select(x => x.LearnerId == user.Id ? x.TeacherId : x.LearnerId).Distinct().ToListAsync();
-        var now = DateTimeOffset.UtcNow;
+        var now = clock.GetUtcNow();
+        var plus = PlusEntitlement.Active(db, now.UtcDateTime).Where(s => s.UserId == user.Id);
+        var credits = await db.Set<ExpertCreditAllocation>().AsNoTracking()
+            .Where(c => c.StartsAtUtc <= now.UtcDateTime && now.UtcDateTime < c.EndsAtUtc &&
+                plus.Any(s => s.Id == c.SubscriptionId))
+            .Select(c => (int?)c.Remaining).FirstOrDefaultAsync();
         var peerSessions = db.LearningSessions.AsNoTracking().Where(s => !s.LearningRequest.IsExpertBooking &&
             s.LearningRequest.Status == RequestStatus.Accepted &&
             (s.LearningRequest.LearnerId == user.Id || s.LearningRequest.TeacherId == user.Id));
@@ -426,6 +482,7 @@ public class AccountController(
         {
             FullName = user.FullName, Email = user.Email ?? string.Empty, Initials = NameFormatting.Initials(user.FullName),
             RequestsCount = await db.LearningRequests.CountAsync(x => x.LearnerId == user.Id || x.TeacherId == user.Id),
+            AvailableExpertCredits = credits,
             IncomingPendingPeerRequests = await db.LearningRequests.CountAsync(x =>
                 x.TeacherId == user.Id && !x.IsExpertBooking && x.Status == RequestStatus.Pending),
             ActiveSessionsCount = await upcoming.CountAsync(),
@@ -460,11 +517,31 @@ public class AccountController(
         return View();
     }
 
-    private async Task<string> BuildConfirmationUrlAsync(ApplicationUser user)
+    private string EmailLanguage() =>
+        AccountEmailLinks.Language(Request.HasFormContentType ? Request.Form["EmailLanguage"].ToString() : Request.Query["lang"].ToString());
+
+    private IActionResult EmailVerificationRequested(string language, string? preview = null)
     {
-        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        TempData["DevelopmentConfirmationUrl"] = preview;
+        TempData["VerifyMessage"] = "If your account is eligible, check your inbox and spam folder. If no message arrives, wait a minute and try again.";
+        return RedirectToAction(nameof(VerifyEmail), new { lang = language });
+    }
+
+    private async Task<AccountEmailDeliveryResult> DeliverAccountEmailAsync(AccountEmailKind kind, ApplicationUser user, string language)
+    {
+        var reset = kind == AccountEmailKind.Reset;
+        var token = reset ? await userManager.GeneratePasswordResetTokenAsync(user)
+            : await userManager.GenerateEmailConfirmationTokenAsync(user);
         var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-        return Url.Action(nameof(ConfirmEmail), "Account", new { userId = user.Id, code }, Request.Scheme)!;
+        var url = emailLinks.Build(reset, user.Id, code, language);
+        if (url is null || string.IsNullOrWhiteSpace(user.Email)) return new(false);
+        return await emailSender.SendAsync(kind, user.Email, url, language, HttpContext.RequestAborted);
+    }
+
+    private void PrivateTokenResponse()
+    {
+        Response.Headers["Referrer-Policy"] = "no-referrer";
+        Response.Headers.CacheControl = "no-store";
     }
 
     private async Task<IReadOnlyList<SkillOptionViewModel>> GetSkillOptionsAsync() =>

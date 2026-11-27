@@ -13,7 +13,7 @@ namespace SkillsSwap.Controllers;
 public class SkillsController(
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager,
-    SkillDiscoveryService discoveryService) : Controller
+    SkillDiscoveryService discoveryService, PlusEntitlement entitlement) : Controller
 {
     [HttpGet("/categories.html")]
     [AllowAnonymous]
@@ -162,6 +162,9 @@ public class SkillsController(
 
         if (model is null) return NotFound();
         model.IsAuthenticated = User.Identity?.IsAuthenticated == true;
+        if (model.IsAuthenticated && User.IsInRole("Member") && !User.IsInRole("Admin") &&
+            Guid.TryParse(userManager.GetUserId(User), out var member))
+            model.HasPlus = await entitlement.HasAccessAsync(member, HttpContext.RequestAborted);
         return View(model);
     }
 
@@ -169,6 +172,7 @@ public class SkillsController(
     public async Task<IActionResult> SkillPartners(string? skillSlug, [FromQuery] SkillDiscoveryQuery query,
         CancellationToken cancellationToken)
     {
+        if (User.IsInRole("Admin")) return Forbid();
         if (string.IsNullOrWhiteSpace(skillSlug)) return NotFound();
         var user = await userManager.GetUserAsync(User);
         if (user is null) return Challenge();

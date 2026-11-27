@@ -525,6 +525,31 @@ namespace SkillsSwap.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SkillsSwap.Models.ExpertCreditAllocation", b =>
+                {
+                    b.Property<int>("SubscriptionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartsAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Allocated")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndsAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Remaining")
+                        .HasColumnType("int");
+
+                    b.HasKey("SubscriptionId", "StartsAtUtc");
+
+                    b.ToTable("ExpertCreditAllocation", t =>
+                        {
+                            t.HasCheckConstraint("CK_ExpertCredits_PeriodBalance", "[StartsAtUtc] < [EndsAtUtc] AND [Allocated] >= 0 AND [Remaining] BETWEEN 0 AND [Allocated]");
+                        });
+                });
+
             modelBuilder.Entity("SkillsSwap.Models.LearningRequest", b =>
                 {
                     b.Property<long>("Id")
@@ -823,10 +848,21 @@ namespace SkillsSwap.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AdditionalExpertPrice")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("ExpertSessionMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ExpertSharePercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -858,7 +894,10 @@ namespace SkillsSwap.Migrations
                         new
                         {
                             Id = 1,
+                            AdditionalExpertPrice = 0m,
                             Code = "FREE",
+                            ExpertSessionMinutes = 0,
+                            ExpertSharePercent = 0m,
                             IsActive = true,
                             MonthlyExpertCredits = 0,
                             MonthlyPrice = 0m,
@@ -868,12 +907,15 @@ namespace SkillsSwap.Migrations
                         new
                         {
                             Id = 2,
+                            AdditionalExpertPrice = 5m,
                             Code = "PLUS",
+                            ExpertSessionMinutes = 30,
+                            ExpertSharePercent = 70m,
                             IsActive = true,
-                            MonthlyExpertCredits = 1,
-                            MonthlyPrice = 9m,
+                            MonthlyExpertCredits = 2,
+                            MonthlyPrice = 14.99m,
                             Name = "Plus",
-                            YearlyPrice = 84m
+                            YearlyPrice = 149.99m
                         });
                 });
 
@@ -1821,10 +1863,16 @@ namespace SkillsSwap.Migrations
                     b.Property<bool>("AutoRenew")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("BillingPeriod")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EndsAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PlanId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchasedMonthlyCredits")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartsAtUtc")
@@ -1840,7 +1888,7 @@ namespace SkillsSwap.Migrations
 
                     b.HasIndex("PlanId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "Status", "EndsAtUtc");
 
                     b.ToTable("Subscriptions");
                 });
@@ -1982,6 +2030,17 @@ namespace SkillsSwap.Migrations
                         .IsRequired();
 
                     b.Navigation("ExpertApplication");
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.ExpertCreditAllocation", b =>
+                {
+                    b.HasOne("SkillsSwap.Models.Subscription", "Subscription")
+                        .WithMany("CreditAllocations")
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
                 });
 
             modelBuilder.Entity("SkillsSwap.Models.LearningRequest", b =>
@@ -2233,6 +2292,11 @@ namespace SkillsSwap.Migrations
             modelBuilder.Entity("SkillsSwap.Models.LearningSession", b =>
                 {
                     b.Navigation("ScheduleProposals");
+                });
+
+            modelBuilder.Entity("SkillsSwap.Models.Subscription", b =>
+                {
+                    b.Navigation("CreditAllocations");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,59 +1,114 @@
-@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Free &amp; Plus - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/pricing.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
-<link rel="stylesheet" href="css/responsive-refinements.css">
-<link rel="stylesheet" href="css/brand.css">
-<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
-<link rel="stylesheet" href="css/interface-polish.css">
-<script src="js/visitor-flow.js"></script>
-<script src="js/skill-access.js"></script>
+@model MembershipPage
+@{
+    var eligible = ViewData["EligibleMember"] is true;
+    string Checkout(BillingPeriod period)
+    {
+        var route = $"/subscription-checkout.html?period={period}";
+        return eligible ? route : Url.Action("Login", "Account", new { returnUrl = route })!;
+    }
 }
-<nav class="navbar navbar-authed">
-        <div class="navbar-container">
-            <a href="home.html" class="navbar-logo"><span class="brand-symbol"><svg data-brand-mark viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L3 14L7 18M3 14H15M17 6L21 10L17 14M21 10H9"/></g></svg></span><span class="brand-text"><span class="brand-wordmark" data-no-translate>Skills <span>Swap</span></span></span></a>
-            <div class="navbar-links">
-                <a href="dashboard.html" class="navbar-link">Dashboard</a>
-                <a href="categories.html" class="navbar-link">Categories</a>
-                <a href="career-path.html" class="navbar-link">Career Path</a>
-                <a href="skill-partners.html" class="navbar-link">Find Partners</a>
-            </div>
-            <div class="navbar-actions">
-                
-                @await Html.PartialAsync("_LearningChatNavigation")
-                <div class="navbar-user" id="userMenu">
-                    <button class="navbar-avatar" id="avatarBtn"><span>AH</span></button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="dropdown-header">
-                            <div class="avatar avatar-md"><span>AH</span></div>
-                            <div>
-                                <strong>Ahmad Hassan</strong>
-                                <span>ahmad@example.com</span>
-                            </div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="profile.html" class="dropdown-item"><span class="dropdown-icon">👤</span> My Profile</a>
-                        <a href="dashboard.html" class="dropdown-item"><span class="dropdown-icon">📊</span> Dashboard</a>
-                        <a href="my-skills.html" class="dropdown-item"><span class="dropdown-icon">🎯</span> My Skills</a>
-                        <a href="swap-requests.html" class="dropdown-item"><span class="dropdown-icon">🔄</span> Swap Requests</a>
-                        <a href="pricing.html" class="dropdown-item dropdown-premium-item">
-                            <span class="dropdown-icon">⭐</span> Upgrade to Plus
-                        </a>
-                        
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item dropdown-logout" id="logoutBtn"><span class="dropdown-icon">🚪</span> Logout</button>
+@section Head {
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Membership - Skills Swap</title>
+<link rel="stylesheet" href="/css/shared.css">
+<link rel="stylesheet" href="/css/site-preferences.css">
+<link rel="stylesheet" href="/css/responsive-refinements.css">
+<link rel="stylesheet" href="/css/brand.css">
+<link rel="stylesheet" href="/css/interface-polish.css">
+<link rel="stylesheet" href="/css/membership.css" asp-append-version="true">
+<script src="/js/site-preferences-init.js"></script>
+}
+@await Html.PartialAsync("_Navigation")
+<main class="membership-page">
+<header class="membership-intro">
+    <h1>Start learning with Basic. Go further with Plus.</h1>
+    <p>Start for free with peer learning. Upgrade when you want access to advanced skills.</p>
+</header>
+<section aria-label="Membership plans" class="membership-plans">
+    <fieldset class="membership-cycle">
+        <legend>Billing period</legend>
+        <label><input type="radio" name="pricing-period" value="Monthly" checked="@(Model.Period == BillingPeriod.Monthly)"> <span>Monthly</span></label>
+        <label><input type="radio" name="pricing-period" value="Yearly" checked="@(Model.Period == BillingPeriod.Yearly)"> <span>Yearly</span></label>
+    </fieldset>
+    <div class="membership-grid">
+        <article class="membership-card">
+            <h2>Basic</h2><p>Explore free skills and learn with peers.</p>
+            <div class="membership-basic-price"><p class="membership-price">Free</p></div>
+            <ul><li>Free skills</li><li>Peer learning, video meetings and chat</li><li>Session reviews</li></ul>
+            @if (!User.Identity!.IsAuthenticated) { <a href="/signup.html" class="btn btn-outline">Create a free account</a> }
+            else if (eligible && Model.Current is null) { <p><strong>Current membership</strong></p> }
+        </article>
+        <article class="membership-card membership-plus">
+            <h2>Plus</h2><p>Learn advanced skills and keep all Basic benefits.</p>
+            @if (Model.Plus is { } plan)
+            {
+                var savings = plan.MonthlyPrice > 0 ? (plan.MonthlyPrice * 12 - plan.YearlyPrice) : 0;
+                <div class="membership-period monthly"><p class="membership-price"><bdi>@plan.MonthlyPrice.ToString("0.00") USD</bdi></p><span>Billed monthly</span></div>
+                <div class="membership-period yearly"><p class="membership-price"><bdi>@plan.YearlyPrice.ToString("0.00") USD</bdi></p><span>Billed yearly</span>
+                <p><span>Equivalent per month</span> <bdi>@((plan.YearlyPrice / 12).ToString("0.00")) USD</bdi></p>
+                @if (savings > 0) { <p class="membership-savings"><span>Annual savings</span> <bdi>@savings.ToString("0.00") USD · @((savings / (plan.MonthlyPrice * 12)).ToString("P1"))</bdi></p> }</div>
+                <ul><li>Advanced skills</li><li><bdi>@plan.MonthlyExpertCredits</bdi> <span>expert credits per month when booking launches</span></li>
+                    <li>Additional expert sessions when booking launches</li></ul>
+                @if (Model.Current is { } current)
+                {
+                    <p><strong>Current membership</strong> · <span>@current.BillingPeriod</span> · <span>Expires</span> @await Html.PartialAsync("_LocalDate", current.EndsAtUtc)</p>
+                    <p><a href="/subscription.html">Manage subscription</a></p>
+                }
+                else if (Model.Latest?.EndsAtUtc <= Model.Now) { <p>Plus has expired.</p> }
+                @if (Model.DemoEnabled && (eligible || !User.Identity!.IsAuthenticated))
+                {
+                    var action = !eligible ? "Log in to choose Plus" : Model.Latest is null ? "Upgrade to Plus" : "Renew Plus";
+                    <div class="membership-actions"><a class="btn btn-primary membership-period monthly" href="@Checkout(BillingPeriod.Monthly)">@action</a>
+                    <a class="btn btn-primary membership-period yearly" href="@Checkout(BillingPeriod.Yearly)">@action</a>
                     </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-<main class="pricing-page"><div class="container">
-<header class="pricing-heading"><span class="pricing-eyebrow">LEARN TOGETHER. CHOOSE YOUR SUPPORT.</span><h1>Good connections.<br><span>A little extra guidance.</span></h1><p>Start with Basic skills for free. Choose Plus for Advanced skill exchanges and approved expert booking.</p><div class="pricing-toggle" role="group" aria-label="Billing period"><button type="button" class="billing-btn active" data-billing="monthly" aria-pressed="true">Monthly</button><button type="button" class="billing-btn" data-billing="yearly" aria-pressed="false">Yearly <span>Save $24 / year</span></button></div></header>
-<div class="pricing-grid">
-<article class="pricing-plan"><div class="plan-label"><span class="plan-symbol">↔</span><span>YOUR COMMUNITY STARTS HERE</span></div><h2>Free</h2><p class="plan-description">Find your people. Learn something new.</p><div class="plan-amount">$0<span>/ forever</span></div><p class="billing-explanation">No subscription required.</p><a class="btn btn-outline plan-cta" href="categories.html">Explore skills →</a><div class="plan-divider"></div><h3>A good place to begin</h3><ul class="plan-benefits"><li>Discover Basic skills and community partners</li><li>Exchange Basic skills or learn from volunteers</li><li>Chat after your request is accepted</li><li>Arrange community learning sessions</li><li>Get a suggested order for your learning</li></ul><p class="plan-footnote">Teaching is optional. Reciprocal partners can ask for a skill in return.</p></article>
-<article class="pricing-plan plus-plan"><span class="plus-ribbon">FOR FOCUSED EXPERT SUPPORT</span><div class="plan-label"><span class="plan-symbol">✧</span><span>GO A LITTLE FURTHER</span></div><h2>Plus</h2><p class="plan-description">Advanced skill exchanges, with expert time when you need it.</p><div class="plan-amount">$<span id="plus-price" class="price-number">9</span><span>/ month</span></div><p class="billing-explanation" id="billing-explanation">$9 billed monthly.</p><button type="button" class="btn btn-primary plan-cta" id="choose-plus">Choose Plus →</button><div class="plan-divider"></div><h3>Everything in Free, plus</h3><ul class="plan-benefits"><li>View and exchange Advanced skills</li><li>Book skill-specific, approved experts</li><li><strong>1 expert-session credit each month</strong></li><li>30 minutes of focused support per credit</li><li>Chat linked to your confirmed expert booking</li><li>Clear booking and cancellation history</li></ul><p class="plan-footnote">A limited allowance, never unlimited sessions. Unused monthly credits do not roll over under the draft policy.</p></article></div>
-<p class="pricing-policy">Proposed pricing in USD. No payment is collected in this preview. Final pricing, taxes, and policies will be confirmed before launch.</p>
-<section class="comparison-section"><div class="pricing-section-head"><span class="pricing-eyebrow">THE DETAILS, SIDE BY SIDE</span><h2>Know what you are choosing.</h2><p>Basic skills are free. Advanced skill details and exchanges require Plus. Expert booking also requires Plus.</p></div><div class="comparison-wrap"><table><caption class="sr-only">Free and Plus feature comparison</caption><thead><tr><th scope="col">What is included</th><th scope="col">Free</th><th scope="col">Plus</th></tr></thead><tbody><tr><th scope="row">Browse Basic skills and partners</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Exchange Basic skills or learn from volunteers</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Chat after an accepted request</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Arrange community learning sessions</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Goal-based skill recommendations</th><td>Included</td><td>Included</td></tr><tr><th scope="row">View and exchange Advanced skills</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">Book approved experts</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">Monthly expert-session allowance</th><td>—</td><td>1 × 30 minutes</td></tr><tr><th scope="row">Community learning history</th><td>Included</td><td>Included</td></tr></tbody></table></div></section>
-<section class="pricing-faq" aria-labelledby="faq-title"><div class="pricing-section-head"><span class="pricing-eyebrow">A FEW THINGS YOU MIGHT BE WONDERING</span><h2 id="faq-title">Good questions. Clear answers.</h2><p>How the community, experts, and subscriptions fit together.</p></div><div class="faq-list"><details class="faq-item"><summary>Do I need to teach a skill to join?<span aria-hidden="true">+</span></summary><p>No. You can join just to learn. Choose a volunteer teacher, or use Plus to book an approved expert. A reciprocal exchange partner may ask for a skill in return.</p></details><details class="faq-item"><summary>What is the difference between a partner and an expert?<span aria-hidden="true">+</span></summary><p>Community partners offer reciprocal exchanges or voluntary teaching. Experts have skill-specific approval after a human reviews their teaching evidence.</p></details><details class="faq-item"><summary>What exactly does Plus include?<span aria-hidden="true">+</span></summary><p>Plus unlocks Advanced skill details and exchanges, and expert booking with a proposed allowance of one 30-minute expert-session credit per subscription month. Basic learning and recommendations remain available on Free.</p></details><details class="faq-item"><summary>Are there courses or recorded lessons?<span aria-hidden="true">+</span></summary><p>No. Skills Swap connects people. Learning happens through agreed conversations and sessions, not a library of courses.</p></details><details class="faq-item"><summary>How does the learning guide work?<span aria-hidden="true">+</span></summary><p>Choose your goal, current level, and skills you know. The guide suggests an order from approved skill sequences. You decide what to learn and whom to contact. It does not certify your level or book a session for you.</p></details><details class="faq-item"><summary>Does the annual plan include unlimited expert sessions?<span aria-hidden="true">+</span></summary><p>No. The proposed annual price covers 12 months, with one expert credit released per service month. Credits do not roll over under the draft policy.</p></details><details class="faq-item"><summary>Can I cancel or change a session?<span aria-hidden="true">+</span></summary><p>The proposed early-cancellation window is 24 hours. An eligible early cancellation returns its credit once. Rescheduling requires the other participant’s acceptance. Support reviews absence and technical issues.</p></details><details class="faq-item"><summary>What happens if I cancel my subscription?<span aria-hidden="true">+</span></summary><p>Cancellation stops the next renewal. Access continues until the paid-through date, and valid previously confirmed bookings remain. Your agreements and learning history are retained.</p></details><details class="faq-item"><summary>Will I be charged in this preview?<span aria-hidden="true">+</span></summary><p>No. The frontend shows a summary only. It does not collect card details, process a payment, activate a subscription, or save data.</p></details></div><div class="faq-contact"><span>Still have a question?</span><a href="help.html">Talk to support →</a></div></section>
-<section class="pricing-bottom"><div><span class="pricing-eyebrow">SMALL STEPS. SHARED PROGRESS.</span><h2>Your next skill starts with a person.</h2><p>Find someone who can help you take the next step.</p></div><a class="btn btn-primary" href="skill-partners.html">Find a learning partner →</a></section>
-</div></main><dialog class="pricing-checkout" id="plus-checkout" aria-labelledby="checkout-title"><div class="checkout-header"><h2 id="checkout-title">Your Plus summary</h2><button type="button" id="close-checkout" aria-label="Close subscription summary">×</button></div><dl><dt>Plan</dt><dd>Plus</dd><dt>Billing</dt><dd id="checkout-period"></dd><dt>Total</dt><dd id="checkout-total"></dd><dt>Allowance</dt><dd>1 × 30-minute expert credit per service month</dd></dl><p class="checkout-note">No payment service is connected. This summary does not activate a subscription.</p><a class="btn btn-primary" href="subscription-checkout.html" id="continue-checkout">Review subscription details →</a></dialog>
-@await Html.PartialAsync("_Footer2")<script src="js/animations.js"></script><script src="js/pricing.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
-<script src="js/icon-tones.js"></script>
-<script src="js/interface-polish.js"></script>
+                }
+            }
+            else { <p>Plus is currently unavailable.</p> }
+        </article>
+    </div>
+</section>
+<section class="membership-card membership-section" id="compare-memberships">
+    <h2>Compare memberships</h2>
+    <table class="membership-comparison">
+        <thead><tr><th scope="col">Feature</th><th scope="col">Basic</th><th scope="col">Plus</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">Free skills and peer learning</th><td>Included</td><td>Included</td></tr>
+        <tr><th scope="row">Video meetings, chat and reviews</th><td>Included</td><td>Included</td></tr>
+        <tr><th scope="row">Advanced skills</th><td>—</td><td>Included</td></tr>
+        <tr><th scope="row">AI career paths and free learning stages</th><td>Planned</td><td>Planned</td></tr>
+        <tr><th scope="row">Advanced learning stages</th><td>—</td><td>Planned</td></tr>
+        <tr><th scope="row">Expert booking and expert applications</th><td>—</td><td>Planned</td></tr>
+        <tr><th scope="row">Monthly expert credits for future bookings</th><td>—</td><td>@(Model.Plus?.MonthlyExpertCredits.ToString() ?? "—")</td></tr>
+        </tbody>
+    </table>
+</section>
+<section class="membership-card membership-section">
+    <h2>How expert credits work</h2>
+    <ol class="membership-steps">
+        <li><strong>Receive credits</strong><p>Plus includes credits each month, even with yearly billing.</p></li>
+        <li><strong>Use one per booking</strong><p>Each included expert session will use one credit when booking launches.</p></li>
+        <li><strong>Start fresh each month</strong><p>Unused credits expire. Extra sessions will be available for purchase.</p></li>
+    </ol>
+    @if (Model.Plus is { } creditPlan)
+    {
+        <p><strong>@creditPlan.MonthlyExpertCredits</strong> <span>credits per month</span> · <strong><bdi>@creditPlan.AdditionalExpertPrice.ToString("0.00") USD</bdi></strong> <span>per additional session when booking launches</span></p>
+    }
+</section>
+<section class="membership-card membership-section">
+    <h2>Frequently asked questions</h2>
+    <details><summary>What is the difference between Basic and Plus?</summary><p>Basic includes free skills and peer learning. Plus also unlocks advanced skills.</p></details>
+    <details><summary>How do expert credits work?</summary><p>One included expert session will use one credit after booking launches.</p></details>
+    <details><summary>How does annual billing work?</summary><p>Pay once for a calendar year. Credit periods still renew monthly.</p></details>
+    <details><summary>Do unused credits carry forward?</summary><p>Unused credits expire at the end of each credit period.</p></details>
+    <details><summary>What happens when Plus expires?</summary><p>Basic access resumes. Your history and accepted sessions remain available.</p></details>
+    <details><summary>How can I renew?</summary><p>Choose a renewal from your membership page. An early renewal starts at the end of your paid access.</p></details>
+    <details><summary>Are payments simulated?</summary><p>Simulated payments use no real money or card details. Renewals are manual.</p></details>
+</section>
+</main>
+@await Html.PartialAsync("_Footer2")
+<script src="/js/site-ar.js"></script>
+<script src="/js/membership-ar.js" asp-append-version="true"></script>
+<script src="/js/site-preferences.js"></script>
+<script src="/js/animations.js"></script>
+<script src="/js/icon-tones.js"></script>
+<script src="/js/membership-dates.js" asp-append-version="true"></script>

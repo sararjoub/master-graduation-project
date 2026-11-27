@@ -1,19 +1,103 @@
-@{
-    ViewData["BodyClass"] = "wf-page";
+@model MembershipPage
+@section Head {
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manage subscription - Skills Swap</title>
+<link rel="stylesheet" href="/css/shared.css">
+<link rel="stylesheet" href="/css/site-preferences.css">
+<link rel="stylesheet" href="/css/responsive-refinements.css">
+<link rel="stylesheet" href="/css/brand.css">
+<link rel="stylesheet" href="/css/interface-polish.css">
+<link rel="stylesheet" href="/css/membership.css" asp-append-version="true">
+<script src="/js/site-preferences-init.js"></script>
 }
-
-@section Head {<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>My subscription - Skills Swap</title><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/subscription.css"><script src="js/site-preferences-init.js"></script><link rel="stylesheet" href="css/site-preferences.css">
-<link rel="stylesheet" href="css/responsive-refinements.css">
-<link rel="stylesheet" href="css/brand.css">
-<link rel="icon" type="image/svg+xml" href="assests/brand-mark.svg">
-<link rel="stylesheet" href="css/interface-polish.css">
-<script src="js/visitor-flow.js"></script>
-<script src="js/skill-access.js"></script>
-}
-
 @await Html.PartialAsync("_Navigation")
-<main class="wf-section"><div class="wf-container"><div class="wf-header"><span class="wf-kicker">Skills Swap</span><h1>My subscription</h1><p>Example subscription details for interface review.</p></div><div class="wf-grid"><section class="wf-card"><h2>Example Plus account</h2><dl><dt>Plan</dt><dd>Plus · illustrative record</dd><dt>Monthly allowance</dt><dd>1 expert session</dd><dt>Unused credits</dt><dd>1 · example only</dd><dt>Renewal</dt><dd id="wf-renewal">Enabled · sample</dd></dl><form data-wf-form="cancel-renewal"><div class="wf-errors" role="alert"></div><div class="form-group"><label class="form-label" for="reason">Reason (optional)</label><textarea class="form-textarea" rows="4" id="reason" name="reason" maxlength="500"></textarea></div><button class="btn btn-primary" type="submit">Preview cancellation request</button><p class="wf-feedback" role="status" aria-live="polite"></p></form></section><section class="wf-card"><h2>Access and history</h2><p>Cancelling renewal keeps paid access until the period ends. New expert bookings require active Plus access; learning history and eligible confirmed bookings remain.</p><a href="pricing.html" class="btn btn-outline">Compare plans</a><div class="wf-note " role="note">No subscription is modified by this page. Monthly grants and credit returns require an authoritative server ledger.</div></section></div><div class="wf-note wf-muted" role="note">Frontend preview: sample data only. Actions update this page for review; no email, payment, AI service, or database is connected. Nothing is stored in the browser.</div></div></main>
+<main class="membership-page">
+<header class="membership-intro"><h1>Manage subscription</h1></header>
+<div class="membership-grid">
+    <section class="membership-card">
+        <h2>Current membership</h2>
+        @if (Model.Current is { } current)
+        {
+            <p><strong>Plus</strong> <span class="membership-badge membership-status-paid">Active</span></p>
+            <dl class="membership-summary">
+                <dt>Billing period</dt><dd>@current.BillingPeriod</dd>
+                <dt>Access starts</dt><dd>@await Html.PartialAsync("_LocalDate", current.StartsAtUtc)</dd>
+                <dt>Expires</dt><dd>@await Html.PartialAsync("_LocalDate", current.EndsAtUtc)</dd>
+                <dt>Days remaining</dt><dd>@Math.Ceiling((current.EndsAtUtc - Model.Now).TotalDays)</dd>
+            </dl>
+        }
+        else
+        {
+            <p><strong>Basic</strong></p>
+            @if (Model.Latest?.EndsAtUtc <= Model.Now) { <p>Plus has expired.</p> }
+        }
+        <div class="membership-actions">
+            @if (Model.DemoEnabled && Model.Plus is not null)
+            {
+                <a href="/pricing.html?period=@(Model.Current?.BillingPeriod ?? Model.Latest?.BillingPeriod ?? Model.Period)" class="btn btn-primary">@(Model.Latest is null ? "Upgrade to Plus" : "Renew subscription")</a>
+            }
+            <a href="/pricing.html#compare-memberships" class="btn btn-outline">Compare memberships</a>
+        </div>
+    </section>
+    <section class="membership-card">
+        <h2>Expert credits</h2>
+        @if (Model.Credits is { } credits)
+        {
+            <p><span>Available credits</span> <strong>@credits.Remaining / @credits.Allocated</strong></p>
+            <meter class="membership-meter" min="0" max="@Math.Max(1, credits.Allocated)" value="@credits.Remaining" aria-label="Available credits"></meter>
+            var next = Model.Current!.EndsAtUtc > credits.EndsAtUtc ? credits.EndsAtUtc : Model.Future.FirstOrDefault()?.StartsAtUtc;
+            <dl class="membership-summary">
+                <dt>Credit period starts</dt><dd>@await Html.PartialAsync("_LocalDate", credits.StartsAtUtc)</dd>
+                <dt>Credit expiration</dt><dd>@await Html.PartialAsync("_LocalDate", credits.EndsAtUtc)</dd>
+                @if (next is DateTime date) { <dt>Next credit allocation</dt><dd>@await Html.PartialAsync("_LocalDate", date)</dd> }
+            </dl>
+        }
+        else { <p>No current credit allocation.</p> }
+        <p>Expert booking is planned.</p>
+    </section>
+</div>
+@if (Model.Future.Count > 0)
+{
+    <section class="membership-card membership-section"><h2>Upcoming paid renewals</h2>
+        <ul>@foreach (var future in Model.Future)
+        {
+            <li><span>@future.BillingPeriod</span> · @await Html.PartialAsync("_LocalDate", future.StartsAtUtc) – @await Html.PartialAsync("_LocalDate", future.EndsAtUtc)</li>
+        }</ul>
+    </section>
+}
+<section class="membership-card membership-section">
+    <h2>Subscription and payment history</h2>
+    @if (Model.History.Count == 0) { <p>No transactions yet.</p> }
+    else
+    {
+        <ul class="membership-transaction-list">
+        @foreach (var payment in Model.History)
+        {
+            <li>
+                <div class="membership-transaction-header"><strong>Plus · <span>@payment.Subscription.BillingPeriod</span></strong>
+                    <span class="membership-badge membership-status-@payment.Status.ToString().ToLowerInvariant()">@payment.Status</span></div>
+                <dl class="membership-summary">
+                    <dt>Total payment</dt><dd><bdi>@payment.Amount.ToString("0.00") @payment.Currency</bdi></dd>
+                    <dt>Transaction date</dt><dd>@await Html.PartialAsync("_LocalDate", payment.CreatedAtUtc)</dd>
+                    @if (payment.Status == PaymentStatus.Paid)
+                    {
+                        <dt>Access period</dt><dd>@await Html.PartialAsync("_LocalDate", payment.Subscription.StartsAtUtc) – @await Html.PartialAsync("_LocalDate", payment.Subscription.EndsAtUtc)</dd>
+                    }
+                </dl>
+                @if (payment.Provider == SkillsSwap.Services.SimulatedPaymentGateway.ProviderName)
+                {
+                    <a href="/subscription-payment.html?reference=@payment.ProviderReference">View simulated transaction</a>
+                }
+            </li>
+        }
+        </ul>
+    }
+</section>
+</main>
 @await Html.PartialAsync("_Footer2")
-<script src="js/animations.js"></script><script src="js/workflow-ui.js"></script><script src="js/subscription.js"></script><script src="js/site-ar.js"></script><script src="js/site-preferences.js"></script>
-<script src="js/icon-tones.js"></script>
-<script src="js/interface-polish.js"></script>
+<script src="/js/site-ar.js"></script>
+<script src="/js/membership-ar.js" asp-append-version="true"></script>
+<script src="/js/site-preferences.js"></script>
+<script src="/js/animations.js"></script>
+<script src="/js/icon-tones.js"></script>
+<script src="/js/membership-dates.js" asp-append-version="true"></script>

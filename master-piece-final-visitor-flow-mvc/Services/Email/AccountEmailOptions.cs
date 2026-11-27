@@ -4,6 +4,9 @@ public sealed class AccountEmailOptions
 {
     public const string SectionName = "AccountEmail";
     public bool EnableDevelopmentPreview { get; set; }
+
+    public static bool PreviewAllowed(IHostEnvironment environment, bool enabled) => environment.IsDevelopment() && enabled;
+    public string PublicBaseUrl { get; set; } = string.Empty;
     public string Host { get; set; } = string.Empty;
     public int Port { get; set; } = 587;
     public bool UseSsl { get; set; } = true;
